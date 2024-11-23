@@ -76,12 +76,14 @@ export default function App() {
             theme={{
               dark: theme === "dark",
               colors: {
-                primary: colors.primary,
                 background: colors.background,
-                card: colors.background,
                 text: colors.text,
                 border: colors.border,
-                notification: colors.primary,
+                icon: colors.icon,
+                link: colors.link,
+                notification: colors.text,
+                primary: colors.text,
+                card: colors.background,
               },
             }}
             fallback={<Text style={{ color: colors.text }}>Loading...</Text>}
