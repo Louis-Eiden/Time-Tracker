@@ -72,12 +72,24 @@ export const createHomeStyles = (colors: ReturnType<typeof getThemeColors>) =>
       alignItems: "center",
     },
     jobButton: {
-      borderColor: "#000000",
+      borderColor: colors.border,
       borderWidth: 2,
       borderRadius: 0,
       marginVertical: 5,
       height: 40,
       justifyContent: "center",
+    },
+    jobButtonText: {
+      color: colors.text,
+      fontSize: 28,
+      fontWeight: "500",
+    },
+    contextMenuButtons: {
+      backgroundColor: colors.background,
+      right: 0,
+      left: "auto",
+      position: "absolute",
+      color: colors.icon,
     },
     modalInput: {
       borderWidth: 2,
@@ -99,6 +111,7 @@ export const createHomeStyles = (colors: ReturnType<typeof getThemeColors>) =>
       right: 10,
       borderWidth: 2,
       borderRadius: 0,
+      borderColor: colors.border,
     },
     addButtonText: {
       color: colors.text,
@@ -173,13 +186,13 @@ export const createJobStyles = (colors: ReturnType<typeof getThemeColors>) =>
     timer: {
       fontSize: 56,
       textAlign: "center",
-      marginVertical: 40,
+      marginVertical: 20,
       fontWeight: "400",
       color: colors.text,
     },
     timeEntryList: {
       minHeight: 300,
-      maxHeight: 300,
+      maxHeight: 400,
       width: 300,
       borderWidth: 2,
       borderColor: colors.border,
@@ -199,6 +212,9 @@ export const createJobStyles = (colors: ReturnType<typeof getThemeColors>) =>
       justifyContent: "center",
       borderRadius: 0,
     },
+    buttonText: {
+      color: colors.text,
+    },
     timeEntry: {
       padding: 12,
       borderColor: colors.border,
@@ -211,7 +227,18 @@ export const createJobStyles = (colors: ReturnType<typeof getThemeColors>) =>
     },
     timeEntryText: {
       color: colors.text,
+      fontSize: 24,
+      fontWeight: "500",
     },
+
+    contextMenuButtons: {
+      backgroundColor: colors.background,
+      right: 0,
+      left: "auto",
+      position: "absolute",
+      color: colors.icon,
+    },
+
     printButton: {
       padding: 12,
       borderWidth: 2,
@@ -226,6 +253,8 @@ export const createJobStyles = (colors: ReturnType<typeof getThemeColors>) =>
     },
     printButtonText: {
       color: colors.text,
+      fontSize: 28,
+      fontWeight: "500",
     },
     backIcon: {
       color: colors.icon,

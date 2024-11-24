@@ -1,8 +1,15 @@
 import React, { useState, useEffect } from "react";
-import { StyleSheet, View, FlatList, TouchableOpacity } from "react-native";
+import {
+  View,
+  FlatList,
+  TouchableOpacity,
+  Animated,
+  Platform,
+} from "react-native";
+import { Swipeable } from "react-native-gesture-handler";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useTheme, getThemeColors } from "../contexts/ThemeContext";
-import { Text, Button, IconButton } from "react-native-paper";
+import { Text, Button, IconButton, Menu } from "react-native-paper";
 import { useNavigation, useRoute, RouteProp } from "@react-navigation/native";
 import { colors } from "../theme/colors";
 import { createJobStyles } from "../theme/styles";
@@ -16,6 +23,7 @@ export default function JobScreen() {
   const [isRunning, setIsRunning] = useState(false);
   const [time, setTime] = useState(0);
   const [timeEntries, setTimeEntries] = useState<TimeEntry[]>([]);
+  const [menuVisible, setMenuVisible] = useState<number | null>(null);
   const [startTime, setStartTime] = useState<number | null>(null);
   const navigation = useNavigation();
   const route =
@@ -145,20 +153,128 @@ export default function JobScreen() {
           style={styles.button}
           theme={{ colors: { outline: "#000000" } }}
         >
-          {isRunning ? "⏸" : "▶"}
+          <Text style={styles.buttonText}>{isRunning ? "⏸" : "▶"}</Text>
         </Button>
       </View>
 
       <View style={styles.timeEntryList}>
         <FlatList
           data={timeEntries}
-          renderItem={({ item }) => (
-            <Button style={styles.timeEntry}>
-              <Text style={styles.timeEntryText}>
-                {item.start} - {item.end}
-              </Text>
-            </Button>
-          )}
+          renderItem={({ item, index }) => {
+            const renderRightActions = (
+              progress: Animated.AnimatedInterpolation<number>,
+              dragX: Animated.AnimatedInterpolation<number>
+            ) => {
+              return (
+                <TouchableOpacity
+                  style={{
+                    backgroundColor: "red",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    width: 70,
+                  }}
+                  onPress={() => {
+                    const newTimeEntries = [...timeEntries];
+                    newTimeEntries.splice(index, 1);
+                    setTimeEntries(newTimeEntries);
+                    AsyncStorage.setItem(
+                      `${jobName}_timeEntries`,
+                      JSON.stringify(newTimeEntries)
+                    );
+                  }}
+                >
+                  <Text style={{ color: "white" }}>Delete</Text>
+                </TouchableOpacity>
+              );
+            };
+
+            const renderLeftActions = (
+              progress: Animated.AnimatedInterpolation<number>,
+              dragX: Animated.AnimatedInterpolation<number>
+            ) => {
+              return (
+                <TouchableOpacity
+                  style={{
+                    backgroundColor: "blue",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    width: 70,
+                  }}
+                  onPress={() => {
+                    // TODO: Implement edit functionality for time entries
+                    console.log("Edit time entry:", item);
+                  }}
+                >
+                  <Text style={{ color: "white" }}>Edit</Text>
+                </TouchableOpacity>
+              );
+            };
+
+            return (
+              <Swipeable
+                renderRightActions={renderRightActions}
+                renderLeftActions={renderLeftActions}
+              >
+                <Button style={[styles.timeEntry, { flex: 1 }]}>
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      width: "100%",
+                    }}
+                  >
+                    <Text
+                      style={[
+                        styles.timeEntryText,
+                        { flex: 1, paddingLeft: 10 },
+                      ]}
+                    >
+                      {item.start} - {item.end}
+                    </Text>
+                    {Platform.OS === "web" && (
+                      <Menu
+                        visible={menuVisible === index}
+                        onDismiss={() => setMenuVisible(null)}
+                        anchor={
+                          <IconButton
+                            style={styles.contextMenuButtons}
+                            icon="dots-vertical"
+                            size={20}
+                            onPress={(e) => {
+                              e.stopPropagation();
+                              setMenuVisible(index);
+                            }}
+                          />
+                        }
+                      >
+                        <Menu.Item
+                          onPress={() => {
+                            console.log("Edit time entry:", item);
+                            setMenuVisible(null);
+                          }}
+                          title="Edit"
+                        />
+                        <Menu.Item
+                          onPress={() => {
+                            const newTimeEntries = [...timeEntries];
+                            newTimeEntries.splice(index, 1);
+                            setTimeEntries(newTimeEntries);
+                            AsyncStorage.setItem(
+                              `${jobName}_timeEntries`,
+                              JSON.stringify(newTimeEntries)
+                            );
+                            setMenuVisible(null);
+                          }}
+                          title="Delete"
+                        />
+                      </Menu>
+                    )}
+                  </View>
+                </Button>
+              </Swipeable>
+            );
+          }}
           keyExtractor={(_, index) => index.toString()}
         />
 

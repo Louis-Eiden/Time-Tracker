@@ -1,13 +1,15 @@
 import React, { useState } from "react";
 import {
-  StyleSheet,
   View,
   FlatList,
   TouchableOpacity,
   Modal,
   TextInput,
+  Animated,
+  Platform,
 } from "react-native";
-import { Text, Button, IconButton } from "react-native-paper";
+import { Swipeable } from "react-native-gesture-handler";
+import { Text, Button, IconButton, Menu } from "react-native-paper";
 import { useNavigation } from "@react-navigation/native";
 import { useTheme, getThemeColors } from "../contexts/ThemeContext";
 import { createHomeStyles, createCommonStyles } from "../theme/styles";
@@ -16,6 +18,7 @@ export default function HomeScreen() {
   const [jobs, setJobs] = useState<string[]>(["Job 1", "Job 2"]);
   const [modalVisible, setModalVisible] = useState(false);
   const [newJobName, setNewJobName] = useState("");
+  const [menuVisible, setMenuVisible] = useState<number | null>(null);
   const navigation = useNavigation();
   const { theme } = useTheme();
   const colors = getThemeColors(theme);
@@ -30,8 +33,9 @@ export default function HomeScreen() {
     modalContent: {
       width: 400,
       padding: 20,
-      backgroundColor: "#fff",
-      borderWidth: 1,
+      backgroundColor: colors.background,
+      borderWidth: 2,
+      borderColor: colors.border,
     },
     modalTitle: {
       fontSize: 18,
@@ -86,32 +90,120 @@ export default function HomeScreen() {
         <View style={[styles.jobList, { borderColor: colors.border }]}>
           <FlatList
             data={jobs}
-            renderItem={({ item }) => (
-              <Button
-                mode="outlined"
-                onPress={() => navigation.navigate("Job", { jobName: item })}
-                style={styles.jobButton}
-                theme={{ colors: { outline: "#000000" } }}
-              >
-                <Text style={{ color: colors.text }}>{item}</Text>
-              </Button>
-            )}
+            renderItem={({ item, index }) => {
+              const renderRightActions = (
+                progress: Animated.AnimatedInterpolation<number>,
+                dragX: Animated.AnimatedInterpolation<number>
+              ) => {
+                return (
+                  <TouchableOpacity
+                    style={{
+                      backgroundColor: "red",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      width: 70,
+                    }}
+                    onPress={() => {
+                      setJobs(jobs.filter((_, i) => i !== index));
+                    }}
+                  >
+                    <Text style={{ color: "white" }}>Delete</Text>
+                  </TouchableOpacity>
+                );
+              };
+
+              const renderLeftActions = (
+                progress: Animated.AnimatedInterpolation<number>,
+                dragX: Animated.AnimatedInterpolation<number>
+              ) => {
+                return (
+                  <TouchableOpacity
+                    style={{
+                      backgroundColor: "blue",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      width: 70,
+                    }}
+                    onPress={() => {
+                      // TODO: Implement edit functionality
+                      console.log("Edit job:", item);
+                    }}
+                  >
+                    <Text style={{ color: "white" }}>Edit</Text>
+                  </TouchableOpacity>
+                );
+              };
+
+              return (
+                <Swipeable
+                  renderRightActions={renderRightActions}
+                  renderLeftActions={renderLeftActions}
+                >
+                  <Button
+                    mode="outlined"
+                    onPress={() =>
+                      navigation.navigate("Job", { jobName: item })
+                    }
+                    style={[styles.jobButton, { flex: 1 }]}
+                    theme={{ colors: { outline: "#000000" } }}
+                  >
+                    <View
+                      style={{
+                        flexDirection: "row",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        width: "100%",
+                        paddingLeft: 10,
+                      }}
+                    >
+                      <Text
+                        style={[
+                          styles.jobButtonText,
+                          { color: colors.text, flex: 1 },
+                        ]}
+                      >
+                        {item}
+                      </Text>
+                      {Platform.OS === "web" && (
+                        <Menu
+                          visible={menuVisible === index}
+                          onDismiss={() => setMenuVisible(null)}
+                          anchor={
+                            <IconButton
+                              style={styles.contextMenuButtons}
+                              icon="dots-vertical"
+                              size={20}
+                              onPress={(e) => {
+                                e.stopPropagation();
+                                setMenuVisible(index);
+                              }}
+                            />
+                          }
+                        >
+                          <Menu.Item
+                            onPress={() => {
+                              console.log("Edit job:", item);
+                              setMenuVisible(null);
+                            }}
+                            title="Edit"
+                          />
+                          <Menu.Item
+                            onPress={() => {
+                              setJobs(jobs.filter((_, i) => i !== index));
+                              setMenuVisible(null);
+                            }}
+                            title="Delete"
+                          />
+                        </Menu>
+                      )}
+                    </View>
+                  </Button>
+                </Swipeable>
+              );
+            }}
             keyExtractor={(item) => item}
           />
-          <Button
-            mode="outlined"
-            onPress={showModal}
-            style={[
-              styles.addButton,
-              {
-                borderColor: "#000000",
-                borderRadius: 0,
-                height: 40,
-                marginTop: 10,
-              },
-            ]}
-            theme={{ colors: { outline: "#000000" } }}
-          >
+          <Button mode="outlined" onPress={showModal} style={styles.addButton}>
             <Text style={styles.addButtonText}>+</Text>
           </Button>
         </View>

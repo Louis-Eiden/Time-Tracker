@@ -187,3 +187,54 @@
 
 # 2024-11-23 18:43:10.659001
 +ok make the text that you made bold to its state before pls
+
+# 2024-11-23 21:29:03.904782
++n
+
+# 2024-11-23 21:29:58.880855
++/ask why does the app on my android phone wont start when starting using bun run android.
+
+# 2024-11-23 21:30:15.213795
++n
+
+# 2024-11-23 21:30:25.193383
++/add package.json
+
+# 2024-11-23 21:30:34.924135
++/ask why does the app on my android phone wont start when starting using bun run android.
+
+# 2024-11-24 11:35:23.298265
++n
+
+# 2024-11-24 15:07:10.216488
++/add components/HomeScreen.tsx components/JobScreen.tsx add a delete slide functionality left swipe reveals the delete button on the right of each jobentry and each timeentry
+
+# 2024-11-24 15:07:23.544946
++n
+
+# 2024-11-24 15:07:50.244054
++add a delete slide functionality left swipe reveals the delete button on the right of each jobentry and each timeentry
+
+# 2024-11-24 15:08:21.443698
++y
+
+# 2024-11-24 15:08:21.447205
++/run bun add react-native-gesture-handler
+
+# 2024-11-24 15:08:21.448594
++/run bun add react-native-gesture-handler
+
+# 2024-11-24 15:08:46.062593
++y
+
+# 2024-11-24 15:10:14.287772
++Cool now make it when you slide to the right a edit icon shows up on the left side.
+
+# 2024-11-24 15:13:06.674833
++cool thats nearly perfectI will come back to that later can you pls add a context menu with three dots icon to each jobentry and each timeentry containing a edit and a delete button. IMPORTANT the context menu should only be visible on desktop devices on all mobile or touch devices the slide functionality should stay like it is. do not mess with the slide left slide right functionality pls!
+
+# 2024-11-24 15:14:10.232291
++make the context menu buttons inside the jobbuttons and timeentries
+
+# 2024-11-24 15:15:47.802879
++oh dont change the padding of the buttons and pls keep the context menu buttons on the right
