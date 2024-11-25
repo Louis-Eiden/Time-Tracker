@@ -4,8 +4,8 @@ import {
   FlatList,
   TouchableOpacity,
   Animated,
-  Platform,
 } from "react-native";
+import { isMobileOrTablet } from "../utils/platform";
 import { Swipeable } from "react-native-gesture-handler";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useTheme, getThemeColors } from "../contexts/ThemeContext";
@@ -17,13 +17,21 @@ import { createJobStyles } from "../theme/styles";
 interface TimeEntry {
   start: string;
   end: string;
+  id: string;
+}
+
+interface DayEntry {
+  date: string;
+  timeEntries: TimeEntry[];
 }
 
 export default function JobScreen() {
   const [isRunning, setIsRunning] = useState(false);
   const [time, setTime] = useState(0);
-  const [timeEntries, setTimeEntries] = useState<TimeEntry[]>([]);
+  const [days, setDays] = useState<DayEntry[]>([]);
+  const [selectedDay, setSelectedDay] = useState<string | null>(null);
   const [menuVisible, setMenuVisible] = useState<number | null>(null);
+  const [viewMode, setViewMode] = useState<"days" | "entries">("days");
   const [startTime, setStartTime] = useState<number | null>(null);
   const navigation = useNavigation();
   const route =
@@ -43,9 +51,7 @@ export default function JobScreen() {
         const savedIsRunning = await AsyncStorage.getItem(
           `${jobName}_isRunning`
         );
-        const savedTimeEntries = await AsyncStorage.getItem(
-          `${jobName}_timeEntries`
-        );
+        const savedDays = await AsyncStorage.getItem(`${jobName}_days`);
 
         if (savedStartTime && savedIsRunning === "true") {
           const startTimeNum = parseInt(savedStartTime);
@@ -55,8 +61,8 @@ export default function JobScreen() {
           setTime(elapsedSeconds);
         }
 
-        if (savedTimeEntries) {
-          setTimeEntries(JSON.parse(savedTimeEntries));
+        if (savedDays) {
+          setDays(JSON.parse(savedDays));
         }
       } catch (error) {
         console.error("Error loading saved state:", error);
@@ -93,20 +99,34 @@ export default function JobScreen() {
   const handleStartStop = async () => {
     if (isRunning) {
       // Stopping the timer
+      const currentDate = new Date().toISOString().split("T")[0];
       const newEntry = {
+        id: Date.now().toString(),
         start: new Date(startTime!).toLocaleTimeString(),
         end: new Date().toLocaleTimeString(),
       };
-      const newTimeEntries = [...timeEntries, newEntry];
-      setTimeEntries(newTimeEntries);
+
+      const updatedDays = [...days];
+      const dayIndex = updatedDays.findIndex((day) => day.date === currentDate);
+
+      if (dayIndex >= 0) {
+        updatedDays[dayIndex].timeEntries.push(newEntry);
+      } else {
+        updatedDays.push({
+          date: currentDate,
+          timeEntries: [newEntry],
+        });
+      }
+
+      setDays(updatedDays);
       setTime(0);
       setStartTime(null);
 
       // Save state
       await AsyncStorage.setItem(`${jobName}_isRunning`, "false");
       await AsyncStorage.setItem(
-        `${jobName}_timeEntries`,
-        JSON.stringify(newTimeEntries)
+        `${jobName}_days`,
+        JSON.stringify(updatedDays)
       );
       await AsyncStorage.removeItem(`${jobName}_startTime`);
     } else {
@@ -158,9 +178,108 @@ export default function JobScreen() {
       </View>
 
       <View style={styles.timeEntryList}>
+        {viewMode === "entries" && (
+          <Button
+            style={styles.backButton}
+            onPress={() => {
+              setViewMode("days");
+              setSelectedDay(null);
+            }}
+          >
+            <Text style={styles.backButtonText}>← Back to Days</Text>
+          </Button>
+        )}
         <FlatList
-          data={timeEntries}
+          data={
+            viewMode === "days"
+              ? days
+              : days.find((d) => d.date === selectedDay)?.timeEntries || []
+          }
           renderItem={({ item, index }) => {
+            if (viewMode === "days") {
+              const renderDayRightActions = (
+                progress: Animated.AnimatedInterpolation<number>,
+                dragX: Animated.AnimatedInterpolation<number>
+              ) => {
+                return (
+                  <TouchableOpacity
+                    style={{
+                      backgroundColor: "red",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      width: 70,
+                    }}
+                    onPress={() => {
+                      const updatedDays = days.filter(d => d.date !== item.date);
+                      setDays(updatedDays);
+                      AsyncStorage.setItem(`${jobName}_days`, JSON.stringify(updatedDays));
+                    }}
+                  >
+                    <Text style={{ color: "white" }}>Delete</Text>
+                  </TouchableOpacity>
+                );
+              };
+
+              return (
+                <Swipeable renderRightActions={renderDayRightActions}>
+                  <Button
+                    mode="outlined"
+                    onPress={() => {
+                      setSelectedDay(item.date);
+                      setViewMode("entries");
+                    }}
+                    style={[styles.timeEntry, { flex: 1 }]}
+                  >
+                    <View
+                      style={{
+                        flexDirection: "row",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        width: "100%",
+                      }}
+                    >
+                      <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center' }}>
+                        <Text
+                          style={[
+                            styles.timeEntryText,
+                            { flex: 1, paddingLeft: 10 },
+                          ]}
+                        >
+                          {new Date(item.date).toLocaleDateString()} (
+                          {item.timeEntries.length} entries)
+                        </Text>
+                        {!isMobileOrTablet() && (
+                          <Menu
+                            visible={menuVisible === index}
+                            onDismiss={() => setMenuVisible(null)}
+                            anchor={
+                              <IconButton
+                                icon="dots-vertical"
+                                size={20}
+                                onPress={(e) => {
+                                  e.stopPropagation();
+                                  setMenuVisible(index);
+                                }}
+                              />
+                            }
+                          >
+                            <Menu.Item
+                              onPress={() => {
+                                const updatedDays = days.filter(d => d.date !== item.date);
+                                setDays(updatedDays);
+                                AsyncStorage.setItem(`${jobName}_days`, JSON.stringify(updatedDays));
+                                setMenuVisible(null);
+                              }}
+                              title="Delete"
+                            />
+                          </Menu>
+                        )}
+                      </View>
+                    </View>
+                  </Button>
+                </Swipeable>
+              );
+            }
             const renderRightActions = (
               progress: Animated.AnimatedInterpolation<number>,
               dragX: Animated.AnimatedInterpolation<number>
@@ -174,13 +293,16 @@ export default function JobScreen() {
                     width: 70,
                   }}
                   onPress={() => {
-                    const newTimeEntries = [...timeEntries];
-                    newTimeEntries.splice(index, 1);
-                    setTimeEntries(newTimeEntries);
-                    AsyncStorage.setItem(
-                      `${jobName}_timeEntries`,
-                      JSON.stringify(newTimeEntries)
-                    );
+                    const updatedDays = [...days];
+                    const dayIndex = updatedDays.findIndex(d => d.date === selectedDay);
+                    if (dayIndex !== -1) {
+                      updatedDays[dayIndex].timeEntries = updatedDays[dayIndex].timeEntries.filter((_, i) => i !== index);
+                      if (updatedDays[dayIndex].timeEntries.length === 0) {
+                        updatedDays.splice(dayIndex, 1);
+                      }
+                      setDays(updatedDays);
+                      AsyncStorage.setItem(`${jobName}_days`, JSON.stringify(updatedDays));
+                    }
                   }}
                 >
                   <Text style={{ color: "white" }}>Delete</Text>
@@ -232,7 +354,7 @@ export default function JobScreen() {
                     >
                       {item.start} - {item.end}
                     </Text>
-                    {Platform.OS === "web" && (
+                    {!isMobileOrTablet() && (
                       <Menu
                         visible={menuVisible === index}
                         onDismiss={() => setMenuVisible(null)}
@@ -257,13 +379,16 @@ export default function JobScreen() {
                         />
                         <Menu.Item
                           onPress={() => {
-                            const newTimeEntries = [...timeEntries];
-                            newTimeEntries.splice(index, 1);
-                            setTimeEntries(newTimeEntries);
-                            AsyncStorage.setItem(
-                              `${jobName}_timeEntries`,
-                              JSON.stringify(newTimeEntries)
-                            );
+                            const updatedDays = [...days];
+                            const dayIndex = updatedDays.findIndex(d => d.date === selectedDay);
+                            if (dayIndex !== -1) {
+                              updatedDays[dayIndex].timeEntries = updatedDays[dayIndex].timeEntries.filter((_, i) => i !== index);
+                              if (updatedDays[dayIndex].timeEntries.length === 0) {
+                                updatedDays.splice(dayIndex, 1);
+                              }
+                              setDays(updatedDays);
+                              AsyncStorage.setItem(`${jobName}_days`, JSON.stringify(updatedDays));
+                            }
                             setMenuVisible(null);
                           }}
                           title="Delete"

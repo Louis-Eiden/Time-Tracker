@@ -238,3 +238,135 @@
 
 # 2024-11-24 15:15:47.802879
 +oh dont change the padding of the buttons and pls keep the context menu buttons on the right
+
+# 2024-11-24 15:34:27.515428
++cool I made some changes pls review and then make it so there is a second list for each day. so when a user creates a job and then starts to take time for the first time as soon as he stops a timeentry and also a day is created that means that the default list on the JobScreen shows the DayList when a user clicks on a day the list for this specific day is shown in place of the dayslist each day can have multiple timeentry.
+
+# 2024-11-24 15:47:54.966565
++Delete is not working for timeentries anymore and also add the delete edit slide and context menu to the day list. for the joblist everything is working fine
+
+# 2024-11-24 15:49:49.439755
++ok pls fix the context menu button. now it looks messed up and pushes the jobbutton text away
+
+# 2024-11-24 15:52:11.811668
++there is a syntax error in HomeScreen
+
+# 2024-11-24 15:53:42.014139
++Web Bundling failed 1074ms index.ts (576 modules)
++ ERROR  SyntaxError: /home/louis/Documents/Programming/TimeTracker/components/JobScreen.tsx: Expected corresponding JSX closing tag for <View>. (278:18)
++
++  276 |                       )}
++  277 |                     </View>
++> 278 |                   </Button>
++      |                   ^
++  279 |                 </Swipeable>
++  280 |               );
++  281 |             }
++› Open in the web browser...
++› Press ? │ show all commands
++Web Bundling failed 714ms index.ts (598 modules)
++ ERROR  SyntaxError: /home/louis/Documents/Programming/TimeTracker/components/HomeScreen.tsx: Expected corresponding JSX closing tag for <View>. (214:24)
++
++  212 |                             title="Delete"
++  213 |                           />
++> 214 |                         </Menu>
++      |                         ^
++  215 |                       )}
++  216 |                     </View>
++  217 |                   </Button>
+
+# 2024-11-24 15:53:47.007177
++y
+
+# 2024-11-24 15:55:13.987839
++Web Bundling failed 945ms index.ts (542 modules)
++ ERROR  SyntaxError: /home/louis/Documents/Programming/TimeTracker/components/JobScreen.tsx: Expected corresponding JSX closing tag for <View>. (278:18)
++
++  276 |                         )}
++  277 |                       </View>
++> 278 |                   </Button>
++      |                   ^
++  279 |                 </Swipeable>
++  280 |               );
++  281 |             }
+
+# 2024-11-24 16:11:10.879963
++/ask how do you check if its a mobile or touch device so you dont show the context menu button in those devices just the slide options
+
+# 2024-11-24 16:14:41.826381
++also check the /add theme/styles.ts with all the styling for all screens
+
+# 2024-11-24 16:14:43.928678
++y
+
+# 2024-11-24 16:16:00.995649
++Something went wrong. is what i see in the browser
+
+# 2024-11-24 16:17:18.893727
++mh i still see "Something went wring." in the browser
+
+# 2024-11-24 16:18:41.045387
++same error still
+
+# 2024-11-25 15:53:16.393345
++n
+
+# 2024-11-25 15:57:12.154007
++/add components/HomeScreen.tsx components/JobScreen.tsx pls make the settingsbutton theme/styles.ts
+
+# 2024-11-25 15:59:41.718651
++n
+
+# 2024-11-25 16:11:43.716977
++i still have issues with the iconButton dots-vertical or contextMenuButton which is sitting in the buttonContent View together with the jobButtonText. Now want the `jobButtonText` to be centered in the JobButton and the contextMenuButton should be on the right side of the JobButton the buttonContent should be as big as the Jobbutton.
+
+# 2024-11-25 16:22:21.612722
++review your last change there seems to be a syntax error in homescreen
+
+# 2024-11-25 16:23:47.911170
++Web Bundling failed 27ms index.ts (1 module)
++ ERROR  SyntaxError: /home/louis/Documents/Programming/TimeTracker/components/HomeScreen.tsx: Expected corresponding JSX closing tag for <View>. (218:18)
++
++  216 |                         )}
++  217 |                       </View>
++> 218 |                   </Button>
++      |                   ^
++  219 |                 </Swipeable>
++  220 |               );
++  221 |             }}
+
+# 2024-11-25 16:23:50.782350
++y
+
+# 2024-11-25 18:01:30.530220
++/add assets/button.png
+
+# 2024-11-25 18:02:11.709761
++why is it so hard to arrange the context menu and the job title in the job button like in the button.png ?
+
+# 2024-11-25 18:02:58.086217
++Web Bundling failed 59ms index.ts (1 module)
++ ERROR  SyntaxError: /home/louis/Documents/Programming/TimeTracker/components/HomeScreen.tsx: Expected corresponding JSX closing tag for <View>. (203:18)
++
++  201 |                     )}
++  202 |                     {/* </View> */}
++> 203 |                   </Button>
++      |                   ^
++  204 |                 </Swipeable>
++  205 |               );
++  206 |             }}
+
+# 2024-11-25 18:05:11.263848
++/add assets/Screenshot from 2024-11-25 18-04-04.png
+
+# 2024-11-25 18:05:15.041915
++n
+
+# 2024-11-25 18:05:48.688768
++/add assets/currentbutton.png
+
+# 2024-11-25 18:07:19.108702
++/ask when you look at currentbutton.png you see how the button looks currently, not like the button.png with my desired design. pls confirm that you understand what I want first.
+
+# 2024-11-25 18:07:59.830649
++yes pleas

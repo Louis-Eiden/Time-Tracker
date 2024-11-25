@@ -1,4 +1,5 @@
 import { StyleSheet } from "react-native";
+import { isMobileOrTablet } from "../utils/platform";
 import { getThemeColors } from "../contexts/ThemeContext";
 
 // Common styles that can be reused across components
@@ -64,12 +65,12 @@ export const createHomeStyles = (colors: ReturnType<typeof getThemeColors>) =>
       padding: 10,
     },
     jobItem: {
-      padding: 12,
+      // padding: 12,
       borderWidth: 2,
       marginBottom: 10,
       height: 45,
-      justifyContent: "center",
-      alignItems: "center",
+      // justifyContent: "center",
+      // alignItems: "center",
     },
     jobButton: {
       borderColor: colors.border,
@@ -77,33 +78,46 @@ export const createHomeStyles = (colors: ReturnType<typeof getThemeColors>) =>
       borderRadius: 0,
       marginVertical: 5,
       height: 40,
-      justifyContent: "center",
+      width: 276,
+      backgroundColor: "#D3D3D3",
+      elevation: 2,
+      shadowColor: "#000",
+      shadowOffset: { width: 0, height: 1 },
+      shadowOpacity: 0.2,
+      shadowRadius: 1,
+    },
+    buttonContent: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      paddingLeft: 16,
+      paddingRight: 0,
+      flex: 1,
     },
     jobButtonText: {
       color: colors.text,
-      fontSize: 28,
+      fontSize: 20,
       fontWeight: "500",
+      // textAlign: "left",
     },
     contextMenuButtons: {
-      backgroundColor: colors.background,
-      right: 0,
-      left: "auto",
-      position: "absolute",
-      color: colors.icon,
-    },
-    modalInput: {
-      borderWidth: 2,
-      borderColor: colors.border,
-      borderRadius: 0,
-      padding: 10,
-      marginBottom: 15,
+      // Reset all styles
+      backgroundColor: "transparent",
+      borderWidth: 0,
+      padding: 0,
+      margin: 0,
+      // Styles for the icon
+      color: colors.text,
+      display: !isMobileOrTablet() ? "flex" : "none",
+      width: 40,
       height: 40,
+      alignItems: "center",
+      justifyContent: "center",
     },
-    modalActionButton: {
-      borderColor: "#000000",
-      borderRadius: 0,
-      backgroundColor: "#D3D3D3",
+    swipeableContainer: {
+      display: isMobileOrTablet() ? "flex" : "none",
     },
+
     addButton: {
       position: "absolute",
       bottom: 20,
@@ -190,6 +204,19 @@ export const createJobStyles = (colors: ReturnType<typeof getThemeColors>) =>
       fontWeight: "400",
       color: colors.text,
     },
+    backButton: {
+      marginBottom: 10,
+      borderWidth: 2,
+      borderColor: colors.border,
+      borderRadius: 0,
+      padding: 12,
+      height: 45,
+      justifyContent: "center",
+      alignItems: "center",
+    },
+    backButtonText: {
+      color: colors.text,
+    },
     timeEntryList: {
       minHeight: 300,
       maxHeight: 400,
@@ -208,7 +235,6 @@ export const createJobStyles = (colors: ReturnType<typeof getThemeColors>) =>
       width: 100,
       height: 100,
       alignSelf: "center",
-      marginBottom: 40,
       justifyContent: "center",
       borderRadius: 0,
     },
@@ -227,16 +253,19 @@ export const createJobStyles = (colors: ReturnType<typeof getThemeColors>) =>
     },
     timeEntryText: {
       color: colors.text,
-      fontSize: 24,
+      fontSize: 18,
       fontWeight: "500",
     },
 
     contextMenuButtons: {
       backgroundColor: colors.background,
       right: 0,
-      left: "auto",
       position: "absolute",
       color: colors.icon,
+      display: !isMobileOrTablet() ? "flex" : "none",
+    },
+    swipeableContainer: {
+      display: isMobileOrTablet() ? "flex" : "none",
     },
 
     printButton: {

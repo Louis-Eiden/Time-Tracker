@@ -6,8 +6,8 @@ import {
   Modal,
   TextInput,
   Animated,
-  Platform,
 } from "react-native";
+import { isMobileOrTablet } from "../utils/platform";
 import { Swipeable } from "react-native-gesture-handler";
 import { Text, Button, IconButton, Menu } from "react-native-paper";
 import { useNavigation } from "@react-navigation/native";
@@ -31,7 +31,10 @@ export default function HomeScreen() {
       backgroundColor: "rgba(0, 0, 0, 0.5)",
     },
     modalContent: {
-      width: 400,
+      flex: 1,
+      width: "100%",
+      justifyContent: "center",
+      alignItems: "center",
       padding: 20,
       backgroundColor: colors.background,
       borderWidth: 2,
@@ -51,6 +54,7 @@ export default function HomeScreen() {
     modalButtons: {
       flexDirection: "row",
       justifyContent: "space-between",
+      width: "100%",
     },
     modalButton: {
       flex: 1,
@@ -58,6 +62,20 @@ export default function HomeScreen() {
       borderRadius: 0,
       borderColor: colors.border,
       borderWidth: 2,
+    },
+    modalInput: {
+      borderWidth: 2,
+      borderColor: colors.border,
+      borderRadius: 0,
+      padding: 10,
+      marginBottom: 15,
+      height: 40,
+      width: "100%",
+    },
+    modalActionButton: {
+      borderColor: "#000000",
+      borderRadius: 0,
+      backgroundColor: "#D3D3D3",
     },
   };
 
@@ -141,38 +159,23 @@ export default function HomeScreen() {
                 >
                   <Button
                     mode="outlined"
-                    onPress={() =>
-                      navigation.navigate("Job", { jobName: item })
-                    }
-                    style={[styles.jobButton, { flex: 1 }]}
+                    onPress={() => navigation.navigate("Job", { jobName: item })}
+                    style={styles.jobButton}
                     theme={{ colors: { outline: "#000000" } }}
                   >
-                    <View
-                      style={{
-                        flexDirection: "row",
-                        alignItems: "center",
-                        justifyContent: "space-between",
-                        width: "100%",
-                        paddingLeft: 10,
-                      }}
-                    >
-                      <Text
-                        style={[
-                          styles.jobButtonText,
-                          { color: colors.text, flex: 1 },
-                        ]}
-                      >
+                    <View style={styles.buttonContent}>
+                      <Text style={[styles.jobButtonText, { color: colors.text }]}>
                         {item}
                       </Text>
-                      {Platform.OS === "web" && (
+                      {!isMobileOrTablet() && (
                         <Menu
                           visible={menuVisible === index}
                           onDismiss={() => setMenuVisible(null)}
                           anchor={
                             <IconButton
-                              style={styles.contextMenuButtons}
                               icon="dots-vertical"
-                              size={20}
+                              size={24}
+                              style={styles.contextMenuButtons}
                               onPress={(e) => {
                                 e.stopPropagation();
                                 setMenuVisible(index);
