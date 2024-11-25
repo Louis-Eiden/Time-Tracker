@@ -174,7 +174,7 @@ export default function HomeScreen() {
                           anchor={
                             <IconButton
                               icon="dots-vertical"
-                              size={24}
+                              size={20}
                               style={styles.contextMenuButtons}
                               onPress={(e) => {
                                 e.stopPropagation();
