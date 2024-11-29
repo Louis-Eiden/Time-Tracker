@@ -1,10 +1,14 @@
 import React, { useState, useEffect } from "react";
+import ListItemModal from "./ListItemModal";
 import {
   View,
   FlatList,
   TouchableOpacity,
   Animated,
+  Platform,
+  Share,
 } from "react-native";
+import RNHTMLtoPDF from "react-native-html-to-pdf";
 import { isMobileOrTablet } from "../utils/platform";
 import { Swipeable } from "react-native-gesture-handler";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -32,6 +36,13 @@ export default function JobScreen() {
   const [selectedDay, setSelectedDay] = useState<string | null>(null);
   const [menuVisible, setMenuVisible] = useState<number | null>(null);
   const [viewMode, setViewMode] = useState<"days" | "entries">("days");
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [modalMode, setModalMode] = useState<"add" | "edit">("add");
+  const [editingEntryIndex, setEditingEntryIndex] = useState<number | null>(
+    null
+  );
+  const [startTimeInput, setStartTimeInput] = useState("");
+  const [endTimeInput, setEndTimeInput] = useState("");
   const [startTime, setStartTime] = useState<number | null>(null);
   const navigation = useNavigation();
   const route =
@@ -141,9 +152,181 @@ export default function JobScreen() {
     setIsRunning(!isRunning);
   };
 
-  const handlePrint = () => {
-    // TODO: Implement PDF generation and printing
-    console.log("Print time entries");
+  const handlePrint = async () => {
+    try {
+      // Generate HTML content for the timesheet
+      const htmlContent = `
+        <!DOCTYPE html>
+        <html>
+          <head>
+            <style>
+              body { 
+                font-family: Arial, sans-serif; 
+                margin: 0;
+                padding: 20px;
+                color: #333;
+              }
+              table { 
+                width: 100%; 
+                border-collapse: collapse; 
+                margin-bottom: 30px;
+              }
+              th { 
+                padding: 12px 8px;
+                text-align: left;
+                font-weight: bold;
+                border-bottom: 2px solid #ddd;
+              }
+              td { 
+                padding: 8px;
+                text-align: left;
+              }
+              .header { 
+                text-align: center; 
+                margin-bottom: 40px;
+                padding-bottom: 20px;
+                border-bottom: 2px solid #ddd;
+              }
+              .day-total { 
+                font-weight: bold;
+              }
+              .week-section {
+                margin-bottom: 40px;
+                padding-bottom: 20px;
+                border-bottom: 2px solid #ddd;
+              }
+              .week-total {
+                margin-top: 20px;
+                padding-top: 10px;
+                border-top: 1px solid #ddd;
+                text-align: right;
+                font-size: 1.1em;
+              }
+              h3 { 
+                color: #444;
+                margin-top: 30px;
+                padding-bottom: 10px;
+                border-bottom: 1px solid #eee;
+              }
+            </style>
+          </head>
+          <body>
+            <div class="header">
+              <h1>Time Sheet</h1>
+              <h2>${jobName}</h2>
+              <p>Generated on ${new Date().toLocaleDateString()}</p>
+            </div>
+            ${(() => {
+              // Group days by week
+              const weekMap = new Map();
+              days.forEach((day) => {
+                const date = new Date(day.date);
+                const weekStart = new Date(date);
+                weekStart.setDate(date.getDate() - date.getDay()); // Start of week (Sunday)
+                const weekKey = weekStart.toISOString().split("T")[0];
+
+                if (!weekMap.has(weekKey)) {
+                  weekMap.set(weekKey, []);
+                }
+                weekMap.get(weekKey).push(day);
+              });
+
+              // Sort weeks and render
+              return Array.from(weekMap.entries())
+                .map(([weekStart, weekDays]) => {
+                  let weekTotalMinutes = 0;
+
+                  const daysHtml = weekDays
+                    .map((day) => {
+                      let dayTotalMinutes = 0;
+                      const entriesWithDuration = day.timeEntries.map(
+                        (entry) => {
+                          const start = new Date(`1970/01/01 ${entry.start}`);
+                          const end = new Date(`1970/01/01 ${entry.end}`);
+                          const durationMinutes =
+                            (end.getTime() - start.getTime()) / 60000;
+                          dayTotalMinutes += durationMinutes;
+                          return {
+                            ...entry,
+                            duration: `${Math.floor(
+                              durationMinutes / 60
+                            )}h ${Math.round(durationMinutes % 60)}m`,
+                          };
+                        }
+                      );
+
+                      weekTotalMinutes += dayTotalMinutes;
+
+                      return `
+                      <h3>Date: ${new Date(day.date).toLocaleDateString()}</h3>
+                      <table>
+                        <tr>
+                          <th>Start Time</th>
+                          <th>End Time</th>
+                          <th>Duration</th>
+                          <th>Notes</th>
+                        </tr>
+                        ${entriesWithDuration
+                          .map(
+                            (entry) => `
+                          <tr>
+                            <td>${entry.start}</td>
+                            <td>${entry.end}</td>
+                            <td>${entry.duration}</td>
+                            <td></td>
+                          </tr>
+                        `
+                          )
+                          .join("")}
+                        <tr class="day-total">
+                          <td colspan="2">Day Total:</td>
+                          <td>${Math.floor(dayTotalMinutes / 60)}h ${Math.round(
+                        dayTotalMinutes % 60
+                      )}m</td>
+                          <td></td>
+                        </tr>
+                      </table>
+                    `;
+                    })
+                    .join("");
+
+                  const weekStartDate = new Date(weekStart);
+                  const weekEndDate = new Date(weekStart);
+                  weekEndDate.setDate(weekEndDate.getDate() + 6);
+
+                  return `
+                    <div class="week-section">
+                      <h2>Week of ${weekStartDate.toLocaleDateString()} - ${weekEndDate.toLocaleDateString()}</h2>
+                      ${daysHtml}
+                      <div class="week-total">
+                        <strong>Week Total: ${Math.floor(
+                          weekTotalMinutes / 60
+                        )}h ${Math.round(weekTotalMinutes % 60)}m</strong>
+                      </div>
+                    </div>
+                  `;
+                })
+                .join("");
+            })()}
+          </body>
+        </html>
+      `;
+
+      // Create a Blob from the HTML content
+      const blob = new Blob([htmlContent], { type: "text/html" });
+
+      // Create a URL for the Blob
+      const url = URL.createObjectURL(blob);
+
+      // Open the URL in a new window/tab
+      window.open(url, "_blank");
+
+      // Clean up by revoking the URL after a delay
+      setTimeout(() => URL.revokeObjectURL(url), 100);
+    } catch (error) {
+      console.error("Error generating timesheet:", error);
+      alert("Failed to generate timesheet: " + error.message);
+    }
   };
 
   return (
@@ -153,6 +336,7 @@ export default function JobScreen() {
           icon="arrow-left"
           onPress={() => navigation.goBack()}
           iconColor={colors.icon}
+          style={{ elevation: 0 }}
           animated={false}
         />
         <Text style={styles.title}>{jobName}</Text>
@@ -160,6 +344,7 @@ export default function JobScreen() {
           icon="cog"
           onPress={() => navigation.navigate("Settings")}
           iconColor={colors.icon}
+          style={{ elevation: 0 }}
           animated={false}
         />
       </View>
@@ -172,12 +357,70 @@ export default function JobScreen() {
           onPress={handleStartStop}
           style={styles.button}
           theme={{ colors: { outline: "#000000" } }}
+          rippleColor="transparent"
         >
           <Text style={styles.buttonText}>{isRunning ? "⏸" : "▶"}</Text>
         </Button>
       </View>
 
+      <ListItemModal
+        visible={isModalVisible}
+        onClose={() => {
+          setIsModalVisible(false);
+          setStartTimeInput("");
+          setEndTimeInput("");
+          setEditingEntryIndex(null);
+        }}
+        onConfirm={(_, startTime, endTime) => {
+          if (startTime && endTime) {
+            const updatedDays = [...days];
+            const dayIndex = updatedDays.findIndex(
+              (d) => d.date === selectedDay
+            );
+
+            if (
+              modalMode === "edit" &&
+              editingEntryIndex !== null &&
+              dayIndex !== -1
+            ) {
+              updatedDays[dayIndex].timeEntries[editingEntryIndex] = {
+                ...updatedDays[dayIndex].timeEntries[editingEntryIndex],
+                start: startTime,
+                end: endTime,
+              };
+            }
+
+            setDays(updatedDays);
+            AsyncStorage.setItem(
+              `${jobName}_days`,
+              JSON.stringify(updatedDays)
+            );
+            setIsModalVisible(false);
+            setStartTimeInput("");
+            setEndTimeInput("");
+            setEditingEntryIndex(null);
+          }
+        }}
+        title={modalMode === "add" ? "Add Time Entry" : "Edit Time Entry"}
+        inputValue=""
+        onInputChange={() => {}}
+        isTimeEntry={true}
+        startTime={startTimeInput}
+        endTime={endTimeInput}
+        onStartTimeChange={setStartTimeInput}
+        onEndTimeChange={setEndTimeInput}
+      />
+
       <View style={styles.timeEntryList}>
+        {viewMode === "days" && (
+          <Button
+            style={styles.backToJobsButton}
+            onPress={() => navigation.goBack()}
+            rippleColor="transparent"
+          >
+            <Text style={styles.backButtonText}>← Back to Jobs</Text>
+          </Button>
+        )}
         {viewMode === "entries" && (
           <Button
             style={styles.backButton}
@@ -185,6 +428,7 @@ export default function JobScreen() {
               setViewMode("days");
               setSelectedDay(null);
             }}
+            rippleColor="transparent"
           >
             <Text style={styles.backButtonText}>← Back to Days</Text>
           </Button>
@@ -207,12 +451,17 @@ export default function JobScreen() {
                       backgroundColor: "red",
                       justifyContent: "center",
                       alignItems: "center",
-                      width: 70,
+                      width: 60,
                     }}
                     onPress={() => {
-                      const updatedDays = days.filter(d => d.date !== item.date);
+                      const updatedDays = days.filter(
+                        (d) => d.date !== item.date
+                      );
                       setDays(updatedDays);
-                      AsyncStorage.setItem(`${jobName}_days`, JSON.stringify(updatedDays));
+                      AsyncStorage.setItem(
+                        `${jobName}_days`,
+                        JSON.stringify(updatedDays)
+                      );
                     }}
                   >
                     <Text style={{ color: "white" }}>Delete</Text>
@@ -228,53 +477,46 @@ export default function JobScreen() {
                       setSelectedDay(item.date);
                       setViewMode("entries");
                     }}
-                    style={[styles.timeEntry, { flex: 1 }]}
+                    style={styles.timeEntry}
                   >
-                    <View
-                      style={{
-                        flexDirection: "row",
-                        alignItems: "center",
-                        justifyContent: "space-between",
-                        width: "100%",
-                      }}
-                    >
-                      <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center' }}>
-                        <Text
-                          style={[
-                            styles.timeEntryText,
-                            { flex: 1, paddingLeft: 10 },
-                          ]}
-                        >
-                          {new Date(item.date).toLocaleDateString()} (
-                          {item.timeEntries.length} entries)
-                        </Text>
-                        {!isMobileOrTablet() && (
-                          <Menu
-                            visible={menuVisible === index}
-                            onDismiss={() => setMenuVisible(null)}
-                            anchor={
-                              <IconButton
-                                icon="dots-vertical"
-                                size={20}
-                                onPress={(e) => {
-                                  e.stopPropagation();
-                                  setMenuVisible(index);
-                                }}
-                              />
-                            }
-                          >
-                            <Menu.Item
-                              onPress={() => {
-                                const updatedDays = days.filter(d => d.date !== item.date);
-                                setDays(updatedDays);
-                                AsyncStorage.setItem(`${jobName}_days`, JSON.stringify(updatedDays));
-                                setMenuVisible(null);
+                    <View style={styles.buttonContent}>
+                      <Text style={styles.timeEntryText}>
+                        {new Date(item.date).toLocaleDateString()} (
+                        {item.timeEntries.length} entries)
+                      </Text>
+                      {!isMobileOrTablet() && (
+                        <Menu
+                          visible={menuVisible === index}
+                          onDismiss={() => setMenuVisible(null)}
+                          anchor={
+                            <IconButton
+                              icon="dots-vertical"
+                              size={20}
+                              iconColor={colors.icon}
+                              style={styles.contextMenuButtons}
+                              onPress={(e) => {
+                                e.stopPropagation();
+                                setMenuVisible(index);
                               }}
-                              title="Delete"
                             />
-                          </Menu>
-                        )}
-                      </View>
+                          }
+                        >
+                          <Menu.Item
+                            onPress={() => {
+                              const updatedDays = days.filter(
+                                (d) => d.date !== item.date
+                              );
+                              setDays(updatedDays);
+                              AsyncStorage.setItem(
+                                `${jobName}_days`,
+                                JSON.stringify(updatedDays)
+                              );
+                              setMenuVisible(null);
+                            }}
+                            title="Delete"
+                          />
+                        </Menu>
+                      )}
                     </View>
                   </Button>
                 </Swipeable>
@@ -294,14 +536,21 @@ export default function JobScreen() {
                   }}
                   onPress={() => {
                     const updatedDays = [...days];
-                    const dayIndex = updatedDays.findIndex(d => d.date === selectedDay);
+                    const dayIndex = updatedDays.findIndex(
+                      (d) => d.date === selectedDay
+                    );
                     if (dayIndex !== -1) {
-                      updatedDays[dayIndex].timeEntries = updatedDays[dayIndex].timeEntries.filter((_, i) => i !== index);
+                      updatedDays[dayIndex].timeEntries = updatedDays[
+                        dayIndex
+                      ].timeEntries.filter((_, i) => i !== index);
                       if (updatedDays[dayIndex].timeEntries.length === 0) {
                         updatedDays.splice(dayIndex, 1);
                       }
                       setDays(updatedDays);
-                      AsyncStorage.setItem(`${jobName}_days`, JSON.stringify(updatedDays));
+                      AsyncStorage.setItem(
+                        `${jobName}_days`,
+                        JSON.stringify(updatedDays)
+                      );
                     }
                   }}
                 >
@@ -320,11 +569,14 @@ export default function JobScreen() {
                     backgroundColor: "blue",
                     justifyContent: "center",
                     alignItems: "center",
-                    width: 70,
+                    width: 60,
                   }}
                   onPress={() => {
-                    // TODO: Implement edit functionality for time entries
-                    console.log("Edit time entry:", item);
+                    setModalMode("edit");
+                    setEditingEntryIndex(index);
+                    setStartTimeInput(item.start);
+                    setEndTimeInput(item.end);
+                    setIsModalVisible(true);
                   }}
                 >
                   <Text style={{ color: "white" }}>Edit</Text>
@@ -337,21 +589,12 @@ export default function JobScreen() {
                 renderRightActions={renderRightActions}
                 renderLeftActions={renderLeftActions}
               >
-                <Button style={[styles.timeEntry, { flex: 1 }]}>
-                  <View
-                    style={{
-                      flexDirection: "row",
-                      alignItems: "center",
-                      justifyContent: "space-between",
-                      width: "100%",
-                    }}
-                  >
-                    <Text
-                      style={[
-                        styles.timeEntryText,
-                        { flex: 1, paddingLeft: 10 },
-                      ]}
-                    >
+                <Button
+                  style={[styles.timeEntry, { flex: 1 }]}
+                  rippleColor="transparent"
+                >
+                  <View style={styles.buttonContent}>
+                    <Text style={styles.timeEntryText}>
                       {item.start} - {item.end}
                     </Text>
                     {!isMobileOrTablet() && (
@@ -372,7 +615,11 @@ export default function JobScreen() {
                       >
                         <Menu.Item
                           onPress={() => {
-                            console.log("Edit time entry:", item);
+                            setModalMode("edit");
+                            setEditingEntryIndex(index);
+                            setStartTimeInput(item.start);
+                            setEndTimeInput(item.end);
+                            setIsModalVisible(true);
                             setMenuVisible(null);
                           }}
                           title="Edit"
@@ -380,14 +627,23 @@ export default function JobScreen() {
                         <Menu.Item
                           onPress={() => {
                             const updatedDays = [...days];
-                            const dayIndex = updatedDays.findIndex(d => d.date === selectedDay);
+                            const dayIndex = updatedDays.findIndex(
+                              (d) => d.date === selectedDay
+                            );
                             if (dayIndex !== -1) {
-                              updatedDays[dayIndex].timeEntries = updatedDays[dayIndex].timeEntries.filter((_, i) => i !== index);
-                              if (updatedDays[dayIndex].timeEntries.length === 0) {
+                              updatedDays[dayIndex].timeEntries = updatedDays[
+                                dayIndex
+                              ].timeEntries.filter((_, i) => i !== index);
+                              if (
+                                updatedDays[dayIndex].timeEntries.length === 0
+                              ) {
                                 updatedDays.splice(dayIndex, 1);
                               }
                               setDays(updatedDays);
-                              AsyncStorage.setItem(`${jobName}_days`, JSON.stringify(updatedDays));
+                              AsyncStorage.setItem(
+                                `${jobName}_days`,
+                                JSON.stringify(updatedDays)
+                              );
                             }
                             setMenuVisible(null);
                           }}
@@ -402,20 +658,30 @@ export default function JobScreen() {
           }}
           keyExtractor={(_, index) => index.toString()}
         />
-
         <Button
           mode="outlined"
-          onPress={handlePrint}
-          style={[
-            styles.printButton,
-            {
-              marginTop: 10,
-            },
-          ]}
-          theme={{ colors: { outline: "#000000" } }}
+          onPress={() => setIsModalVisible(true)}
+          style={styles.addButton}
+          rippleColor="transparent"
         >
-          <Text style={styles.printButtonText}>Print Time</Text>
+          <Text style={styles.addButtonText}>+</Text>
         </Button>
+        {viewMode === "entries" && (
+          <Button
+            mode="outlined"
+            onPress={handlePrint}
+            style={[
+              styles.printButton,
+              {
+                marginTop: 10,
+              },
+            ]}
+            theme={{ colors: { outline: "#000000" } }}
+            rippleColor="transparent"
+          >
+            <Text style={styles.printButtonText}>Print Time</Text>
+          </Button>
+        )}
       </View>
     </View>
   );

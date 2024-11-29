@@ -373,3 +373,231 @@
 
 # 2024-11-25 18:22:57.608852
 +pls check the repo again and try fixing the jobbutton on the HomeScreen so it looks like the button.png picture.
+
+# 2024-11-25 18:28:26.246622
++/add assets/currentbutten.png
+
+# 2024-11-25 18:28:33.930160
++n
+
+# 2024-11-25 18:28:43.345559
++/add assets/currentbutton.png
+
+# 2024-11-25 18:30:04.181299
++ok cool so the currentbutton look a lot better than befor but the context menu vertical-dots are stil not on the right side of the jobbutton as you can see in the assets/currentbutten.png. Please work on it so it looks exactly like the button.png
+
+# 2024-11-25 18:30:08.310772
++y
+
+# 2024-11-25 18:30:35.293908
++/add assets/currentbutton.png
+
+# 2024-11-25 18:32:24.920070
++I cant see the `contextMenuButtons` dots anymore
+
+# 2024-11-25 19:31:39.481112
++ok forgett the dots for nor I assume they get pushed out of the jobbutton and are no longer visible. for now pls add a Back to Jobs button at the top of the Days List just like the "Back to Days" button in the `timeEntryList`
+
+# 2024-11-25 19:33:25.400164
++perfect, now remove the hover of all buttons there is a light violet background hover or something on most of the buttons.
+
+# 2024-11-25 19:37:43.342567
++ok pls do that for all buttons on all other screens like the jobscreen in both the dayslist and the timeentrylist
+
+# 2024-11-25 19:40:31.875023
++cool remove the hover shadow from the backicon and the settings icon
+
+# 2024-11-25 19:41:38.244999
++ok revert pls there is still a shadow maybe its the background?
+
+# 2024-11-25 19:50:40.559140
++go to JobScreen and Implement the handlePrint Function I want a TimeSheet created as either PDF or ODT other formats recommended?)
+
+# 2024-11-25 19:51:22.518281
++y
+
+# 2024-11-25 19:51:49.628446
++/run bun add react-native-html-to-pdf
+
+# 2024-11-25 19:51:49.628483
++/run bun add react-native-html-to-pdf
+
+# 2024-11-25 19:53:46.844054
++y
+
+# 2024-11-25 19:53:51.714321
++/run bun install
+
+# 2024-11-25 19:53:51.714403
++/run bun install
+
+# 2024-11-25 19:53:55.154604
++y
+
+# 2024-11-25 19:54:44.910499
++unfortunately nothing happens when clicking the print Time button
+
+# 2024-11-25 19:59:25.914037
++ok I get a html file with a two collumn table. I like to have a better organised timesheet with 4 column. first one is start time second one is end time third one is the duration. then the fourth row is for day total that is shown once after each day. print each day the same.do not use tableborders for each cell just bold text for the heading of the tabel
+
+# 2024-11-25 20:00:52.535664
++perfect now make it a pdf download when you click PrintTime
+
+# 2024-11-25 20:02:27.369682
++Failed to generate timesheet: html2pdf is not defined
+
+# 2024-11-25 20:02:52.247497
++y
+
+# 2024-11-25 20:02:58.010134
++/run npm install --save @types/html2pdf.js
+
+# 2024-11-25 20:02:58.010224
++/run npm install --save @types/html2pdf.js
+
+# 2024-11-25 20:03:14.618498
++y
+
+# 2024-11-25 20:03:56.035054
++bun add @types/html2pdf.js
+
+# 2024-11-25 20:05:54.132347
++Failed to generate timesheet: html2pdf library not loaded. Please check your internet connection and try again.
+
+# 2024-11-25 20:06:35.407790
++same issue
+
+# 2024-11-25 20:07:50.605827
++ok for now just generate the html file pls like you did before.
+
+# 2024-11-25 20:08:13.303939
++y
+
+# 2024-11-25 20:08:18.835090
++/run xdg-open button-test.html
+
+# 2024-11-25 20:08:18.835210
++/run xdg-open button-test.html
+
+# 2024-11-25 20:09:02.547371
++noo you misunderstood revert your changes
+
+# 2024-11-25 20:10:17.770243
++ok confirm
+
+# 2024-11-25 20:12:07.400943
++ok but the print time problem is not solved I want it to create that .html file again it did before I asked you to implement the html2pdf stuff
+
+# 2024-11-25 20:13:55.044814
++ok perfect but no backgroudn colors for the table
+
+# 2024-11-25 20:16:04.767189
++cool also add a Week total pls
+
+# 2024-11-25 20:18:59.025226
++ok now make the dayentries button and the timeentry button just like the jobbutton look and size pls
+
+# 2024-11-25 20:23:59.391016
++can you fix the dayentries button it should be like the timeentry button but the text is not vertically aligned center and the context dots are not the text color like they are in the joblist 
+
+# 2024-11-25 20:25:19.062667
++remove the Print Time button from the DaysList just show it on the `timeEntryList`
+
+# 2024-11-25 20:27:59.108775
++can you make the edit and delete button (slideoptions 5 pixels smaller at eacht side ? so 10 in height 10 in width)
+
+# 2024-11-25 20:28:39.921564
++thats to small revert pls
+
+# 2024-11-25 20:45:28.168969
++I am trying to start the project with bun run android my phone is connected in developer mode and with usb-debuggin on it is also recognised by the computer but when running bun run android my phone opens the expo go app and shows "Something went wrong. Sorry about that. You can go back to epo home or try to reload the project."
+
+# 2024-11-25 20:45:48.081283
++y
+
+# 2024-11-25 20:45:48.085375
++/run rm -rf node_modules/.cache
+
+# 2024-11-25 20:45:48.085461
++/run rm -rf node_modules/.cache
+
+# 2024-11-25 20:45:48.236509
++/run bun install
+
+# 2024-11-25 20:45:48.236640
++/run bun install
+
+# 2024-11-25 20:45:50.385409
++/run expo start --clear
+
+# 2024-11-25 20:45:50.385799
++/run expo start --clear
+
+# 2024-11-25 20:45:57.785683
++y
+
+# 2024-11-25 20:46:04.708893
++/run adb reverse tcp:8081 tcp:8081
+
+# 2024-11-25 20:46:04.709520
++/run adb reverse tcp:8081 tcp:8081
+
+# 2024-11-27 11:51:30.665640
++y
+
+# 2024-11-27 11:51:49.100063
++n
+
+# 2024-11-27 11:52:01.527483
++y
+
+# 2024-11-27 11:52:36.782071
++components/HomeScreen.tsx components/JobScreen.tsx
+
+# 2024-11-27 11:52:47.471463
++y
+
+# 2024-11-27 11:53:35.098933
++pls make the addJob button the last item in the list
+
+# 2024-11-27 11:54:32.756747
++now its on top of the other JobListEntries
+
+# 2024-11-27 11:54:56.350803
++mh revert to the bottom pls
+
+# 2024-11-27 11:55:22.377205
++revert one more to where it was initially
+
+# 2024-11-27 11:57:08.573707
++what happened? now there is just a white screen
+
+# 2024-11-29 21:50:48.894348
++n
+
+# 2024-11-29 21:51:10.664945
++/add components/HomeScreen.tsx components/JobScreen.tsx
+
+# 2024-11-29 21:54:08.392436
++I want to add a add button to the jobScreens day and job list and make it open a modal to create a day or timeentry, pls make the modal from the HomeScreen a reusable component that can be used to create every type of list item or can be used to edit each type of list item if a user clicks either the slide option edit or the context menu edit
+
+# 2024-11-29 21:55:16.902116
++y
+
+# 2024-11-29 21:56:43.231621
++there is an error I only see Something went wrong in the browser also implement the edit functionality it should prefill the inputfields in the modal and open it.
+
+# 2024-11-29 21:57:33.910936
++Something went wrong.
+
+# 2024-11-29 21:58:22.489825
++there is an error I only see Something went wrong in the browser
+
+# 2024-11-29 21:59:10.076839
++ok now the homescreen works but when opening the jobscreen I see again Something went wrong
+
+# 2024-11-29 22:01:20.272306
++/ask when I want to write a backend for my app where user can login and that is connected to a database to store the timentries in a database as well. how to do that with my bun expo typescript project
+
+# 2024-11-29 22:02:17.085668
++y

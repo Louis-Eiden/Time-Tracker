@@ -3,10 +3,9 @@ import {
   View,
   FlatList,
   TouchableOpacity,
-  Modal,
-  TextInput,
   Animated,
 } from "react-native";
+import ListItemModal from "./ListItemModal";
 import { isMobileOrTablet } from "../utils/platform";
 import { Swipeable } from "react-native-gesture-handler";
 import { Text, Button, IconButton, Menu } from "react-native-paper";
@@ -16,8 +15,10 @@ import { createHomeStyles, createCommonStyles } from "../theme/styles";
 
 export default function HomeScreen() {
   const [jobs, setJobs] = useState<string[]>(["Job 1", "Job 2"]);
-  const [modalVisible, setModalVisible] = useState(false);
-  const [newJobName, setNewJobName] = useState("");
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [modalMode, setModalMode] = useState<"add" | "edit">("add");
+  const [jobInput, setJobInput] = useState("");
+  const [editingJobIndex, setEditingJobIndex] = useState<number | null>(null);
   const [menuVisible, setMenuVisible] = useState<number | null>(null);
   const navigation = useNavigation();
   const { theme } = useTheme();
@@ -79,16 +80,30 @@ export default function HomeScreen() {
     },
   };
 
-  const showModal = () => {
-    setModalVisible(true);
+  const showAddModal = () => {
+    setModalMode("add");
+    setJobInput("");
+    setIsModalVisible(true);
   };
 
-  const addJob = () => {
-    if (newJobName.trim()) {
-      setJobs([...jobs, newJobName.trim()]);
-      setNewJobName("");
-      setModalVisible(false);
+  const showEditModal = (index: number) => {
+    setModalMode("edit");
+    setEditingJobIndex(index);
+    setJobInput(jobs[index]);
+    setIsModalVisible(true);
+  };
+
+  const handleJobConfirm = (value: string) => {
+    if (modalMode === "add") {
+      setJobs([...jobs, value]);
+    } else {
+      const updatedJobs = [...jobs];
+      if (editingJobIndex !== null) {
+        updatedJobs[editingJobIndex] = value;
+        setJobs(updatedJobs);
+      }
     }
+    setIsModalVisible(false);
   };
 
   return (
@@ -159,12 +174,17 @@ export default function HomeScreen() {
                 >
                   <Button
                     mode="outlined"
-                    onPress={() => navigation.navigate("Job", { jobName: item })}
+                    onPress={() =>
+                      navigation.navigate("Job", { jobName: item })
+                    }
                     style={styles.jobButton}
                     theme={{ colors: { outline: "#000000" } }}
+                    rippleColor="transparent"
                   >
                     <View style={styles.buttonContent}>
-                      <Text style={[styles.jobButtonText, { color: colors.text }]}>
+                      <Text
+                        style={[styles.jobButtonText, { color: colors.text }]}
+                      >
                         {item}
                       </Text>
                       {!isMobileOrTablet() && (
@@ -175,6 +195,7 @@ export default function HomeScreen() {
                             <IconButton
                               icon="dots-vertical"
                               size={20}
+                              iconColor={colors.icon}
                               style={styles.contextMenuButtons}
                               onPress={(e) => {
                                 e.stopPropagation();
@@ -206,56 +227,26 @@ export default function HomeScreen() {
             }}
             keyExtractor={(item) => item}
           />
-          <Button mode="outlined" onPress={showModal} style={styles.addButton}>
+          <Button
+            mode="outlined"
+            onPress={showAddModal}
+            style={styles.addButton}
+            rippleColor="transparent"
+          >
             <Text style={styles.addButtonText}>+</Text>
           </Button>
         </View>
       </View>
 
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={modalVisible}
-        onRequestClose={() => setModalVisible(false)}
-      >
-        <View style={styles.modalContainer}>
-          <View
-            style={[
-              styles.modalContent,
-              { backgroundColor: colors.background },
-            ]}
-          >
-            <Text style={[styles.modalTitle, { color: colors.text }]}>
-              Job Name
-            </Text>
-            <TextInput
-              style={[styles.modalInput, { color: colors.text }]}
-              value={newJobName}
-              onChangeText={setNewJobName}
-              placeholder="Enter job name"
-              placeholderTextColor={colors.text}
-              selectionColor="#000000"
-              underlineColorAndroid="transparent"
-            />
-            <View style={styles.modalButtons}>
-              <Button
-                mode="outlined"
-                onPress={() => setModalVisible(false)}
-                style={[styles.modalButton, styles.modalActionButton]}
-              >
-                <Text style={{ color: "#000000" }}>Cancel</Text>
-              </Button>
-              <Button
-                mode="outlined"
-                onPress={addJob}
-                style={[styles.modalButton, styles.modalActionButton]}
-              >
-                <Text style={{ color: "#000000" }}>Confirm</Text>
-              </Button>
-            </View>
-          </View>
-        </View>
-      </Modal>
+      <ListItemModal
+        visible={isModalVisible}
+        onClose={() => setIsModalVisible(false)}
+        onConfirm={handleJobConfirm}
+        title={modalMode === "add" ? "New Job" : "Edit Job"}
+        inputValue={jobInput}
+        onInputChange={setJobInput}
+        placeholder="Enter job name"
+      />
     </View>
   );
 }
