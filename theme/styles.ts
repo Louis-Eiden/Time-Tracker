@@ -277,9 +277,7 @@ export const createJobStyles = (colors: ReturnType<typeof getThemeColors>) =>
       borderRadius: 0,
       backgroundColor: colors.background,
     },
-    buttonText: {
-      color: colors.text,
-    },
+
     timeEntry: {
       borderColor: colors.border,
       borderWidth: 2,
