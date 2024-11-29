@@ -6,6 +6,8 @@ node_modules/
 #Python Venv
 venv/
 
+commandlinetools-linux-9477386_latest.zip
+
 # Expo
 .expo/
 dist/
