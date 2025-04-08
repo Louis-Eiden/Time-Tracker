@@ -20,6 +20,58 @@ export const createCommonStyles = (colors: ReturnType<typeof getThemeColors>) =>
     },
   });
 
+export const createListItemModalStyles = (
+  colors: ReturnType<typeof getThemeColors>
+) =>
+  StyleSheet.create({
+    modalContainer: {
+      flex: 1,
+      justifyContent: "center",
+      alignItems: "center",
+      backgroundColor: "rgba(0, 0, 0, 0.5)",
+    },
+    modalContent: {
+      flex: 1,
+      width: "100%",
+      justifyContent: "center",
+      alignItems: "center",
+      padding: 20,
+      backgroundColor: colors.background,
+      borderWidth: 2,
+      borderColor: colors.border,
+    },
+    modalTitle: {
+      fontSize: 18,
+      marginBottom: 15,
+      textAlign: "center",
+      color: colors.text,
+    },
+    modalInput: {
+      borderWidth: 2,
+      borderColor: colors.border,
+      borderRadius: 0,
+      padding: 10,
+      marginBottom: 15,
+      height: 40,
+      width: "50%",
+      color: colors.text,
+    },
+    modalButtons: {
+      flexDirection: "row",
+      justifyContent: "space-around",
+      width: "50%",
+    },
+    modalButton: {
+      flex: 1,
+      marginHorizontal: 5,
+      borderRadius: 0,
+      borderColor: colors.border,
+      borderWidth: 2,
+      maxWidth: 276,
+      backgroundColor: "#D3D3D3",
+    },
+  });
+
 export const createHomeStyles = (colors: ReturnType<typeof getThemeColors>) =>
   StyleSheet.create({
     container: {
@@ -33,12 +85,14 @@ export const createHomeStyles = (colors: ReturnType<typeof getThemeColors>) =>
     },
     header: {
       width: "100%",
+      height: 50,
       flexDirection: "row",
       justifyContent: "center",
       alignItems: "center",
       marginBottom: 30,
       position: "relative",
       marginTop: 10,
+      right: 0,
     },
     settingsIcon: {
       position: "absolute",
@@ -94,24 +148,23 @@ export const createHomeStyles = (colors: ReturnType<typeof getThemeColors>) =>
       shadowOpacity: 0,
     },
     buttonContent: {
+      borderRadius: 0,
+      width: 225,
       flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "space-between",
-      paddingLeft: 12,
-      paddingRight: 8,
-      flex: 1,
-      position: "relative",
     },
     jobButtonText: {
       color: colors.text,
       fontSize: 18,
       fontWeight: "400",
-      textAlign: "left",
       flex: 1,
     },
     contextMenuButtons: {
-      backgroundColor: "transparent",
+      // backgroundColor: "transparent",
       borderWidth: 0,
+      position: "absolute",
+      right: -1,
+      top: -2,
+      zIndex: 1000,
       padding: 0,
       margin: 0,
       color: colors.icon,
@@ -120,8 +173,8 @@ export const createHomeStyles = (colors: ReturnType<typeof getThemeColors>) =>
       height: 24,
       alignItems: "center",
       justifyContent: "center",
-      position: "relative",
     },
+
     swipeableContainer: {
       display: isMobileOrTablet() ? "flex" : "none",
     },
@@ -131,6 +184,7 @@ export const createHomeStyles = (colors: ReturnType<typeof getThemeColors>) =>
       bottom: 10,
       left: 10,
       right: 10,
+      width: "auto",
       borderWidth: 2,
       borderRadius: 0,
       borderColor: colors.border,
@@ -138,6 +192,59 @@ export const createHomeStyles = (colors: ReturnType<typeof getThemeColors>) =>
     addButtonText: {
       color: colors.text,
       fontSize: 32,
+    },
+    modalContainer: {
+      flex: 1,
+      justifyContent: "center",
+      alignItems: "center",
+      backgroundColor: "rgba(0, 0, 0, 0.5)",
+    },
+    modalContent: {
+      flex: 1,
+      width: "100%",
+      justifyContent: "center",
+      alignItems: "center",
+      padding: 20,
+      backgroundColor: colors.background,
+      borderWidth: 2,
+      borderColor: colors.border,
+    },
+    modalTitle: {
+      fontSize: 18,
+      marginBottom: 15,
+      textAlign: "center",
+    },
+    input: {
+      borderWidth: 1,
+      padding: 10,
+      marginBottom: 15,
+      height: 40,
+    },
+    modalButtons: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      width: "100%",
+    },
+    modalButton: {
+      flex: 1,
+      marginHorizontal: 5,
+      borderRadius: 0,
+      borderColor: colors.border,
+      borderWidth: 2,
+    },
+    modalInput: {
+      borderWidth: 2,
+      borderColor: colors.border,
+      borderRadius: 0,
+      padding: 10,
+      marginBottom: 15,
+      height: 40,
+      width: "100%",
+    },
+    modalActionButton: {
+      borderColor: "#000000",
+      borderRadius: 0,
+      backgroundColor: "#D3D3D3",
     },
   });
 
@@ -153,10 +260,14 @@ export const createSettingsStyles = (
     },
     header: {
       width: "100%",
+      height: 50,
       flexDirection: "row",
       justifyContent: "space-between",
       alignItems: "center",
       marginBottom: 30,
+      marginTop: 10,
+      marginRight: 0,
+      paddingRight: 0,
     },
     title: {
       fontSize: 24,
@@ -172,8 +283,8 @@ export const createSettingsStyles = (
       borderColor: colors.border,
       marginBottom: 15,
       height: 45,
-      justifyContent: "center",
-      alignItems: "center",
+      // justifyContent: "center",
+      // alignItems: "center",
       borderRadius: 0,
     },
     languageButtonText: {
@@ -181,6 +292,63 @@ export const createSettingsStyles = (
     },
     themeButtonText: {
       color: colors.text,
+    },
+  });
+
+export const createListItemStyles = (
+  colors: ReturnType<typeof getThemeColors>
+) =>
+  StyleSheet.create({
+    container: {
+      borderColor: colors.border,
+      borderWidth: 2,
+      borderRadius: 0,
+      marginVertical: 5,
+      height: 45,
+      width: "100%",
+      backgroundColor: colors.background,
+      elevation: 0,
+      shadowOpacity: 0,
+    },
+    content: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "center",
+      width: 225,
+      borderColor: colors.border,
+      borderWidth: 2,
+      borderRadius: 0,
+    },
+    text: {
+      // position: "absolute",
+      // top: "50%",
+      // left: "50%",
+      // transform: [{ translateX: -50 }, { translateY: -50 }],
+      color: colors.text,
+      fontSize: 18,
+      fontWeight: "400",
+      // flex: 1,
+    },
+    contextMenuButton: {
+      borderColor: colors.border,
+      borderWidth: 2,
+      borderRadius: 0,
+      backgroundColor: "transparent",
+      // borderWidth: 0,
+      position: "absolute",
+      right: -89,
+      top: -12,
+      padding: 0,
+      margin: 0,
+      color: colors.icon,
+      display: !isMobileOrTablet() ? "flex" : "none",
+      width: 24,
+      height: 24,
+      // alignItems: "center",
+      // justifyContent: "center",
+    },
+    swipeableContainer: {
+      display: isMobileOrTablet() ? "flex" : "none",
     },
   });
 
@@ -194,11 +362,14 @@ export const createJobStyles = (colors: ReturnType<typeof getThemeColors>) =>
     },
     header: {
       width: "100%",
+      height: 50,
       flexDirection: "row",
       justifyContent: "space-between",
       alignItems: "center",
       marginBottom: 30,
       position: "relative",
+      marginTop: 10,
+      right: 0,
     },
     title: {
       fontSize: 24,
@@ -210,6 +381,7 @@ export const createJobStyles = (colors: ReturnType<typeof getThemeColors>) =>
       bottom: 10,
       left: 10,
       right: 10,
+      width: "auto",
       borderWidth: 2,
       borderRadius: 0,
       borderColor: colors.border,
@@ -310,14 +482,14 @@ export const createJobStyles = (colors: ReturnType<typeof getThemeColors>) =>
     },
 
     printButton: {
-      padding: 12,
+      // padding: 12,
       borderWidth: 2,
-      height: 45,
-      justifyContent: "center",
-      alignItems: "center",
-      position: "absolute",
-      bottom: 10,
-      width: 276,
+      height: 46,
+      // justifyContent: "center",
+      // alignItems: "center",
+      // position: "absolute",
+      // bottom: 10,
+      // width: 276,
       borderColor: colors.border,
       borderRadius: 0,
       backgroundColor: colors.background,
@@ -338,12 +510,19 @@ export const createJobStyles = (colors: ReturnType<typeof getThemeColors>) =>
       alignItems: "center",
       marginBottom: 30,
     },
-    buttonContainer: {
+    buttonContent: {
       flexDirection: "row",
       justifyContent: "space-around",
       width: "100%",
       marginBottom: 30,
     },
+
+    // buttonContent: {
+    //   borderRadius: 0,
+    //   width: 225,
+    //   flexDirection: "row",
+    // },
+
     buttonText: {
       fontSize: 16,
       color: colors.text,

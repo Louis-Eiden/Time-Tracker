@@ -24,16 +24,23 @@ export default function SettingsScreen() {
           icon="arrow-left"
           onPress={() => navigation.goBack()}
           iconColor={colors.text}
+          rippleColor="transparent"
+          containerColor="transparent" // Background color of button
+          theme={{
+            colors: {
+              secondaryContainer: "transparent", // Controls hover state background
+            },
+          }}
           animated={false}
         />
         <Text style={[styles.title, { color: colors.text }]}>Settings</Text>
         <View style={styles.placeholder} />
       </View>
-
+      {/* TODO: add timeformat toggle
+      TODO: add mode toggle for wireframe/modern */}
       <Button mode="outlined" onPress={toggleLanguage} style={styles.button}>
         <Text style={styles.languageButtonText}>Language: {language}</Text>
       </Button>
-
       <Button mode="outlined" onPress={toggleTheme} style={styles.button}>
         <Text style={styles.themeButtonText}>Theme: {theme}</Text>
       </Button>

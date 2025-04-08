@@ -1,14 +1,8 @@
 import React, { useState } from "react";
-import {
-  View,
-  FlatList,
-  TouchableOpacity,
-  Animated,
-} from "react-native";
+import { View, FlatList } from "react-native";
 import ListItemModal from "./ListItemModal";
-import { isMobileOrTablet } from "../utils/platform";
-import { Swipeable } from "react-native-gesture-handler";
-import { Text, Button, IconButton, Menu } from "react-native-paper";
+import ListItem from "./ListItem";
+import { Text, IconButton } from "react-native-paper";
 import { useNavigation } from "@react-navigation/native";
 import { useTheme, getThemeColors } from "../contexts/ThemeContext";
 import { createHomeStyles, createCommonStyles } from "../theme/styles";
@@ -107,6 +101,7 @@ export default function HomeScreen() {
   };
 
   return (
+    //TODO: Make one headbar so its easier to style and change theme / mode
     <View style={styles.container}>
       <View style={styles.header}>
         <Text style={[styles.title, { color: colors.text }]}>Time Tracker</Text>
@@ -116,6 +111,13 @@ export default function HomeScreen() {
           onPress={() => navigation.navigate("Settings")}
           iconColor={colors.icon}
           style={styles.settingsIcon}
+          rippleColor="transparent"
+          containerColor="transparent" // Background color of button
+          theme={{
+            colors: {
+              secondaryContainer: "transparent", // Controls hover state background
+            },
+          }}
           animated={false}
         />
       </View>
@@ -123,118 +125,48 @@ export default function HomeScreen() {
         <View style={[styles.jobList, { borderColor: colors.border }]}>
           <FlatList
             data={jobs}
-            renderItem={({ item, index }) => {
-              const renderRightActions = (
-                progress: Animated.AnimatedInterpolation<number>,
-                dragX: Animated.AnimatedInterpolation<number>
-              ) => {
-                return (
-                  <TouchableOpacity
-                    style={{
-                      backgroundColor: "red",
-                      justifyContent: "center",
-                      alignItems: "center",
-                      width: 70,
-                    }}
-                    onPress={() => {
-                      setJobs(jobs.filter((_, i) => i !== index));
-                    }}
-                  >
-                    <Text style={{ color: "white" }}>Delete</Text>
-                  </TouchableOpacity>
-                );
-              };
-
-              const renderLeftActions = (
-                progress: Animated.AnimatedInterpolation<number>,
-                dragX: Animated.AnimatedInterpolation<number>
-              ) => {
-                return (
-                  <TouchableOpacity
-                    style={{
-                      backgroundColor: "blue",
-                      justifyContent: "center",
-                      alignItems: "center",
-                      width: 70,
-                    }}
-                    onPress={() => {
-                      // TODO: Implement edit functionality
-                      console.log("Edit job:", item);
-                    }}
-                  >
-                    <Text style={{ color: "white" }}>Edit</Text>
-                  </TouchableOpacity>
-                );
-              };
-
-              return (
-                <Swipeable
-                  renderRightActions={renderRightActions}
-                  renderLeftActions={renderLeftActions}
-                >
-                  <Button
-                    mode="outlined"
-                    onPress={() =>
-                      navigation.navigate("Job", { jobName: item })
-                    }
-                    style={styles.jobButton}
-                    theme={{ colors: { outline: "#000000" } }}
-                    rippleColor="transparent"
-                  >
-                    <View style={styles.buttonContent}>
-                      <Text
-                        style={[styles.jobButtonText, { color: colors.text }]}
-                      >
-                        {item}
-                      </Text>
-                      {!isMobileOrTablet() && (
-                        <Menu
-                          visible={menuVisible === index}
-                          onDismiss={() => setMenuVisible(null)}
-                          anchor={
-                            <IconButton
-                              icon="dots-vertical"
-                              size={20}
-                              iconColor={colors.icon}
-                              style={styles.contextMenuButtons}
-                              onPress={(e) => {
-                                e.stopPropagation();
-                                setMenuVisible(index);
-                              }}
-                            />
-                          }
-                        >
-                          <Menu.Item
-                            onPress={() => {
-                              console.log("Edit job:", item);
-                              setMenuVisible(null);
-                            }}
-                            title="Edit"
-                          />
-                          <Menu.Item
-                            onPress={() => {
-                              setJobs(jobs.filter((_, i) => i !== index));
-                              setMenuVisible(null);
-                            }}
-                            title="Delete"
-                          />
-                        </Menu>
-                      )}
-                    </View>
-                  </Button>
-                </Swipeable>
-              );
-            }}
+            renderItem={({ item, index }) => (
+              <ListItem
+                text={item}
+                onPress={() => navigation.navigate("Job", { jobName: item })}
+                onEdit={() => showEditModal(index)}
+                onDelete={() => {
+                  setJobs(jobs.filter((_, i) => i !== index));
+                }}
+                rightSwipeActions={{
+                  label: "Delete",
+                  color: "red",
+                  onPress: () => {
+                    setJobs(jobs.filter((_, i) => i !== index));
+                  }
+                }}
+                leftSwipeActions={{
+                  label: "Edit",
+                  color: "blue",
+                  onPress: () => showEditModal(index)
+                }}
+              />
+            )}
             keyExtractor={(item) => item}
           />
-          <Button
+          {/* <Button
             mode="outlined"
             onPress={showAddModal}
             style={styles.addButton}
             rippleColor="transparent"
           >
             <Text style={styles.addButtonText}>+</Text>
-          </Button>
+          </Button> */}
+          <IconButton
+            icon="plus"
+            size={24}
+            mode="outlined"
+            onPress={showAddModal}
+            style={styles.addButton}
+            rippleColor="transparent"
+            iconColor={colors.icon}
+            animated={false}
+          />
         </View>
       </View>
 

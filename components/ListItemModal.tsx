@@ -2,6 +2,7 @@ import React from "react";
 import { View, Modal, TextInput } from "react-native";
 import { Text, Button } from "react-native-paper";
 import { useTheme, getThemeColors } from "../contexts/ThemeContext";
+import { createListItemModalStyles } from "../theme/styles";
 
 interface ListItemModalProps {
   visible: boolean;
@@ -30,58 +31,11 @@ export default function ListItemModal({
   startTime = "",
   endTime = "",
   onStartTimeChange,
-  onEndTimeChange
+  onEndTimeChange,
 }: ListItemModalProps) {
   const { theme } = useTheme();
   const colors = getThemeColors(theme);
-
-  const styles = {
-    modalContainer: {
-      flex: 1,
-      justifyContent: "center",
-      alignItems: "center",
-      backgroundColor: "rgba(0, 0, 0, 0.5)",
-    },
-    modalContent: {
-      flex: 1,
-      width: "100%",
-      justifyContent: "center",
-      alignItems: "center",
-      padding: 20,
-      backgroundColor: colors.background,
-      borderWidth: 2,
-      borderColor: colors.border,
-    },
-    modalTitle: {
-      fontSize: 18,
-      marginBottom: 15,
-      textAlign: "center",
-      color: colors.text,
-    },
-    modalInput: {
-      borderWidth: 2,
-      borderColor: colors.border,
-      borderRadius: 0,
-      padding: 10,
-      marginBottom: 15,
-      height: 40,
-      width: "100%",
-      color: colors.text,
-    },
-    modalButtons: {
-      flexDirection: "row",
-      justifyContent: "space-between",
-      width: "100%",
-    },
-    modalButton: {
-      flex: 1,
-      marginHorizontal: 5,
-      borderRadius: 0,
-      borderColor: colors.border,
-      borderWidth: 2,
-      backgroundColor: "#D3D3D3",
-    },
-  };
+  const styles = createListItemModalStyles(colors);
 
   const handleConfirm = () => {
     if (isTimeEntry) {

@@ -1,19 +1,11 @@
 import React, { useState, useEffect } from "react";
 import ListItemModal from "./ListItemModal";
-import {
-  View,
-  FlatList,
-  TouchableOpacity,
-  Animated,
-  Platform,
-  Share,
-} from "react-native";
+import ListItem from "./ListItem";
+import { View, FlatList, Platform, Share } from "react-native";
 import RNHTMLtoPDF from "react-native-html-to-pdf";
-import { isMobileOrTablet } from "../utils/platform";
-import { Swipeable } from "react-native-gesture-handler";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useTheme, getThemeColors } from "../contexts/ThemeContext";
-import { Text, Button, IconButton, Menu } from "react-native-paper";
+import { Text, Button, IconButton } from "react-native-paper";
 import { useNavigation, useRoute, RouteProp } from "@react-navigation/native";
 import { colors } from "../theme/colors";
 import { createJobStyles } from "../theme/styles";
@@ -336,8 +328,13 @@ export default function JobScreen() {
           icon="arrow-left"
           onPress={() => navigation.goBack()}
           iconColor={colors.icon}
-          style={{ elevation: 0 }}
-          animated={false}
+          // style={{ elevation: 0 }}
+          containerColor="transparent" // Background color of button
+          theme={{
+            colors: {
+              secondaryContainer: "transparent", // Controls hover state background
+            },
+          }}
         />
         <Text style={styles.title}>{jobName}</Text>
         <IconButton
@@ -345,12 +342,19 @@ export default function JobScreen() {
           onPress={() => navigation.navigate("Settings")}
           iconColor={colors.icon}
           style={{ elevation: 0 }}
-          animated={false}
+          rippleColor="transparent"
+          containerColor="transparent" // Background color of button
+          theme={{
+            colors: {
+              secondaryContainer: "transparent", // Controls hover state background
+            },
+          }}
         />
       </View>
 
       <Text style={styles.timer}>{formatTime(time)}</Text>
 
+      {/* TODO: Add Hover effect using boxshadow so it looks pressed when isRunning*/}
       <View style={styles.timerContainer}>
         <Button
           mode="outlined"
@@ -441,19 +445,29 @@ export default function JobScreen() {
           }
           renderItem={({ item, index }) => {
             if (viewMode === "days") {
-              const renderDayRightActions = (
-                progress: Animated.AnimatedInterpolation<number>,
-                dragX: Animated.AnimatedInterpolation<number>
-              ) => {
-                return (
-                  <TouchableOpacity
-                    style={{
-                      backgroundColor: "red",
-                      justifyContent: "center",
-                      alignItems: "center",
-                      width: 60,
-                    }}
-                    onPress={() => {
+              return (
+                <ListItem
+                  text={`${new Date(item.date).toLocaleDateString()} (${
+                    item.timeEntries.length
+                  } entries)`}
+                  onPress={() => {
+                    setSelectedDay(item.date);
+                    setViewMode("entries");
+                  }}
+                  onDelete={() => {
+                    const updatedDays = days.filter(
+                      (d) => d.date !== item.date
+                    );
+                    setDays(updatedDays);
+                    AsyncStorage.setItem(
+                      `${jobName}_days`,
+                      JSON.stringify(updatedDays)
+                    );
+                  }}
+                  rightSwipeActions={{
+                    label: "Delete",
+                    color: "red",
+                    onPress: () => {
                       const updatedDays = days.filter(
                         (d) => d.date !== item.date
                       );
@@ -462,79 +476,45 @@ export default function JobScreen() {
                         `${jobName}_days`,
                         JSON.stringify(updatedDays)
                       );
-                    }}
-                  >
-                    <Text style={{ color: "white" }}>Delete</Text>
-                  </TouchableOpacity>
-                );
-              };
-
-              return (
-                <Swipeable renderRightActions={renderDayRightActions}>
-                  <Button
-                    mode="outlined"
-                    onPress={() => {
-                      setSelectedDay(item.date);
-                      setViewMode("entries");
-                    }}
-                    style={styles.timeEntry}
-                  >
-                    <View style={styles.buttonContent}>
-                      <Text style={styles.timeEntryText}>
-                        {new Date(item.date).toLocaleDateString()} (
-                        {item.timeEntries.length} entries)
-                      </Text>
-                      {!isMobileOrTablet() && (
-                        <Menu
-                          visible={menuVisible === index}
-                          onDismiss={() => setMenuVisible(null)}
-                          anchor={
-                            <IconButton
-                              icon="dots-vertical"
-                              size={20}
-                              iconColor={colors.icon}
-                              style={styles.contextMenuButtons}
-                              onPress={(e) => {
-                                e.stopPropagation();
-                                setMenuVisible(index);
-                              }}
-                            />
-                          }
-                        >
-                          <Menu.Item
-                            onPress={() => {
-                              const updatedDays = days.filter(
-                                (d) => d.date !== item.date
-                              );
-                              setDays(updatedDays);
-                              AsyncStorage.setItem(
-                                `${jobName}_days`,
-                                JSON.stringify(updatedDays)
-                              );
-                              setMenuVisible(null);
-                            }}
-                            title="Delete"
-                          />
-                        </Menu>
-                      )}
-                    </View>
-                  </Button>
-                </Swipeable>
+                    },
+                  }}
+                />
               );
             }
-            const renderRightActions = (
-              progress: Animated.AnimatedInterpolation<number>,
-              dragX: Animated.AnimatedInterpolation<number>
-            ) => {
-              return (
-                <TouchableOpacity
-                  style={{
-                    backgroundColor: "red",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    width: 70,
-                  }}
-                  onPress={() => {
+
+            return (
+              <ListItem
+                text={`${item.start} - ${item.end}`}
+                onEdit={() => {
+                  setModalMode("edit");
+                  setEditingEntryIndex(index);
+                  setStartTimeInput(item.start);
+                  setEndTimeInput(item.end);
+                  setIsModalVisible(true);
+                }}
+                onDelete={() => {
+                  const updatedDays = [...days];
+                  const dayIndex = updatedDays.findIndex(
+                    (d) => d.date === selectedDay
+                  );
+                  if (dayIndex !== -1) {
+                    updatedDays[dayIndex].timeEntries = updatedDays[
+                      dayIndex
+                    ].timeEntries.filter((_, i) => i !== index);
+                    if (updatedDays[dayIndex].timeEntries.length === 0) {
+                      updatedDays.splice(dayIndex, 1);
+                    }
+                    setDays(updatedDays);
+                    AsyncStorage.setItem(
+                      `${jobName}_days`,
+                      JSON.stringify(updatedDays)
+                    );
+                  }
+                }}
+                rightSwipeActions={{
+                  label: "Delete",
+                  color: "red",
+                  onPress: () => {
                     const updatedDays = [...days];
                     const dayIndex = updatedDays.findIndex(
                       (d) => d.date === selectedDay
@@ -552,120 +532,43 @@ export default function JobScreen() {
                         JSON.stringify(updatedDays)
                       );
                     }
-                  }}
-                >
-                  <Text style={{ color: "white" }}>Delete</Text>
-                </TouchableOpacity>
-              );
-            };
-
-            const renderLeftActions = (
-              progress: Animated.AnimatedInterpolation<number>,
-              dragX: Animated.AnimatedInterpolation<number>
-            ) => {
-              return (
-                <TouchableOpacity
-                  style={{
-                    backgroundColor: "blue",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    width: 60,
-                  }}
-                  onPress={() => {
+                  },
+                }}
+                leftSwipeActions={{
+                  label: "Edit",
+                  color: "blue",
+                  onPress: () => {
                     setModalMode("edit");
                     setEditingEntryIndex(index);
                     setStartTimeInput(item.start);
                     setEndTimeInput(item.end);
                     setIsModalVisible(true);
-                  }}
-                >
-                  <Text style={{ color: "white" }}>Edit</Text>
-                </TouchableOpacity>
-              );
-            };
-
-            return (
-              <Swipeable
-                renderRightActions={renderRightActions}
-                renderLeftActions={renderLeftActions}
-              >
-                <Button
-                  style={[styles.timeEntry, { flex: 1 }]}
-                  rippleColor="transparent"
-                >
-                  <View style={styles.buttonContent}>
-                    <Text style={styles.timeEntryText}>
-                      {item.start} - {item.end}
-                    </Text>
-                    {!isMobileOrTablet() && (
-                      <Menu
-                        visible={menuVisible === index}
-                        onDismiss={() => setMenuVisible(null)}
-                        anchor={
-                          <IconButton
-                            style={styles.contextMenuButtons}
-                            icon="dots-vertical"
-                            size={20}
-                            onPress={(e) => {
-                              e.stopPropagation();
-                              setMenuVisible(index);
-                            }}
-                          />
-                        }
-                      >
-                        <Menu.Item
-                          onPress={() => {
-                            setModalMode("edit");
-                            setEditingEntryIndex(index);
-                            setStartTimeInput(item.start);
-                            setEndTimeInput(item.end);
-                            setIsModalVisible(true);
-                            setMenuVisible(null);
-                          }}
-                          title="Edit"
-                        />
-                        <Menu.Item
-                          onPress={() => {
-                            const updatedDays = [...days];
-                            const dayIndex = updatedDays.findIndex(
-                              (d) => d.date === selectedDay
-                            );
-                            if (dayIndex !== -1) {
-                              updatedDays[dayIndex].timeEntries = updatedDays[
-                                dayIndex
-                              ].timeEntries.filter((_, i) => i !== index);
-                              if (
-                                updatedDays[dayIndex].timeEntries.length === 0
-                              ) {
-                                updatedDays.splice(dayIndex, 1);
-                              }
-                              setDays(updatedDays);
-                              AsyncStorage.setItem(
-                                `${jobName}_days`,
-                                JSON.stringify(updatedDays)
-                              );
-                            }
-                            setMenuVisible(null);
-                          }}
-                          title="Delete"
-                        />
-                      </Menu>
-                    )}
-                  </View>
-                </Button>
-              </Swipeable>
+                  },
+                }}
+              />
             );
           }}
           keyExtractor={(_, index) => index.toString()}
         />
-        <Button
+        {/* <Button
           mode="outlined"
           onPress={() => setIsModalVisible(true)}
           style={styles.addButton}
           rippleColor="transparent"
         >
           <Text style={styles.addButtonText}>+</Text>
-        </Button>
+        </Button> */}
+        <IconButton
+          icon="plus"
+          size={24}
+          mode="outlined"
+          // onPress={showAddModal}
+          onPress={() => setIsModalVisible(true)}
+          style={styles.addButton}
+          rippleColor="transparent"
+          iconColor={colors.icon}
+          animated={false}
+        />
         {viewMode === "entries" && (
           <Button
             mode="outlined"

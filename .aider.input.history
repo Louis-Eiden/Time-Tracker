@@ -601,3 +601,123 @@
 
 # 2024-11-29 22:02:17.085668
 +y
+
+# 2025-04-07 15:55:28.939700
++n
+
+# 2025-04-07 17:00:00.446364
++/ask working`?
+
+# 2025-04-07 17:00:13.572223
++n
+
+# 2025-04-07 17:00:42.341295
++/ask working`?
+
+# 2025-04-07 17:00:56.834526
++y
+
+# 2025-04-07 17:09:25.623465
++n
+
+# 2025-04-07 17:09:57.038529
++/model claude-3-7-sonnet-20250219
+
+# 2025-04-07 17:10:07.461979
++/ask working`?
+
+# 2025-04-07 17:16:37.250420
++n
+
+# 2025-04-07 17:16:48.249126
++/ask working`?
+
+# 2025-04-07 17:18:29.413999
++please move all styles from the components files into the styles.ts file
+
+# 2025-04-07 17:18:54.137725
++y
+
+# 2025-04-07 17:32:48.020937
++/ask why does the addbutton font size not change when putting a smaller number into the fontSize field of the addButtonText styles in styles.ts?
+
+# 2025-04-07 18:42:53.243242
++n
+
+# 2025-04-07 18:44:03.298713
++/ask which icon library iam using here and where did you find it ut
+
+# 2025-04-07 18:44:26.231591
++y
+
+# 2025-04-07 18:44:52.978468
++ok cool whats the name for a Plus icon ?
+
+# 2025-04-07 18:55:02.387911
++I want to style the JobButton so that the jobButtonText is centered but the Menu is on the right.
+
+# 2025-04-07 18:56:06.236819
++that did not work please revert 
+
+# 2025-04-07 18:57:50.646204
++how to remove the hover background from the buttons
+
+# 2025-04-07 19:29:50.201149
++/ask how would you center the `jobButtonText`
+
+# 2025-04-08 12:14:27.692779
++n
+
+# 2025-04-08 13:03:24.314996
++/add components/HomeScreen.tsx components/JobScreen.tsx
+
+# 2025-04-08 13:03:50.018932
++/add components/ListItemModal.tsx components/SettingsScreen.tsx
+
+# 2025-04-08 13:04:39.379409
++/add components/listItem.tsx
+
+# 2025-04-08 13:06:22.237004
++create a listItem component thats exactly like the jobButton but reusable for every list entries in my screens. also style the component using a new style object in the styles.ts file called createListItemStyles
+
+# 2025-04-08 13:06:26.259960
++y
+
+# 2025-04-08 13:13:42.936856
++oh but there are no changes made 
+
+# 2025-04-08 14:27:36.826166
++ok please revert the changes I want to keep the old listitems and buttons
+
+# 2025-04-08 14:29:16.172667
++n
+
+# 2025-04-08 14:34:09.829544
++ok now use the listItem from JobScreen also for the `HomeScreen`
+
+# 2025-04-08 16:27:06.039740
++put the ListItem inside its own file
+
+# 2025-04-08 16:27:53.661313
++y
+
+# 2025-04-08 16:30:07.898959
++n
+
+# 2025-04-08 16:36:46.508376
++It didn't show the rightswipeaction on the components/JobScreen.tsx, and it opens the swiped entry when swiping it should prevent from opening
+
+# 2025-04-08 16:36:51.395812
++y
+
+# 2025-04-08 16:39:58.704643
++ok revert the changes made to the Swipeables
+
+# 2025-04-08 16:52:59.449838
++/ask how to use transfrom , translate to center an absolute positioned element
+
+# 2025-04-08 16:54:43.644000
++/ask what if element is not 100x100
+
+# 2025-04-08 17:07:52.686264
++remove the ListItem from the JobScreen.tsx file only use the ListItem.tsx component in all lists on the home and on the Job screen.
