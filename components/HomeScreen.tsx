@@ -17,62 +17,7 @@ export default function HomeScreen() {
   const navigation = useNavigation();
   const { theme } = useTheme();
   const colors = getThemeColors(theme);
-  const styles = {
-    ...createHomeStyles(colors),
-    modalContainer: {
-      flex: 1,
-      justifyContent: "center",
-      alignItems: "center",
-      backgroundColor: "rgba(0, 0, 0, 0.5)",
-    },
-    modalContent: {
-      flex: 1,
-      width: "100%",
-      justifyContent: "center",
-      alignItems: "center",
-      padding: 20,
-      backgroundColor: colors.background,
-      borderWidth: 2,
-      borderColor: colors.border,
-    },
-    modalTitle: {
-      fontSize: 18,
-      marginBottom: 15,
-      textAlign: "center",
-    },
-    input: {
-      borderWidth: 1,
-      padding: 10,
-      marginBottom: 15,
-      height: 40,
-    },
-    modalButtons: {
-      flexDirection: "row",
-      justifyContent: "space-between",
-      width: "100%",
-    },
-    modalButton: {
-      flex: 1,
-      marginHorizontal: 5,
-      borderRadius: 0,
-      borderColor: colors.border,
-      borderWidth: 2,
-    },
-    modalInput: {
-      borderWidth: 2,
-      borderColor: colors.border,
-      borderRadius: 0,
-      padding: 10,
-      marginBottom: 15,
-      height: 40,
-      width: "100%",
-    },
-    modalActionButton: {
-      borderColor: "#000000",
-      borderRadius: 0,
-      backgroundColor: "#D3D3D3",
-    },
-  };
+  const styles = createHomeStyles(colors);
 
   const showAddModal = () => {
     setModalMode("add");
@@ -138,25 +83,17 @@ export default function HomeScreen() {
                   color: "red",
                   onPress: () => {
                     setJobs(jobs.filter((_, i) => i !== index));
-                  }
+                  },
                 }}
                 leftSwipeActions={{
                   label: "Edit",
                   color: "blue",
-                  onPress: () => showEditModal(index)
+                  onPress: () => showEditModal(index),
                 }}
               />
             )}
             keyExtractor={(item) => item}
           />
-          {/* <Button
-            mode="outlined"
-            onPress={showAddModal}
-            style={styles.addButton}
-            rippleColor="transparent"
-          >
-            <Text style={styles.addButtonText}>+</Text>
-          </Button> */}
           <IconButton
             icon="plus"
             size={24}
