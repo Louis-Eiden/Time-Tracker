@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "TimeTracker",
-    "slug": "TimeTracker",
+    "name": "Time-Tracker",
+    "slug": "time-tracker",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -12,20 +12,21 @@
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
+
     "ios": {
       "supportsTablet": true
     },
+
     "android": {
+      "googleServicesFile": "./android/app/google-services.json",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "permissions": [
-        "WRITE_EXTERNAL_STORAGE",
-        "READ_EXTERNAL_STORAGE"
-      ],
+      "permissions": ["WRITE_EXTERNAL_STORAGE", "READ_EXTERNAL_STORAGE"],
       "package": "com.timetracker.app"
     },
+
     "web": {
       "favicon": "./assets/favicon.png",
       "config": {
@@ -42,6 +43,17 @@
           }
         ]
       }
-    }
+    },
+
+    "plugins": [
+      "expo-build-properties",
+      [
+        "expo-firebase-core",
+        {
+          "googleServicesFile": "./android/app/google-services.json",
+          "iosGoogleServicesFile": "./ios/GoogleService-Info.plist"
+        }
+      ]
+    ]
   }
 }
