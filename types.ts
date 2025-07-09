@@ -20,3 +20,7 @@ export interface DayEntry {
   date: string;
   timeEntries: TimeEntry[];
 }
+
+export interface JobName {
+  JobName: string;
+}

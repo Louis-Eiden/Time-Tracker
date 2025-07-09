@@ -395,7 +395,7 @@ export default function JobScreen() {
         {viewMode === "entries" && (
           <Button
             mode="outlined"
-            onPress={handlePrint(days)} //different for dayscreen
+            onPress={handlePrint(jobName, days)} //different for dayscreen
             style={[
               styles.printButton,
               {

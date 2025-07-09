@@ -1,6 +1,6 @@
-import { DayEntry, TimeEntry } from "../types";
+import { DayEntry, JobName } from "../types";
 
-const handlePrint = async (days?: DayEntry[], timeEntries?: TimeEntry[]) => {
+const handlePrint = async (jobName: JobName, days: DayEntry[]) => {
   try {
     // Generate HTML content for the timesheet
     const htmlContent = `
