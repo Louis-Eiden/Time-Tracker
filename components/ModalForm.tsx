@@ -1,10 +1,11 @@
-import React from "react";
+import React, { ReactNode, useEffect, useState } from "react";
 import { View, Modal, TextInput } from "react-native";
 import { Text, Button } from "react-native-paper";
 import { useTheme, getThemeColors } from "../contexts/ThemeContext";
-import { createListItemModalStyles } from "../theme/styles";
+import { createModalFormStyles } from "../theme/styles";
 
-interface ListItemModalProps {
+interface ModalFormProps {
+  //general
   visible: boolean;
   onClose: () => void;
   onConfirm: (value: string, startTime?: string, endTime?: string) => void;
@@ -12,14 +13,19 @@ interface ListItemModalProps {
   inputValue: string;
   onInputChange: (value: string) => void;
   placeholder?: string;
+
+  // Time related
   isTimeEntry?: boolean;
   startTime?: string;
   endTime?: string;
   onStartTimeChange?: (value: string) => void;
   onEndTimeChange?: (value: string) => void;
+
+  //other
+  children?: ReactNode;
 }
 
-export default function ListItemModal({
+export default function ModalForm({
   visible,
   onClose,
   onConfirm,
@@ -32,10 +38,11 @@ export default function ListItemModal({
   endTime = "",
   onStartTimeChange,
   onEndTimeChange,
-}: ListItemModalProps) {
+}: ModalFormProps) {
   const { theme } = useTheme();
   const colors = getThemeColors(theme);
-  const styles = createListItemModalStyles(colors);
+  const styles = createModalFormStyles(colors);
+  const [isFocused, setIsFocused] = useState(false);
 
   const handleConfirm = () => {
     if (isTimeEntry) {
@@ -80,13 +87,15 @@ export default function ListItemModal({
             </>
           ) : (
             <TextInput
-              style={styles.modalInput}
+              style={[styles.modalInput, isFocused && styles.modalInputFocused]}
               value={inputValue}
               onChangeText={onInputChange}
               placeholder={placeholder}
               placeholderTextColor={colors.text}
               selectionColor="#000000"
               underlineColorAndroid="transparent"
+              onFocus={() => setIsFocused(true)} //Just for styling when focus
+              onBlur={() => setIsFocused(false)}
             />
           )}
           <View style={styles.modalButtons}>
@@ -101,6 +110,7 @@ export default function ListItemModal({
             <Button
               mode="outlined"
               onPress={handleConfirm}
+              disabled={!inputValue.trim()}
               style={styles.modalButton}
               rippleColor="transparent"
             >

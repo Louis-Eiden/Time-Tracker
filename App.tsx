@@ -6,16 +6,18 @@ import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { Provider as PaperProvider } from "react-native-paper";
 import { View, Text } from "react-native";
 import { ThemeProvider } from "./contexts/ThemeContext";
-import HomeScreen from "./components/HomeScreen";
-import JobScreen from "./components/JobScreen";
+import HomeScreen from "@/components/HomeScreen";
+import JobScreen from "@/components/JobScreen";
 import SettingsScreen from "./components/SettingsScreen";
 import { colors } from "./theme/colors";
+import { RootStackParamList } from "./types";
 
-type RootStackParamList = {
-  Home: undefined;
-  Job: undefined;
-  Settings: undefined;
-};
+// Native Stack Navigation
+// type RootStackParamList = {
+//   Home: undefined;
+//   Job: undefined;
+//   Settings: undefined;
+// };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -54,19 +56,19 @@ export default function App() {
   const [isReady, setIsReady] = useState(false);
   const theme = useColorScheme();
 
-  useEffect(() => {
-    console.log("App mounting...");
-    try {
-      setIsReady(true);
-      console.log("App ready");
-    } catch (error) {
-      console.error("Error during app initialization:", error);
-    }
-  }, []);
+  // useEffect(() => {
+  //   console.log("App mounting...");
+  //   try {
+  //     setIsReady(true);
+  //     console.log("App ready");
+  //   } catch (error) {
+  //     console.error("Error during app initialization:", error);
+  //   }
+  // }, []);
 
-  if (!isReady) {
-    return null;
-  }
+  // if (!isReady) {
+  //   return null;
+  // }
 
   return (
     <ErrorBoundary>

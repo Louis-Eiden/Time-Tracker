@@ -1,6 +1,7 @@
 import { StyleSheet } from "react-native";
 import { isMobileOrTablet } from "../utils/platform";
 import { getThemeColors } from "../contexts/ThemeContext";
+import { red100 } from "react-native-paper/lib/typescript/styles/themes/v2/colors";
 
 // Common styles that can be reused across components
 export const createCommonStyles = (colors: ReturnType<typeof getThemeColors>) =>
@@ -20,7 +21,7 @@ export const createCommonStyles = (colors: ReturnType<typeof getThemeColors>) =>
     },
   });
 
-export const createListItemModalStyles = (
+export const createModalFormStyles = (
   colors: ReturnType<typeof getThemeColors>
 ) =>
   StyleSheet.create({
@@ -55,6 +56,9 @@ export const createListItemModalStyles = (
       height: 40,
       width: "50%",
       color: colors.text,
+    },
+    modalInputFocused: {
+      borderColor: colors.border,
     },
     modalButtons: {
       flexDirection: "row",
@@ -315,9 +319,9 @@ export const createListItemStyles = (
       alignItems: "center",
       justifyContent: "center",
       width: 225,
-      borderColor: colors.border,
-      borderWidth: 2,
-      borderRadius: 0,
+      // borderColor: colors.border,
+      // borderWidth: 0,
+      // borderRadius: 0,
     },
     text: {
       // position: "absolute",
@@ -330,11 +334,10 @@ export const createListItemStyles = (
       // flex: 1,
     },
     contextMenuButton: {
-      borderColor: colors.border,
-      borderWidth: 2,
-      borderRadius: 0,
+      // borderColor: colors.border,
+      // borderWidth: 2,
+      // borderRadius: 0,
       backgroundColor: "transparent",
-      // borderWidth: 0,
       position: "absolute",
       right: -89,
       top: -12,

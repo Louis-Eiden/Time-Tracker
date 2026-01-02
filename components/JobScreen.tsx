@@ -1,93 +1,54 @@
 import React, { useState, useEffect } from "react";
-import ListItemModal from "./ListItemModal";
+import ListItemModal from "./ModalForm";
 import ListItem from "./ListItem";
-import { View, FlatList, Platform, Share } from "react-native";
-// import RNHTMLtoPDF from "react-native-html-to-pdf";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { View, FlatList } from "react-native";
 import { useTheme, getThemeColors } from "../contexts/ThemeContext";
 import { Text, Button, IconButton } from "react-native-paper";
 import { useNavigation, useRoute, RouteProp } from "@react-navigation/native";
-import { colors } from "../theme/colors";
+// import { colors } from "../theme/colors";
 import { createJobStyles } from "../theme/styles";
-
-interface TimeEntry {
-  start: string;
-  end: string;
-  id: string;
-}
-
-interface DayEntry {
-  date: string;
-  timeEntries: TimeEntry[];
-}
+import { handlePrint } from "../utils/print";
+import { useTimes } from "../hooks/useTimes";
+import { startTimer, stopTimer } from "../services/times.services";
+import ModalForm from "./ModalForm";
+import { useModalForm } from "@/hooks/useModalForm";
+import { createTime, deleteTime } from "@/services/times.services";
+import { Time, Days } from "@/types";
 
 export default function JobScreen() {
-  const [isRunning, setIsRunning] = useState(false);
-  const [time, setTime] = useState(0);
-  const [days, setDays] = useState<DayEntry[]>([]);
-  const [selectedDay, setSelectedDay] = useState<string | null>(null);
-  const [menuVisible, setMenuVisible] = useState<number | null>(null);
-  const [viewMode, setViewMode] = useState<"days" | "entries">("days");
-  const [isModalVisible, setIsModalVisible] = useState(false);
-  const [modalMode, setModalMode] = useState<"add" | "edit">("add");
-  const [editingEntryIndex, setEditingEntryIndex] = useState<number | null>(
-    null
-  );
-  const [startTimeInput, setStartTimeInput] = useState("");
-  const [endTimeInput, setEndTimeInput] = useState("");
-  const [startTime, setStartTime] = useState<number | null>(null);
-  const navigation = useNavigation();
-  const route =
-    useRoute<RouteProp<{ params: { jobName: string } }, "params">>();
-  const jobName = route.params?.jobName;
   const { theme } = useTheme();
   const colors = getThemeColors(theme);
   const styles = createJobStyles(colors);
 
-  // Load saved state
-  useEffect(() => {
-    const loadSavedState = async () => {
-      try {
-        const savedStartTime = await AsyncStorage.getItem(
-          `${jobName}_startTime`
-        );
-        const savedIsRunning = await AsyncStorage.getItem(
-          `${jobName}_isRunning`
-        );
-        const savedDays = await AsyncStorage.getItem(`${jobName}_days`);
+  const [isTimeModalVisible, setIsTimeModalVisible] = useState(false);
+  const [startTime, setStartTime] = useState("");
+  const [endTime, setEndTime] = useState("");
 
-        if (savedStartTime && savedIsRunning === "true") {
-          const startTimeNum = parseInt(savedStartTime);
-          setStartTime(startTimeNum);
-          setIsRunning(true);
-          const elapsedSeconds = Math.floor((Date.now() - startTimeNum) / 1000);
-          setTime(elapsedSeconds);
-        }
+  const navigation = useNavigation();
+  const route =
+    useRoute<
+      RouteProp<{ params: { jobId: string; jobName: string } }, "params">
+    >();
 
-        if (savedDays) {
-          setDays(JSON.parse(savedDays));
-        }
-      } catch (error) {
-        console.error("Error loading saved state:", error);
-      }
-    };
+  const userId = "local-user"; // TODO: needs to be changes when authentication is added
+  const [selectedDay, setSelectedDay] = useState<string | null>(null); // When a day is selected it shows the times
+  const { jobId, jobName } = route.params;
+  const { times } = useTimes(jobId);
+  const activeEntry = times.find((t) => t.end === null) ?? null; // checks for running timers
 
-    loadSavedState();
-  }, [jobName]);
+  // Helper function
 
-  // Timer effect
-  useEffect(() => {
-    let interval: NodeJS.Timeout;
-    if (isRunning) {
-      interval = setInterval(() => {
-        if (startTime) {
-          const elapsedSeconds = Math.floor((Date.now() - startTime) / 1000);
-          setTime(elapsedSeconds);
-        }
-      }, 1000);
+  const elapsedSeconds = activeEntry
+    ? Math.floor((Date.now() - activeEntry.start.toMillis()) / 1000)
+    : 0;
+
+  const handleStartStop = async () => {
+    if (activeEntry) {
+      await stopTimer(activeEntry.id);
+    } else {
+      await startTimer(jobId, userId);
     }
-    return () => clearInterval(interval);
-  }, [isRunning, startTime]);
+  };
 
   const formatTime = (seconds: number) => {
     const hrs = Math.floor(seconds / 3600);
@@ -99,50 +60,21 @@ export default function JobScreen() {
     )}:${String(secs).padStart(2, "0")}`;
   };
 
-  const handleStartStop = async () => {
-    if (isRunning) {
-      // Stopping the timer
-      const currentDate = new Date().toISOString().split("T")[0];
-      const newEntry = {
-        id: Date.now().toString(),
-        start: new Date(startTime!).toLocaleTimeString(),
-        end: new Date().toLocaleTimeString(),
-      };
+  // Get all Days from Times collection
+  const days = React.useMemo(() => {
+    const map = new Map<string, typeof times>();
 
-      const updatedDays = [...days];
-      const dayIndex = updatedDays.findIndex((day) => day.date === currentDate);
+    times.forEach((t) => {
+      const date = new Date(t.start.toMillis()).toDateString();
+      if (!map.has(date)) map.set(date, []);
+      map.get(date)!.push(t);
+    });
 
-      if (dayIndex >= 0) {
-        updatedDays[dayIndex].timeEntries.push(newEntry);
-      } else {
-        updatedDays.push({
-          date: currentDate,
-          timeEntries: [newEntry],
-        });
-      }
-
-      setDays(updatedDays);
-      setTime(0);
-      setStartTime(null);
-
-      // Save state
-      await AsyncStorage.setItem(`${jobName}_isRunning`, "false");
-      await AsyncStorage.setItem(
-        `${jobName}_days`,
-        JSON.stringify(updatedDays)
-      );
-      await AsyncStorage.removeItem(`${jobName}_startTime`);
-    } else {
-      // Starting the timer
-      const now = Date.now();
-      setStartTime(now);
-
-      // Save state
-      await AsyncStorage.setItem(`${jobName}_startTime`, now.toString());
-      await AsyncStorage.setItem(`${jobName}_isRunning`, "true");
-    }
-    setIsRunning(!isRunning);
-  };
+    return Array.from(map.entries()).map(([date, times]) => ({
+      date,
+      times,
+    }));
+  }, [times]);
 
   return (
     <View style={styles.container}>
@@ -175,9 +107,17 @@ export default function JobScreen() {
         />
       </View>
 
-      <Text style={styles.timer}>{formatTime(time)}</Text>
+      {/* ============================================================================ */}
+      {/* Timer */}
+      {/* ============================================================================ */}
 
+      <Text style={styles.timer}>{formatTime(elapsedSeconds)}</Text>
+
+      {/* ============================================================================ */}
+      {/* Start/Stop Button */}
+      {/* ============================================================================ */}
       {/* TODO: Add Hover effect using boxshadow so it looks pressed when isRunning*/}
+
       <View style={styles.timerContainer}>
         <Button
           mode="outlined"
@@ -186,60 +126,16 @@ export default function JobScreen() {
           theme={{ colors: { outline: "#000000" } }}
           rippleColor="transparent"
         >
-          <Text style={styles.buttonText}>{isRunning ? "⏸" : "▶"}</Text>
+          <Text style={styles.buttonText}>{activeEntry ? "⏸" : "▶"}</Text>
         </Button>
       </View>
 
-      <ListItemModal
-        visible={isModalVisible}
-        onClose={() => {
-          setIsModalVisible(false);
-          setStartTimeInput("");
-          setEndTimeInput("");
-          setEditingEntryIndex(null);
-        }}
-        onConfirm={(_, startTime, endTime) => {
-          if (startTime && endTime) {
-            const updatedDays = [...days];
-            const dayIndex = updatedDays.findIndex(
-              (d) => d.date === selectedDay
-            );
-
-            if (
-              modalMode === "edit" &&
-              editingEntryIndex !== null &&
-              dayIndex !== -1
-            ) {
-              updatedDays[dayIndex].timeEntries[editingEntryIndex] = {
-                ...updatedDays[dayIndex].timeEntries[editingEntryIndex],
-                start: startTime,
-                end: endTime,
-              };
-            }
-
-            setDays(updatedDays);
-            AsyncStorage.setItem(
-              `${jobName}_days`,
-              JSON.stringify(updatedDays)
-            );
-            setIsModalVisible(false);
-            setStartTimeInput("");
-            setEndTimeInput("");
-            setEditingEntryIndex(null);
-          }
-        }}
-        title={modalMode === "add" ? "Add Time Entry" : "Edit Time Entry"}
-        inputValue=""
-        onInputChange={() => {}}
-        isTimeEntry={true}
-        startTime={startTimeInput}
-        endTime={endTimeInput}
-        onStartTimeChange={setStartTimeInput}
-        onEndTimeChange={setEndTimeInput}
-      />
-
+      {/* ============================================================================ */}
+      {/* List JSX */}
+      {/* ============================================================================ */}
       <View style={styles.timeEntryList}>
-        {viewMode === "days" && (
+        {/* Backbutton */}
+        {selectedDay === null && (
           <Button
             style={styles.backToJobsButton}
             onPress={() => navigation.goBack()}
@@ -248,11 +144,10 @@ export default function JobScreen() {
             <Text style={styles.backButtonText}>← Back to Jobs</Text>
           </Button>
         )}
-        {viewMode === "entries" && (
+        {selectedDay !== null && (
           <Button
             style={styles.backButton}
             onPress={() => {
-              setViewMode("days");
               setSelectedDay(null);
             }}
             rippleColor="transparent"
@@ -260,142 +155,76 @@ export default function JobScreen() {
             <Text style={styles.backButtonText}>← Back to Days</Text>
           </Button>
         )}
-        <FlatList
-          data={
-            viewMode === "days"
-              ? days
-              : days.find((d) => d.date === selectedDay)?.timeEntries || []
-          }
-          renderItem={({ item, index }) => {
-            if (viewMode === "days") {
-              return (
-                <ListItem
-                  text={`${new Date(item.date).toLocaleDateString()} (${
-                    item.timeEntries.length
-                  } entries)`}
-                  onPress={() => {
-                    setSelectedDay(item.date);
-                    setViewMode("entries");
-                  }}
-                  onDelete={() => {
-                    const updatedDays = days.filter(
-                      (d) => d.date !== item.date
-                    );
-                    setDays(updatedDays);
-                    AsyncStorage.setItem(
-                      `${jobName}_days`,
-                      JSON.stringify(updatedDays)
-                    );
-                  }}
-                  rightSwipeActions={{
-                    label: "Delete",
-                    color: "red",
-                    onPress: () => {
-                      const updatedDays = days.filter(
-                        (d) => d.date !== item.date
-                      );
-                      setDays(updatedDays);
-                      AsyncStorage.setItem(
-                        `${jobName}_days`,
-                        JSON.stringify(updatedDays)
-                      );
-                    },
-                  }}
-                />
-              );
-            }
 
-            return (
+        {/* ============================================================================ */}
+        {/* Days FlatList */}
+        {selectedDay === null && (
+          <FlatList<Days>
+            data={days}
+            keyExtractor={(item) => item.date}
+            renderItem={({ item }) => (
               <ListItem
-                text={`${item.start} - ${item.end}`}
-                onEdit={() => {
-                  setModalMode("edit");
-                  setEditingEntryIndex(index);
-                  setStartTimeInput(item.start);
-                  setEndTimeInput(item.end);
-                  setIsModalVisible(true);
-                }}
+                text={`${new Date(item.date).toLocaleDateString()} (${
+                  item.times.length
+                } entries)`}
+                onPress={() => setSelectedDay(item.date)}
                 onDelete={() => {
-                  const updatedDays = [...days];
-                  const dayIndex = updatedDays.findIndex(
-                    (d) => d.date === selectedDay
-                  );
-                  if (dayIndex !== -1) {
-                    updatedDays[dayIndex].timeEntries = updatedDays[
-                      dayIndex
-                    ].timeEntries.filter((_, i) => i !== index);
-                    if (updatedDays[dayIndex].timeEntries.length === 0) {
-                      updatedDays.splice(dayIndex, 1);
-                    }
-                    setDays(updatedDays);
-                    AsyncStorage.setItem(
-                      `${jobName}_days`,
-                      JSON.stringify(updatedDays)
-                    );
-                  }
+                  // TODO: delete from days array and more important recrusively delete from firestore
+                  // TODO: add safety check "really delete all times from this day?"
                 }}
                 rightSwipeActions={{
                   label: "Delete",
                   color: "red",
                   onPress: () => {
-                    const updatedDays = [...days];
-                    const dayIndex = updatedDays.findIndex(
-                      (d) => d.date === selectedDay
-                    );
-                    if (dayIndex !== -1) {
-                      updatedDays[dayIndex].timeEntries = updatedDays[
-                        dayIndex
-                      ].timeEntries.filter((_, i) => i !== index);
-                      if (updatedDays[dayIndex].timeEntries.length === 0) {
-                        updatedDays.splice(dayIndex, 1);
-                      }
-                      setDays(updatedDays);
-                      AsyncStorage.setItem(
-                        `${jobName}_days`,
-                        JSON.stringify(updatedDays)
-                      );
-                    }
-                  },
-                }}
-                leftSwipeActions={{
-                  label: "Edit",
-                  color: "blue",
-                  onPress: () => {
-                    setModalMode("edit");
-                    setEditingEntryIndex(index);
-                    setStartTimeInput(item.start);
-                    setEndTimeInput(item.end);
-                    setIsModalVisible(true);
+                    // TODO: delete from days array and more important recrusively delete from firestore
+                    // TODO: add safety check "really delete all times from this day?"
                   },
                 }}
               />
-            );
-          }}
-          keyExtractor={(_, index) => index.toString()}
-        />
-        {/* <Button
-          mode="outlined"
-          onPress={() => setIsModalVisible(true)}
-          style={styles.addButton}
-          rippleColor="transparent"
-        >
-          <Text style={styles.addButtonText}>+</Text>
-        </Button> */}
+            )}
+          />
+        )}
+
+        {/* ============================================================================ */}
+        {/* Times FlatList */}
+        {selectedDay !== null && (
+          <FlatList<Time>
+            data={days.find((d) => d.date === selectedDay)?.times ?? []}
+            keyExtractor={(item) => item.id}
+            renderItem={({ item }) => (
+              <ListItem
+                text={`${new Date(
+                  item.start.toMillis()
+                ).toLocaleTimeString()} - ${
+                  item.end
+                    ? new Date(item.end.toMillis()).toLocaleTimeString()
+                    : "Running"
+                }`}
+                rightSwipeActions={{
+                  label: "Delete",
+                  color: "red",
+                  onPress: () => deleteTime(item.id),
+                }}
+              />
+            )}
+          />
+        )}
+
         <IconButton
           icon="plus"
           size={24}
           mode="outlined"
           // onPress={showAddModal}
-          onPress={() => setIsModalVisible(true)}
+          onPress={() => setIsTimeModalVisible(true)}
           style={styles.addButton}
           rippleColor="transparent"
           iconColor={colors.icon}
           animated={false}
         />
-        {viewMode === "entries" && (
+        {selectedDay !== null && (
           <Button
             mode="outlined"
-            onPress={handlePrint(jobName, days)} //different for dayscreen
+            onPress={() => handlePrint(jobName, days)} //different for dayscreen
             style={[
               styles.printButton,
               {
@@ -409,6 +238,34 @@ export default function JobScreen() {
           </Button>
         )}
       </View>
+
+      {/* ============================================================================ */}
+      {/* ModalForm JSX */}
+      {/* ============================================================================ */}
+      <ModalForm
+        visible={isTimeModalVisible}
+        title="Add time"
+        isTimeEntry
+        inputValue="" // required by ModalForm
+        onInputChange={() => {}} // noop
+        startTime={startTime}
+        endTime={endTime}
+        onStartTimeChange={setStartTime}
+        onEndTimeChange={setEndTime}
+        onClose={() => setIsTimeModalVisible(false)}
+        onConfirm={(_, start, end) => {
+          if (!start || !end) return;
+
+          createTime({
+            jobId,
+            userId,
+            start: new Date(start),
+            end: new Date(end),
+          });
+
+          setIsTimeModalVisible(false);
+        }}
+      />
     </View>
   );
 }

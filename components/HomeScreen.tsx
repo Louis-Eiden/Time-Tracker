@@ -1,49 +1,34 @@
 import React, { useState } from "react";
 import { View, FlatList } from "react-native";
-import ListItemModal from "./ListItemModal";
+import ModalForm from "./ModalForm";
 import ListItem from "./ListItem";
+
+// types
+import { Job } from "@/types";
+
 import { Text, IconButton } from "react-native-paper";
 import { useNavigation } from "@react-navigation/native";
-import { useTheme, getThemeColors } from "../contexts/ThemeContext";
-import { createHomeStyles, createCommonStyles } from "../theme/styles";
+import { useTheme, getThemeColors } from "@/contexts/ThemeContext";
+import { createHomeStyles, createCommonStyles } from "@/theme/styles";
+
+import { useJobs } from "@/hooks/useJobs";
+import { useModalForm } from "@/hooks/useModalForm";
+
+import { createJob, deleteJob, updateJob } from "@/services/jobs.services";
 
 export default function HomeScreen() {
-  const [jobs, setJobs] = useState<string[]>(["Job 1", "Job 2"]);
-  const [isModalVisible, setIsModalVisible] = useState(false);
-  const [modalMode, setModalMode] = useState<"add" | "edit">("add");
-  const [jobInput, setJobInput] = useState("");
-  const [editingJobIndex, setEditingJobIndex] = useState<number | null>(null);
-  const [menuVisible, setMenuVisible] = useState<number | null>(null);
+  // hooks
   const navigation = useNavigation();
+  const modal = useModalForm<Job>({
+    onAdd: createJob,
+    onEdit: (job, value) => updateJob(job.id, value),
+  });
+  const { jobs, loading } = useJobs();
+
+  // context
   const { theme } = useTheme();
   const colors = getThemeColors(theme);
   const styles = createHomeStyles(colors);
-
-  const showAddModal = () => {
-    setModalMode("add");
-    setJobInput("");
-    setIsModalVisible(true);
-  };
-
-  const showEditModal = (index: number) => {
-    setModalMode("edit");
-    setEditingJobIndex(index);
-    setJobInput(jobs[index]);
-    setIsModalVisible(true);
-  };
-
-  const handleJobConfirm = (value: string) => {
-    if (modalMode === "add") {
-      setJobs([...jobs, value]);
-    } else {
-      const updatedJobs = [...jobs];
-      if (editingJobIndex !== null) {
-        updatedJobs[editingJobIndex] = value;
-        setJobs(updatedJobs);
-      }
-    }
-    setIsModalVisible(false);
-  };
 
   return (
     //TODO: Make one headbar so its easier to style and change theme / mode
@@ -70,35 +55,34 @@ export default function HomeScreen() {
         <View style={[styles.jobList, { borderColor: colors.border }]}>
           <FlatList
             data={jobs}
-            renderItem={({ item, index }) => (
+            keyExtractor={(item) => item.id}
+            renderItem={({ item }) => (
               <ListItem
-                text={item}
-                onPress={() => navigation.navigate("Job", { jobName: item })}
-                onEdit={() => showEditModal(index)}
-                onDelete={() => {
-                  setJobs(jobs.filter((_, i) => i !== index));
-                }}
+                text={item.name}
+                onPress={() =>
+                  navigation.navigate("Job", {
+                    jobId: item.id,
+                    jobName: item.name,
+                  })
+                }
                 rightSwipeActions={{
                   label: "Delete",
                   color: "red",
-                  onPress: () => {
-                    setJobs(jobs.filter((_, i) => i !== index));
-                  },
+                  onPress: () => deleteJob(item.id),
                 }}
                 leftSwipeActions={{
                   label: "Edit",
                   color: "blue",
-                  onPress: () => showEditModal(index),
+                  onPress: () => modal.openEdit(item, item.name),
                 }}
               />
             )}
-            keyExtractor={(item) => item}
           />
           <IconButton
             icon="plus"
             size={24}
             mode="outlined"
-            onPress={showAddModal}
+            onPress={modal.openAdd}
             style={styles.addButton}
             rippleColor="transparent"
             iconColor={colors.icon}
@@ -107,14 +91,13 @@ export default function HomeScreen() {
         </View>
       </View>
 
-      <ListItemModal
-        visible={isModalVisible}
-        onClose={() => setIsModalVisible(false)}
-        onConfirm={handleJobConfirm}
-        title={modalMode === "add" ? "New Job" : "Edit Job"}
-        inputValue={jobInput}
-        onInputChange={setJobInput}
-        placeholder="Enter job name"
+      <ModalForm
+        visible={modal.visible}
+        onClose={modal.close}
+        onConfirm={modal.confirm}
+        title={modal.isEditing ? "Edit Job" : "New Job"}
+        inputValue={modal.value}
+        onInputChange={modal.setValue}
       />
     </View>
   );

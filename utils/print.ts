@@ -1,6 +1,7 @@
-import { DayEntry, JobName } from "../types";
+import { Platform, Alert } from "react-native";
+import { Days } from "../types";
 
-const handlePrint = async (jobName: JobName, days: DayEntry[]) => {
+export const handlePrint = async (jobName: string, days: Days[]) => {
   try {
     // Generate HTML content for the timesheet
     const htmlContent = `
@@ -64,19 +65,39 @@ const handlePrint = async (jobName: JobName, days: DayEntry[]) => {
               <h2>${jobName}</h2>
               <p>Generated on ${new Date().toLocaleDateString()}</p>
             </div>
+            <!-- Inline IIFE used to generate weekly sections -->
             ${(() => {
               // Group days by week
-              const weekMap = new Map();
+
+              // STEP 1 — Create a Map where:
+              // key   = ISO date string representing the start of the week (Sunday)
+              // value = array of DayEntry objects that fall within that week
+              const weekMap = new Map<string, DayEntry[]>();
+
+              // STEP 2 — Loop through each day in the days array
               days.forEach((day) => {
+                // Convert the day's date string into a Date object
                 const date = new Date(day.date);
+
+                // Create a new Date object to calculate the week's start
+                // (copying date so we don’t mutate the original)
                 const weekStart = new Date(date);
-                weekStart.setDate(date.getDate() - date.getDay()); // Start of week (Sunday)
+
+                // Adjust the date backwards to the start of the week (Sunday)
+                // getDay() returns 0–6 (Sunday–Saturday)
+                weekStart.setDate(date.getDate() - date.getDay());
+
+                // Convert the week start date to an ISO string (YYYY-MM-DD)
+                // This will be used as a unique key for each week
                 const weekKey = weekStart.toISOString().split("T")[0];
 
+                // If this week does not yet exist in the map, initialize it
                 if (!weekMap.has(weekKey)) {
                   weekMap.set(weekKey, []);
                 }
-                weekMap.get(weekKey).push(day);
+
+                // Add the current day to its corresponding week group
+                weekMap.get(weekKey)!.push(day);
               });
 
               // Sort weeks and render
@@ -160,18 +181,27 @@ const handlePrint = async (jobName: JobName, days: DayEntry[]) => {
         </html>
       `;
 
-    // Create a Blob from the HTML content
-    const blob = new Blob([htmlContent], { type: "text/html" });
+    // WEB
+    if (Platform.OS === "web") {
+      // Create a Blob from the HTML content
+      const blob = new Blob([htmlContent], { type: "text/html" });
 
-    // Create a URL for the Blob
-    const url = URL.createObjectURL(blob);
+      // Create a URL for the Blob
+      const url = URL.createObjectURL(blob);
 
-    // Open the URL in a new window/tab
-    window.open(url, "_blank");
+      // Open the URL in a new window/tab
+      window.open(url, "_blank");
 
-    // Clean up by revoking the URL after a delay
-    setTimeout(() => URL.revokeObjectURL(url), 100);
-  } catch (error) {
+      // Clean up by revoking the URL after a delay
+      setTimeout(() => URL.revokeObjectURL(url), 100);
+      return;
+    }
+    // Native (for now)
+    Alert.alert(
+      "Print not supported",
+      "Printing is currently only available in the web"
+    );
+  } catch (error: any) {
     console.error("Error generating timesheet:", error);
     alert("Failed to generate timesheet: " + error.message);
   }

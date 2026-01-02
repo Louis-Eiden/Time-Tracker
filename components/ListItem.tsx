@@ -70,7 +70,7 @@ export default function ListItem({
     dragX: Animated.AnimatedInterpolation<number>
   ) => {
     if (!rightSwipeActions) return null;
-    
+
     return (
       <TouchableOpacity
         style={{
@@ -91,7 +91,7 @@ export default function ListItem({
     dragX: Animated.AnimatedInterpolation<number>
   ) => {
     if (!leftSwipeActions) return null;
-    
+
     return (
       <TouchableOpacity
         style={{

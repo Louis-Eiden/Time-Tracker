@@ -1,6 +1,8 @@
+import { Timestamp } from "firebase/firestore";
+
 export type RootStackParamList = {
   Home: undefined;
-  Job: { jobName: string };
+  Job: { jobId: string; jobName: string };
   Settings: undefined;
 };
 
@@ -10,17 +12,39 @@ declare global {
   }
 }
 
-export interface TimeEntry {
-  start: string;
-  end: string;
+export type Days = {
+  date: string;
+  times: Time[];
+};
+
+// NEW!!!
+export interface JobData {
+  createdAt: Timestamp;
+  name: string;
+}
+
+export interface Job extends JobData {
   id: string;
 }
 
-export interface DayEntry {
-  date: string;
-  timeEntries: TimeEntry[];
+export interface TimeData {
+  end: Timestamp | null;
+  jobId: string;
+  start: Timestamp;
+  userId: string | null; // null for now possible since there is no auth implemented yet
+  createdAt: Timestamp;
 }
 
-export interface JobName {
-  JobName: string;
+export interface Time extends TimeData {
+  id: string;
+}
+
+export interface UserData {
+  createdAt: Timestamp;
+  email: string;
+  name: string;
+}
+
+export interface User extends UserData {
+  id: string;
 }
