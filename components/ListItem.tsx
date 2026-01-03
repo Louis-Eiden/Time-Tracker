@@ -121,7 +121,7 @@ export default function ListItem({
       >
         <View style={styles.content}>
           <Text style={styles.text}>{text}</Text>
-          {!isMobileOrTablet() && allMenuItems.length > 0 && (
+          {/* {!isMobileOrTablet() && allMenuItems.length > 0 && (
             <Menu
               visible={menuVisible}
               onDismiss={() => setMenuVisible(false)}
@@ -153,7 +153,7 @@ export default function ListItem({
                 />
               ))}
             </Menu>
-          )}
+          )} */}
         </View>
       </Button>
     </Swipeable>

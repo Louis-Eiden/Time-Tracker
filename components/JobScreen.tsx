@@ -7,6 +7,7 @@ import { Text, Button, IconButton } from "react-native-paper";
 import { useNavigation, useRoute, RouteProp } from "@react-navigation/native";
 // import { colors } from "../theme/colors";
 import { createJobStyles } from "../theme/styles";
+import { createButtonStyles } from "@/theme/buttons";
 import { handlePrint } from "../utils/print";
 import { useTimes } from "../hooks/useTimes";
 import { startTimer, stopTimer } from "../services/times.services";
@@ -19,6 +20,7 @@ export default function JobScreen() {
   const { theme } = useTheme();
   const colors = getThemeColors(theme);
   const styles = createJobStyles(colors);
+  const buttonStyles = createButtonStyles(colors);
 
   const [isTimeModalVisible, setIsTimeModalVisible] = useState(false);
   const [startTime, setStartTime] = useState("");
@@ -35,11 +37,26 @@ export default function JobScreen() {
   const { jobId, jobName } = route.params;
   const { times } = useTimes(jobId);
   const activeEntry = times.find((t) => t.end === null) ?? null; // checks for running timers
+  const [now, setNow] = useState(Date.now()); // ticking state
+
+  // ticking effect
+  useEffect(() => {
+    if (!activeEntry?.start) return;
+
+    // Update once immediately so it feels responsive
+    setNow(Date.now());
+
+    const interval = setInterval(() => {
+      setNow(Date.now());
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [activeEntry?.id]);
 
   // Helper function
 
-  const elapsedSeconds = activeEntry
-    ? Math.floor((Date.now() - activeEntry.start.toMillis()) / 1000)
+  const elapsedSeconds = activeEntry?.start
+    ? Math.floor((now - activeEntry.start.toMillis()) / 1000)
     : 0;
 
   const handleStartStop = async () => {
@@ -65,7 +82,10 @@ export default function JobScreen() {
     const map = new Map<string, typeof times>();
 
     times.forEach((t) => {
+      if (!t.start) return; // ✅ guard
+
       const date = new Date(t.start.toMillis()).toDateString();
+
       if (!map.has(date)) map.set(date, []);
       map.get(date)!.push(t);
     });
@@ -137,22 +157,22 @@ export default function JobScreen() {
         {/* Backbutton */}
         {selectedDay === null && (
           <Button
-            style={styles.backToJobsButton}
+            style={buttonStyles.backToJobsButton}
             onPress={() => navigation.goBack()}
             rippleColor="transparent"
           >
-            <Text style={styles.backButtonText}>← Back to Jobs</Text>
+            <Text style={buttonStyles.backButtonText}>← Back to Jobs</Text>
           </Button>
         )}
         {selectedDay !== null && (
           <Button
-            style={styles.backButton}
+            style={buttonStyles.backButton}
             onPress={() => {
               setSelectedDay(null);
             }}
             rippleColor="transparent"
           >
-            <Text style={styles.backButtonText}>← Back to Days</Text>
+            <Text style={buttonStyles.backButtonText}>← Back to Days</Text>
           </Button>
         )}
 
@@ -187,6 +207,7 @@ export default function JobScreen() {
 
         {/* ============================================================================ */}
         {/* Times FlatList */}
+        {/* ============================================================================ */}
         {selectedDay !== null && (
           <FlatList<Time>
             data={days.find((d) => d.date === selectedDay)?.times ?? []}
@@ -209,34 +230,37 @@ export default function JobScreen() {
             )}
           />
         )}
-
-        <IconButton
-          icon="plus"
-          size={24}
-          mode="outlined"
-          // onPress={showAddModal}
-          onPress={() => setIsTimeModalVisible(true)}
-          style={styles.addButton}
-          rippleColor="transparent"
-          iconColor={colors.icon}
-          animated={false}
-        />
-        {selectedDay !== null && (
+        <View style={{ flexDirection: "row", height: 46 }}>
+          {/* ============================================================================ */}
+          {/* Print Button */}
+          {/* Only visible in Times Table */}
+          {/* ============================================================================ */}
+          {/* {selectedDay !== null && ( */}
           <Button
             mode="outlined"
             onPress={() => handlePrint(jobName, days)} //different for dayscreen
-            style={[
-              styles.printButton,
-              {
-                marginTop: 10,
-              },
-            ]}
+            style={buttonStyles.printButton}
             theme={{ colors: { outline: "#000000" } }}
             rippleColor="transparent"
           >
-            <Text style={styles.printButtonText}>Print Time</Text>
+            <Text style={buttonStyles.printButtonText}>Print</Text>
           </Button>
-        )}
+          {/* )} */}
+          {/* ============================================================================ */}
+          {/* Add Button */}
+          {/* ============================================================================ */}
+          <IconButton
+            icon="plus"
+            size={24}
+            mode="outlined"
+            // onPress={showAddModal}
+            onPress={() => setIsTimeModalVisible(true)}
+            style={buttonStyles.addButton}
+            rippleColor="transparent"
+            iconColor={colors.icon}
+            animated={false}
+          />
+        </View>
       </View>
 
       {/* ============================================================================ */}

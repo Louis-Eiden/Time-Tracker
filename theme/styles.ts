@@ -183,20 +183,6 @@ export const createHomeStyles = (colors: ReturnType<typeof getThemeColors>) =>
       display: isMobileOrTablet() ? "flex" : "none",
     },
 
-    addButton: {
-      position: "absolute",
-      bottom: 10,
-      left: 10,
-      right: 10,
-      width: "auto",
-      borderWidth: 2,
-      borderRadius: 0,
-      borderColor: colors.border,
-    },
-    addButtonText: {
-      color: colors.text,
-      fontSize: 32,
-    },
     modalContainer: {
       flex: 1,
       justifyContent: "center",
@@ -379,20 +365,6 @@ export const createJobStyles = (colors: ReturnType<typeof getThemeColors>) =>
       fontWeight: "600",
       color: colors.text,
     },
-    addButton: {
-      position: "absolute",
-      bottom: 10,
-      left: 10,
-      right: 10,
-      width: "auto",
-      borderWidth: 2,
-      borderRadius: 0,
-      borderColor: colors.border,
-    },
-    addButtonText: {
-      color: colors.text,
-      fontSize: 32,
-    },
     timer: {
       fontSize: 56,
       textAlign: "center",
@@ -400,22 +372,7 @@ export const createJobStyles = (colors: ReturnType<typeof getThemeColors>) =>
       fontWeight: "400",
       color: colors.text,
     },
-    backButton: {
-      marginBottom: 10,
-      borderWidth: 2,
-      borderColor: colors.border,
-      borderRadius: 0,
-      padding: 12,
-      height: 45,
-      justifyContent: "center",
-      alignItems: "center",
-      backgroundColor: colors.background,
-    },
-    backButtonText: {
-      color: colors.text,
-      fontSize: 22,
-      fontWeight: "600",
-    },
+
     timeEntryList: {
       minHeight: 300,
       maxHeight: 400,
@@ -429,19 +386,8 @@ export const createJobStyles = (colors: ReturnType<typeof getThemeColors>) =>
       position: "relative",
       overflow: "hidden",
     },
-    backToJobsButton: {
-      marginBottom: 10,
-      borderWidth: 2,
-      borderColor: colors.border,
-      borderRadius: 0,
-      padding: 12,
-      height: 45,
-      justifyContent: "center",
-      alignItems: "center",
-      backgroundColor: colors.background,
-      fontSize: 22,
-      fontWeight: "600",
-    },
+
+    // Start Stop Button
     button: {
       borderWidth: 2,
       borderColor: colors.border,
@@ -484,24 +430,6 @@ export const createJobStyles = (colors: ReturnType<typeof getThemeColors>) =>
       display: isMobileOrTablet() ? "flex" : "none",
     },
 
-    printButton: {
-      // padding: 12,
-      borderWidth: 2,
-      height: 46,
-      // justifyContent: "center",
-      // alignItems: "center",
-      // position: "absolute",
-      // bottom: 10,
-      // width: 276,
-      borderColor: colors.border,
-      borderRadius: 0,
-      backgroundColor: colors.background,
-    },
-    printButtonText: {
-      color: colors.text,
-      fontSize: 22,
-      fontWeight: "600",
-    },
     backIcon: {
       color: colors.icon,
     },

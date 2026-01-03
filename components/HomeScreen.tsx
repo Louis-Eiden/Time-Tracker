@@ -10,6 +10,7 @@ import { Text, IconButton } from "react-native-paper";
 import { useNavigation } from "@react-navigation/native";
 import { useTheme, getThemeColors } from "@/contexts/ThemeContext";
 import { createHomeStyles, createCommonStyles } from "@/theme/styles";
+import { createButtonStyles } from "@/theme/buttons";
 
 import { useJobs } from "@/hooks/useJobs";
 import { useModalForm } from "@/hooks/useModalForm";
@@ -29,6 +30,7 @@ export default function HomeScreen() {
   const { theme } = useTheme();
   const colors = getThemeColors(theme);
   const styles = createHomeStyles(colors);
+  const buttonStyles = createButtonStyles(colors);
 
   return (
     //TODO: Make one headbar so its easier to style and change theme / mode
@@ -83,7 +85,13 @@ export default function HomeScreen() {
             size={24}
             mode="outlined"
             onPress={modal.openAdd}
-            style={styles.addButton}
+            style={[
+              buttonStyles.addButton,
+              {
+                width: "100%",
+                borderLeftWidth: 2,
+              },
+            ]}
             rippleColor="transparent"
             iconColor={colors.icon}
             animated={false}

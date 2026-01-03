@@ -1,0 +1,68 @@
+import { StyleSheet } from "react-native";
+import { colors } from "../theme/colors";
+import { getThemeColors } from "@/contexts/ThemeContext";
+
+export const createButtonStyles = (colors: ReturnType<typeof getThemeColors>) =>
+  StyleSheet.create({
+    // Add Button
+    addButton: {
+      width: "50%",
+      height: 46,
+      margin: 0,
+      borderLeftWidth: 0,
+      borderWidth: 2,
+      borderRadius: 0,
+      borderColor: colors.border,
+    },
+
+    addButtonText: {
+      color: colors.text,
+      fontSize: 32,
+    },
+
+    // Print Button
+    printButton: {
+      width: "50%",
+      borderWidth: 2,
+      borderRadius: 0,
+      borderColor: colors.border,
+    },
+
+    printButtonText: {
+      color: colors.text,
+      fontSize: 22,
+      fontWeight: "600",
+    },
+
+    //   Back to days Button
+    backButton: {
+      marginBottom: 10,
+      borderWidth: 2,
+      borderColor: colors.border,
+      borderRadius: 0,
+      padding: 12,
+      height: 45,
+      justifyContent: "center",
+      alignItems: "center",
+      backgroundColor: colors.background,
+    },
+    backButtonText: {
+      color: colors.text,
+      fontSize: 22,
+      fontWeight: "600",
+    },
+    // Back to Jobs Button
+    backToJobsButton: {
+      marginBottom: 10,
+      borderWidth: 2,
+      borderColor: colors.border,
+      borderRadius: 0,
+      padding: 12,
+      height: 45,
+      justifyContent: "center",
+      alignItems: "center",
+      backgroundColor: colors.background,
+      fontSize: 22,
+      fontWeight: "600",
+    },
+  });
