@@ -1,14 +1,15 @@
 import React, { useState } from "react";
-import { StyleSheet, View } from "react-native";
+import { View } from "react-native";
 import { useTheme, getThemeColors } from "../contexts/ThemeContext";
+import { useTimeFormat } from "@/contexts/TimeContext";
 import { Text, Button, IconButton } from "react-native-paper";
 import { useNavigation } from "@react-navigation/native";
-import { colors } from "../theme/colors";
 import { createSettingsStyles } from "../theme/styles";
 
 export default function SettingsScreen() {
   const [language, setLanguage] = useState("English");
   const { theme, toggleTheme } = useTheme();
+  const { timeFormat, toggleTimeFormat } = useTimeFormat();
   const colors = getThemeColors(theme);
   const navigation = useNavigation();
   const styles = createSettingsStyles(colors);
@@ -43,6 +44,9 @@ export default function SettingsScreen() {
       </Button>
       <Button mode="outlined" onPress={toggleTheme} style={styles.button}>
         <Text style={styles.themeButtonText}>Theme: {theme}</Text>
+      </Button>
+      <Button mode="outlined" onPress={toggleTimeFormat} style={styles.button}>
+        <Text style={styles.themeButtonText}>Time Format: {timeFormat}</Text>
       </Button>
     </View>
   );

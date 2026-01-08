@@ -2,6 +2,7 @@ import React, { ReactNode, useEffect, useState } from "react";
 import { View, Modal, TextInput } from "react-native";
 import { Text, Button } from "react-native-paper";
 import { useTheme, getThemeColors } from "../contexts/ThemeContext";
+import { useTimeFormat } from "@/contexts/TimeContext";
 import { createModalFormStyles } from "../theme/styles";
 
 interface ModalFormProps {
@@ -16,9 +17,10 @@ interface ModalFormProps {
 
   // Time related
   isTimeEntry?: boolean;
-  startTime?: string;
-  endTime?: string;
-  onStartTimeChange?: (value: string) => void;
+
+  startTime?: string; // old startTime
+  endTime?: string; // old endTime
+  onStartTimeChange?: (value: string) => void; // new startTime
   onEndTimeChange?: (value: string) => void;
 
   //other
@@ -33,13 +35,14 @@ export default function ModalForm({
   inputValue,
   onInputChange,
   placeholder = "Enter name",
-  isTimeEntry = false,
+  isTimeEntry,
   startTime = "",
   endTime = "",
   onStartTimeChange,
   onEndTimeChange,
 }: ModalFormProps) {
   const { theme } = useTheme();
+  const { timeFormat } = useTimeFormat();
   const colors = getThemeColors(theme);
   const styles = createModalFormStyles(colors);
   const [isFocused, setIsFocused] = useState(false);
@@ -64,13 +67,32 @@ export default function ModalForm({
       <View style={styles.modalContainer}>
         <View style={styles.modalContent}>
           <Text style={styles.modalTitle}>{title}</Text>
+
           {isTimeEntry ? (
             <>
+              {/* Time Entry */}
+              {/* <TextInput
+                style={styles.modalInput}
+                // value={date}
+                // onChangeText={onDateChange}
+                placeholder={
+                  timeFormat === "24h"
+                    ? "date dd,mm,yyyy"
+                    : "date mm/dd/yyyy"
+                }
+                placeholderTextColor={colors.text}
+                selectionColor="#000000"
+                underlineColorAndroid="transparent"
+              /> */}
               <TextInput
                 style={styles.modalInput}
                 value={startTime}
                 onChangeText={onStartTimeChange}
-                placeholder="Start Time (HH:MM)"
+                placeholder={
+                  timeFormat === "24h"
+                    ? "Start Time (HH:MM)"
+                    : "Start Time hh:mm AM/PM"
+                }
                 placeholderTextColor={colors.text}
                 selectionColor="#000000"
                 underlineColorAndroid="transparent"
@@ -79,13 +101,18 @@ export default function ModalForm({
                 style={styles.modalInput}
                 value={endTime}
                 onChangeText={onEndTimeChange}
-                placeholder="End Time (HH:MM)"
+                placeholder={
+                  timeFormat === "24h"
+                    ? "End Time (HH:MM)"
+                    : "End Time hh:mm AM/PM"
+                }
                 placeholderTextColor={colors.text}
                 selectionColor="#000000"
                 underlineColorAndroid="transparent"
               />
             </>
           ) : (
+            // Job Name Entry
             <TextInput
               style={[styles.modalInput, isFocused && styles.modalInputFocused]}
               value={inputValue}
@@ -110,7 +137,12 @@ export default function ModalForm({
             <Button
               mode="outlined"
               onPress={handleConfirm}
-              disabled={!inputValue.trim()}
+              disabled={
+                // disable if either input is empty
+                isTimeEntry
+                  ? !startTime?.trim() || !endTime?.trim()
+                  : !inputValue.trim()
+              }
               style={styles.modalButton}
               rippleColor="transparent"
             >

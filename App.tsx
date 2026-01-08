@@ -6,18 +6,14 @@ import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { Provider as PaperProvider } from "react-native-paper";
 import { View, Text } from "react-native";
 import { ThemeProvider } from "./contexts/ThemeContext";
+import { TimeProvider } from "./contexts/TimeContext";
+
+// Screen Components
+import LoginScreen from "./components/LoginScreen";
 import HomeScreen from "@/components/HomeScreen";
 import JobScreen from "@/components/JobScreen";
 import SettingsScreen from "./components/SettingsScreen";
-import { colors } from "./theme/colors";
 import { RootStackParamList } from "./types";
-
-// Native Stack Navigation
-// type RootStackParamList = {
-//   Home: undefined;
-//   Job: undefined;
-//   Settings: undefined;
-// };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -53,7 +49,7 @@ class ErrorBoundary extends React.Component<Props> {
 }
 
 export default function App() {
-  const [isReady, setIsReady] = useState(false);
+  // const [isReady, setIsReady] = useState(false);
   const theme = useColorScheme();
 
   // useEffect(() => {
@@ -73,34 +69,22 @@ export default function App() {
   return (
     <ErrorBoundary>
       <ThemeProvider>
-        <PaperProvider>
-          <NavigationContainer
-            theme={{
-              dark: theme === "dark",
-              colors: {
-                background: colors.background,
-                text: colors.text,
-                border: colors.border,
-                icon: colors.icon,
-                link: colors.link,
-                notification: colors.text,
-                primary: colors.text,
-                card: colors.background,
-              },
-            }}
-            fallback={<Text style={{ color: colors.text }}>Loading...</Text>}
-          >
-            <Stack.Navigator
-              screenOptions={{
-                headerShown: false,
-              }}
-            >
-              <Stack.Screen name="Home" component={HomeScreen} />
-              <Stack.Screen name="Job" component={JobScreen} />
-              <Stack.Screen name="Settings" component={SettingsScreen} />
-            </Stack.Navigator>
-          </NavigationContainer>
-        </PaperProvider>
+        <TimeProvider>
+          <PaperProvider>
+            <NavigationContainer>
+              <Stack.Navigator
+                screenOptions={{
+                  headerShown: false,
+                }}
+              >
+                <Stack.Screen name="Login" component={LoginScreen} />
+                <Stack.Screen name="Home" component={HomeScreen} />
+                <Stack.Screen name="Job" component={JobScreen} />
+                <Stack.Screen name="Settings" component={SettingsScreen} />
+              </Stack.Navigator>
+            </NavigationContainer>
+          </PaperProvider>
+        </TimeProvider>
       </ThemeProvider>
     </ErrorBoundary>
   );

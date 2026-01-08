@@ -1,5 +1,4 @@
 import { StyleSheet } from "react-native";
-import { colors } from "../theme/colors";
 import { getThemeColors } from "@/contexts/ThemeContext";
 
 export const createButtonStyles = (colors: ReturnType<typeof getThemeColors>) =>

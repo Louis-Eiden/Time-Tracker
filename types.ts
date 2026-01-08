@@ -1,6 +1,8 @@
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { Timestamp } from "firebase/firestore";
 
 export type RootStackParamList = {
+  Login: undefined;
   Home: undefined;
   Job: { jobId: string; jobName: string };
   Settings: undefined;
@@ -11,6 +13,8 @@ declare global {
     interface RootParamList extends RootStackParamList {}
   }
 }
+
+export type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
 export type Days = {
   date: string;

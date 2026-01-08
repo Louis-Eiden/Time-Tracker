@@ -1,23 +1,25 @@
 import React, { useState, useEffect } from "react";
-import ListItemModal from "./ModalForm";
 import ListItem from "./ListItem";
 import { View, FlatList } from "react-native";
 import { useTheme, getThemeColors } from "../contexts/ThemeContext";
+import { useTimeFormat } from "@/contexts/TimeContext";
+import { formatDateForDisplay, formatTimeForDisplay } from "@/utils/time";
 import { Text, Button, IconButton } from "react-native-paper";
 import { useNavigation, useRoute, RouteProp } from "@react-navigation/native";
-// import { colors } from "../theme/colors";
 import { createJobStyles } from "../theme/styles";
 import { createButtonStyles } from "@/theme/buttons";
-import { handlePrint } from "../utils/print";
+import { handlePrint } from "@/utils/print";
 import { useTimes } from "../hooks/useTimes";
 import { startTimer, stopTimer } from "../services/times.services";
 import ModalForm from "./ModalForm";
-import { useModalForm } from "@/hooks/useModalForm";
+// import { useModalForm } from "@/hooks/useModalForm";
 import { createTime, deleteTime } from "@/services/times.services";
 import { Time, Days } from "@/types";
+import { parseTimeFromInput } from "@/utils/time";
 
 export default function JobScreen() {
   const { theme } = useTheme();
+  const { timeFormat } = useTimeFormat();
   const colors = getThemeColors(theme);
   const styles = createJobStyles(colors);
   const buttonStyles = createButtonStyles(colors);
@@ -43,7 +45,11 @@ export default function JobScreen() {
   useEffect(() => {
     if (!activeEntry?.start) return;
 
-    // Update once immediately so it feels responsive
+    const startMs = activeEntry.start.toMillis();
+
+    // Don't tick until the server timestamp is usable
+    if (startMs > Date.now()) return;
+
     setNow(Date.now());
 
     const interval = setInterval(() => {
@@ -51,7 +57,7 @@ export default function JobScreen() {
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [activeEntry?.id]);
+  }, [activeEntry?.id, activeEntry?.start]);
 
   // Helper function
 
@@ -77,12 +83,19 @@ export default function JobScreen() {
     )}:${String(secs).padStart(2, "0")}`;
   };
 
+  const getBaseDateForEntry = () => {
+    if (selectedDay) {
+      return new Date(selectedDay);
+    }
+    return new Date();
+  };
+
   // Get all Days from Times collection
   const days = React.useMemo(() => {
     const map = new Map<string, typeof times>();
 
     times.forEach((t) => {
-      if (!t.start) return; // ✅ guard
+      if (!t.start) return; // guard
 
       const date = new Date(t.start.toMillis()).toDateString();
 
@@ -184,9 +197,10 @@ export default function JobScreen() {
             keyExtractor={(item) => item.date}
             renderItem={({ item }) => (
               <ListItem
-                text={`${new Date(item.date).toLocaleDateString()} (${
-                  item.times.length
-                } entries)`}
+                text={`${formatDateForDisplay(
+                  new Date(item.date),
+                  timeFormat
+                )}`}
                 onPress={() => setSelectedDay(item.date)}
                 onDelete={() => {
                   // TODO: delete from days array and more important recrusively delete from firestore
@@ -214,11 +228,12 @@ export default function JobScreen() {
             keyExtractor={(item) => item.id}
             renderItem={({ item }) => (
               <ListItem
-                text={`${new Date(
-                  item.start.toMillis()
-                ).toLocaleTimeString()} - ${
+                text={`${formatTimeForDisplay(
+                  item.start.toDate(), // Convert Timestamp to Date
+                  timeFormat
+                )} - ${
                   item.end
-                    ? new Date(item.end.toMillis()).toLocaleTimeString()
+                    ? formatTimeForDisplay(item.end.toDate(), timeFormat) // Convert Timestamp to Date
                     : "Running"
                 }`}
                 rightSwipeActions={{
@@ -238,7 +253,7 @@ export default function JobScreen() {
           {/* {selectedDay !== null && ( */}
           <Button
             mode="outlined"
-            onPress={() => handlePrint(jobName, days)} //different for dayscreen
+            onPress={() => handlePrint(jobName, times, timeFormat)} //different for dayscreen
             style={buttonStyles.printButton}
             theme={{ colors: { outline: "#000000" } }}
             rippleColor="transparent"
@@ -269,9 +284,9 @@ export default function JobScreen() {
       <ModalForm
         visible={isTimeModalVisible}
         title="Add time"
-        isTimeEntry
-        inputValue="" // required by ModalForm
-        onInputChange={() => {}} // noop
+        isTimeEntry={true}
+        inputValue="" // required by ModalForm is used
+        onInputChange={() => {}}
         startTime={startTime}
         endTime={endTime}
         onStartTimeChange={setStartTime}
@@ -280,12 +295,32 @@ export default function JobScreen() {
         onConfirm={(_, start, end) => {
           if (!start || !end) return;
 
+          const baseDate = getBaseDateForEntry();
+
+          const parsedStart = parseTimeFromInput(start, baseDate, timeFormat);
+
+          const parsedEnd = parseTimeFromInput(end, baseDate, timeFormat);
+
+          if (!parsedStart || !parsedEnd) {
+            console.warn("Invalid time format");
+            return;
+          }
+
+          // Handle overnight shifts (e.g. 22:00 → 06:00)
+          if (parsedEnd <= parsedStart) {
+            parsedEnd.setDate(parsedEnd.getDate() + 1);
+          }
+
           createTime({
             jobId,
             userId,
-            start: new Date(start),
-            end: new Date(end),
+            start: parsedStart,
+            end: parsedEnd,
           });
+
+          // Clear inputs after Save
+          setStartTime("");
+          setEndTime("");
 
           setIsTimeModalVisible(false);
         }}
