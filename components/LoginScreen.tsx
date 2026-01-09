@@ -1,17 +1,17 @@
+// LoginScreen.tsx
 import React, { useState } from "react";
 import { View } from "react-native";
 import { Text, IconButton } from "react-native-paper";
+import { useNavigation } from "@react-navigation/native";
 
 import { signUpUser, signInUser } from "@/services/users.service";
-import { useNavigation } from "@react-navigation/native";
 import type { NavigationProp } from "@/types";
 import { useTheme, getThemeColors } from "@/contexts/ThemeContext";
 import { createButtonStyles } from "@/theme/buttons";
 import { createHomeStyles } from "@/theme/styles";
+import LoginForm from "@/components/LoginForm";
 
 export default function LoginScreen() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [isSignUp, setIsSignUp] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -20,10 +20,14 @@ export default function LoginScreen() {
   const { theme } = useTheme();
   const colors = getThemeColors(theme);
   const styles = createHomeStyles(colors);
-  const buttonStyles = createButtonStyles(colors);
+  const buttonStyles = createButtonStyles(colors); // (not used here yet)
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async (params: {
+    email: string;
+    password: string;
+    isSignUp: boolean;
+  }) => {
+    const { email, password, isSignUp } = params;
     setError("");
     setLoading(true);
 
@@ -52,64 +56,32 @@ export default function LoginScreen() {
           iconColor={colors.icon}
           style={styles.settingsIcon}
           rippleColor="transparent"
-          containerColor="transparent" // Background color of button
+          containerColor="transparent"
           theme={{
             colors: {
-              secondaryContainer: "transparent", // Controls hover state background
+              secondaryContainer: "transparent",
             },
           }}
           animated={false}
         />
       </View>
+
       <View style={styles.main}>
         <View style={[styles.jobList, { borderColor: colors.border }]}>
-          <div className="flex items-center justify-center min-h-screen bg-gray-100">
-            <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
-              <h1 className="text-2xl font-bold mb-6 text-center"></h1>
+          <Text style={[styles.title, { color: colors.text }]}>
+            {isSignUp ? "Sign Up" : "Login"}
+          </Text>
 
-              {error && (
-                <div className="mb-4 p-3 bg-red-100 text-red-700 rounded">
-                  {error}
-                </div>
-              )}
+          {error ? (
+            <Text style={{ color: "red", marginBottom: 8 }}>{error}</Text>
+          ) : null}
 
-              <form onSubmit={handleSubmit}>
-                <input
-                  type="email"
-                  placeholder="Email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="w-full mb-4 p-2 border rounded"
-                  required
-                />
-                <input
-                  type="password"
-                  placeholder="Password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="w-full mb-6 p-2 border rounded"
-                  required
-                />
-
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="w-full bg-blue-600 text-white p-2 rounded hover:bg-blue-700 disabled:opacity-50"
-                >
-                  {loading ? "Loading..." : isSignUp ? "Sign Up" : "Login"}
-                </button>
-              </form>
-
-              <button
-                onClick={() => setIsSignUp(!isSignUp)}
-                className="w-full mt-4 text-blue-600 hover:underline"
-              >
-                {isSignUp
-                  ? "Already have an account? Login"
-                  : "Don't have an account? Sign Up"}
-              </button>
-            </div>
-          </div>
+          <LoginForm
+            loading={loading}
+            initialIsSignUp={isSignUp}
+            onSubmit={handleSubmit}
+            onToggleMode={setIsSignUp}
+          />
         </View>
       </View>
     </View>

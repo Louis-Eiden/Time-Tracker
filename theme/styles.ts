@@ -1,7 +1,10 @@
-import { StyleSheet } from "react-native";
+import { StyleSheet, TextStyle } from "react-native";
 import { isMobileOrTablet } from "../utils/platform";
 import { getThemeColors } from "../contexts/ThemeContext";
-import { red100 } from "react-native-paper/lib/typescript/styles/themes/v2/colors";
+import {
+  red100,
+  white,
+} from "react-native-paper/lib/typescript/styles/themes/v2/colors";
 
 // Common styles that can be reused across components
 export const createCommonStyles = (colors: ReturnType<typeof getThemeColors>) =>
@@ -59,7 +62,10 @@ export const createModalFormStyles = (
     },
     modalInputFocused: {
       borderColor: colors.border,
-    },
+      outlineStyle: "none",
+      backgroundColor: "white",
+    } as TextStyle,
+
     modalButtons: {
       flexDirection: "row",
       justifyContent: "space-around",
@@ -73,6 +79,46 @@ export const createModalFormStyles = (
       borderWidth: 2,
       maxWidth: 276,
       backgroundColor: "#D3D3D3",
+    },
+  });
+
+export const createLoginStyles = (colors: ReturnType<typeof getThemeColors>) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      padding: 20,
+      backgroundColor: colors.background,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    input: {
+      borderWidth: 2,
+      borderColor: colors.border,
+      borderRadius: 0,
+      backgroundColor: colors.background,
+      padding: 10,
+      marginBottom: 15,
+      height: 40,
+      width: "100%",
+      color: colors.text,
+    },
+    inputFocused: {
+      borderColor: colors.border,
+      outlineStyle: "none",
+      backgroundColor: "white",
+    } as TextStyle,
+
+    errorText: {
+      color: "red",
+      fontSize: 12,
+      marginBottom: 4,
+    },
+    toggleButton: {
+      marginTop: 16,
+    },
+    toggleText: {
+      color: colors.text,
+      textAlign: "center",
     },
   });
 

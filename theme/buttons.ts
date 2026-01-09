@@ -3,6 +3,18 @@ import { getThemeColors } from "@/contexts/ThemeContext";
 
 export const createButtonStyles = (colors: ReturnType<typeof getThemeColors>) =>
   StyleSheet.create({
+    // Login Button
+    loginButton: {
+      marginTop: 20,
+      borderRadius: 0,
+      backgroundColor: colors.background,
+    },
+    loginButtonText: {
+      color: colors.text,
+      fontSize: 18,
+      fontWeight: "600",
+    },
+
     // Add Button
     addButton: {
       width: "50%",

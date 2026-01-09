@@ -41,11 +41,14 @@ export default function ModalForm({
   onStartTimeChange,
   onEndTimeChange,
 }: ModalFormProps) {
+  // Style and Contexts
   const { theme } = useTheme();
-  const { timeFormat } = useTimeFormat();
   const colors = getThemeColors(theme);
   const styles = createModalFormStyles(colors);
   const [isFocused, setIsFocused] = useState(false);
+  const [startTimeFocused, setStartTimeFocused] = useState(false);
+  const [endTimeFocused, setEndTimeFocused] = useState(false);
+  const { timeFormat } = useTimeFormat();
 
   const handleConfirm = () => {
     if (isTimeEntry) {
@@ -85,7 +88,10 @@ export default function ModalForm({
                 underlineColorAndroid="transparent"
               /> */}
               <TextInput
-                style={styles.modalInput}
+                style={[
+                  styles.modalInput,
+                  startTimeFocused && styles.modalInputFocused,
+                ]}
                 value={startTime}
                 onChangeText={onStartTimeChange}
                 placeholder={
@@ -94,11 +100,16 @@ export default function ModalForm({
                     : "Start Time hh:mm AM/PM"
                 }
                 placeholderTextColor={colors.text}
-                selectionColor="#000000"
-                underlineColorAndroid="transparent"
+                onFocus={() => setStartTimeFocused(true)} //Just for styling when focus
+                onBlur={() => setStartTimeFocused(false)}
+                // selectionColor="#000000"
+                // underlineColorAndroid="transparent"
               />
               <TextInput
-                style={styles.modalInput}
+                style={[
+                  styles.modalInput,
+                  endTimeFocused && styles.modalInputFocused,
+                ]}
                 value={endTime}
                 onChangeText={onEndTimeChange}
                 placeholder={
@@ -107,8 +118,10 @@ export default function ModalForm({
                     : "End Time hh:mm AM/PM"
                 }
                 placeholderTextColor={colors.text}
-                selectionColor="#000000"
-                underlineColorAndroid="transparent"
+                onFocus={() => setEndTimeFocused(true)} //Just for styling when focus
+                onBlur={() => setEndTimeFocused(false)}
+                // selectionColor="#000000"
+                // underlineColorAndroid="transparent"
               />
             </>
           ) : (
@@ -119,8 +132,8 @@ export default function ModalForm({
               onChangeText={onInputChange}
               placeholder={placeholder}
               placeholderTextColor={colors.text}
-              selectionColor="#000000"
-              underlineColorAndroid="transparent"
+              // selectionColor="#000000"
+              // underlineColorAndroid="transparent"
               onFocus={() => setIsFocused(true)} //Just for styling when focus
               onBlur={() => setIsFocused(false)}
             />
