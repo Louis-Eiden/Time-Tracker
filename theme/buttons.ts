@@ -6,9 +6,16 @@ export const createButtonStyles = (colors: ReturnType<typeof getThemeColors>) =>
     // Login Button
     loginButton: {
       marginTop: 20,
+      padding: 20,
       borderRadius: 0,
       backgroundColor: colors.background,
+      borderWidth: 2,
+      borderColor: colors.border,
+      height: 45,
+      alignItems: "center",
+      justifyContent: "center",
     },
+
     loginButtonText: {
       color: colors.text,
       fontSize: 18,

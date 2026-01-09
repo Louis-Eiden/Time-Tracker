@@ -16,6 +16,7 @@ import ModalForm from "./ModalForm";
 import { createTime, deleteTime } from "@/services/times.services";
 import { Time, Days } from "@/types";
 import { parseTimeFromInput } from "@/utils/time";
+import Header from "./Header";
 
 export default function JobScreen() {
   const { theme } = useTheme();
@@ -111,34 +112,7 @@ export default function JobScreen() {
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <IconButton
-          icon="arrow-left"
-          onPress={() => navigation.goBack()}
-          iconColor={colors.icon}
-          // style={{ elevation: 0 }}
-          containerColor="transparent" // Background color of button
-          theme={{
-            colors: {
-              secondaryContainer: "transparent", // Controls hover state background
-            },
-          }}
-        />
-        <Text style={styles.title}>{jobName}</Text>
-        <IconButton
-          icon="cog"
-          onPress={() => navigation.navigate("Settings")}
-          iconColor={colors.icon}
-          style={{ elevation: 0 }}
-          rippleColor="transparent"
-          containerColor="transparent" // Background color of button
-          theme={{
-            colors: {
-              secondaryContainer: "transparent", // Controls hover state background
-            },
-          }}
-        />
-      </View>
+      <Header jobName={jobName} />
 
       {/* ============================================================================ */}
       {/* Timer */}
@@ -208,7 +182,6 @@ export default function JobScreen() {
                 }}
                 rightSwipeActions={{
                   label: "Delete",
-                  color: "red",
                   onPress: () => {
                     // TODO: delete from days array and more important recrusively delete from firestore
                     // TODO: add safety check "really delete all times from this day?"
@@ -238,7 +211,6 @@ export default function JobScreen() {
                 }`}
                 rightSwipeActions={{
                   label: "Delete",
-                  color: "red",
                   onPress: () => deleteTime(item.id),
                 }}
               />

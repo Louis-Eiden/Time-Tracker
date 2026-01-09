@@ -16,6 +16,7 @@ import { useJobs } from "@/hooks/useJobs";
 import { useModalForm } from "@/hooks/useModalForm";
 
 import { createJob, deleteJob, updateJob } from "@/services/jobs.services";
+import Header from "./Header";
 
 export default function HomeScreen() {
   // hooks
@@ -35,24 +36,8 @@ export default function HomeScreen() {
   return (
     //TODO: Make one headbar so its easier to style and change theme / mode
     <View style={styles.container}>
-      <View style={styles.header}>
-        <Text style={[styles.title, { color: colors.text }]}>Time Tracker</Text>
-        <IconButton
-          icon="cog"
-          size={24}
-          onPress={() => navigation.navigate("Settings")}
-          iconColor={colors.icon}
-          style={styles.settingsIcon}
-          rippleColor="transparent"
-          containerColor="transparent" // Background color of button
-          theme={{
-            colors: {
-              secondaryContainer: "transparent", // Controls hover state background
-            },
-          }}
-          animated={false}
-        />
-      </View>
+      <Header />
+
       <View style={styles.main}>
         <View style={[styles.jobList, { borderColor: colors.border }]}>
           <FlatList
@@ -69,12 +54,10 @@ export default function HomeScreen() {
                 }
                 rightSwipeActions={{
                   label: "Delete",
-                  color: "red",
                   onPress: () => deleteJob(item.id),
                 }}
                 leftSwipeActions={{
                   label: "Edit",
-                  color: "blue",
                   onPress: () => modal.openEdit(item, item.name),
                 }}
               />

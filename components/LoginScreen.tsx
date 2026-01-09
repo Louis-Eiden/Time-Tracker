@@ -10,6 +10,7 @@ import { useTheme, getThemeColors } from "@/contexts/ThemeContext";
 import { createButtonStyles } from "@/theme/buttons";
 import { createHomeStyles } from "@/theme/styles";
 import LoginForm from "@/components/LoginForm";
+import Header from "./Header";
 
 export default function LoginScreen() {
   const [isSignUp, setIsSignUp] = useState(false);
@@ -47,24 +48,7 @@ export default function LoginScreen() {
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <Text style={[styles.title, { color: colors.text }]}>Time Tracker</Text>
-        <IconButton
-          icon="cog"
-          size={24}
-          onPress={() => navigation.navigate("Settings")}
-          iconColor={colors.icon}
-          style={styles.settingsIcon}
-          rippleColor="transparent"
-          containerColor="transparent"
-          theme={{
-            colors: {
-              secondaryContainer: "transparent",
-            },
-          }}
-          animated={false}
-        />
-      </View>
+      <Header />
 
       <View style={styles.main}>
         <View style={[styles.jobList, { borderColor: colors.border }]}>

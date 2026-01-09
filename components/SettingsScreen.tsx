@@ -5,6 +5,7 @@ import { useTimeFormat } from "@/contexts/TimeContext";
 import { Text, Button, IconButton } from "react-native-paper";
 import { useNavigation } from "@react-navigation/native";
 import { createSettingsStyles } from "../theme/styles";
+import Header from "./Header";
 
 export default function SettingsScreen() {
   const [language, setLanguage] = useState("English");
@@ -20,7 +21,8 @@ export default function SettingsScreen() {
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
+      <Header />
+      {/* <View style={styles.header}>
         <IconButton
           icon="arrow-left"
           onPress={() => navigation.goBack()}
@@ -36,7 +38,7 @@ export default function SettingsScreen() {
         />
         <Text style={[styles.title, { color: colors.text }]}>Settings</Text>
         <View style={styles.placeholder} />
-      </View>
+      </View> */}
       {/* TODO: add timeformat toggle
       TODO: add mode toggle for wireframe/modern */}
       <Button mode="outlined" onPress={toggleLanguage} style={styles.button}>

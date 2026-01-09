@@ -1,6 +1,13 @@
 // LoginForm.tsx
 import React, { useState } from "react";
-import { View, TextInput, Button, Text, StyleSheet } from "react-native";
+import {
+  View,
+  TextInput,
+  Button,
+  Text,
+  StyleSheet,
+  Pressable,
+} from "react-native";
 
 import { createLoginStyles } from "@/theme/styles";
 import { createButtonStyles } from "@/theme/buttons";
@@ -106,12 +113,16 @@ export default function LoginForm({
         <Text style={styles.errorText}>{errors.password}</Text>
       ) : null}
 
-      <View style={buttonStyles.loginButton}>
-        <Button
-          title={loading ? "Loading..." : isSignUp ? "Sign Up" : "Login"}
+      <View>
+        <Pressable
+          style={buttonStyles.loginButton}
           onPress={handleSubmit}
           disabled={loading}
-        />
+        >
+          <Text style={buttonStyles.loginButtonText}>
+            {loading ? "Loading..." : isSignUp ? "Sign Up" : "Login"}
+          </Text>
+        </Pressable>
       </View>
 
       <View style={styles.toggleButton}>

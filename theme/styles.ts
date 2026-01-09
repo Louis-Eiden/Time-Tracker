@@ -24,6 +24,117 @@ export const createCommonStyles = (colors: ReturnType<typeof getThemeColors>) =>
     },
   });
 
+export const createHeaderStyles = (colors: ReturnType<typeof getThemeColors>) =>
+  StyleSheet.create({
+    header: {
+      width: "100%",
+      height: 50,
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      marginBottom: 30,
+      position: "relative",
+      marginTop: 10,
+      right: 0,
+    },
+    // headerIcons: {
+    //   position: "absolute",
+    //   right: 0,
+    //   color: colors.icon,
+    //   elevation: 0, // Android
+    //   shadowOpacity: 0, // iOS
+    //   zIndex: 1,
+    //   shadowColor: "transparent",
+    //   shadowOffset: { height: 0, width: 0 },
+    //   shadowRadius: 0,
+    //   borderWidth: 0,
+    //   padding: 0,
+    //   margin: 0,
+    //   backgroundColor: "transparent",
+    // },
+    title: {
+      fontSize: 28,
+      fontWeight: "600",
+    },
+  });
+
+export const createListItemStyles = (
+  colors: ReturnType<typeof getThemeColors>
+) =>
+  StyleSheet.create({
+    container: {
+      borderColor: colors.border,
+      borderWidth: 2,
+      borderRadius: 0,
+      marginVertical: 5,
+      height: 45,
+      width: "100%",
+      backgroundColor: colors.background,
+      elevation: 0,
+      shadowOpacity: 0,
+    },
+    content: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "center",
+      width: 225,
+      // borderColor: colors.border,
+      // borderWidth: 0,
+      // borderRadius: 0,
+    },
+    text: {
+      // position: "absolute",
+      // top: "50%",
+      // left: "50%",
+      // transform: [{ translateX: -50 }, { translateY: -50 }],
+      color: colors.text,
+      fontSize: 18,
+      fontWeight: "400",
+      // flex: 1,
+    },
+    // contextMenuButton: {
+    //   // borderColor: colors.border,
+    //   // borderWidth: 2,
+    //   // borderRadius: 0,
+    //   backgroundColor: "transparent",
+    //   position: "absolute",
+    //   right: -89,
+    //   top: -12,
+    //   padding: 0,
+    //   margin: 0,
+    //   color: colors.icon,
+    //   display: !isMobileOrTablet() ? "flex" : "none",
+    //   width: 24,
+    //   height: 24,
+    //   // alignItems: "center",
+    //   // justifyContent: "center",
+    // },
+    swipeableContainer: {
+      display: isMobileOrTablet() ? "flex" : "none",
+    },
+    leftSwipeActions: {
+      backgroundColor: "blue",
+      justifyContent: "center",
+      alignItems: "center",
+      width: 70,
+      marginTop: 5,
+      height: 45,
+    },
+
+    rightSwipeActions: {
+      backgroundColor: "red",
+      justifyContent: "center",
+      alignItems: "center",
+      width: 70,
+      marginTop: 5,
+      height: 45,
+    },
+
+    touchableText: {
+      color: "white",
+    },
+  });
+
 export const createModalFormStyles = (
   colors: ReturnType<typeof getThemeColors>
 ) =>
@@ -105,6 +216,7 @@ export const createLoginStyles = (colors: ReturnType<typeof getThemeColors>) =>
     inputFocused: {
       borderColor: colors.border,
       outlineStyle: "none",
+      appearance: "none",
       backgroundColor: "white",
     } as TextStyle,
 
@@ -328,62 +440,6 @@ export const createSettingsStyles = (
     },
     themeButtonText: {
       color: colors.text,
-    },
-  });
-
-export const createListItemStyles = (
-  colors: ReturnType<typeof getThemeColors>
-) =>
-  StyleSheet.create({
-    container: {
-      borderColor: colors.border,
-      borderWidth: 2,
-      borderRadius: 0,
-      marginVertical: 5,
-      height: 45,
-      width: "100%",
-      backgroundColor: colors.background,
-      elevation: 0,
-      shadowOpacity: 0,
-    },
-    content: {
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "center",
-      width: 225,
-      // borderColor: colors.border,
-      // borderWidth: 0,
-      // borderRadius: 0,
-    },
-    text: {
-      // position: "absolute",
-      // top: "50%",
-      // left: "50%",
-      // transform: [{ translateX: -50 }, { translateY: -50 }],
-      color: colors.text,
-      fontSize: 18,
-      fontWeight: "400",
-      // flex: 1,
-    },
-    contextMenuButton: {
-      // borderColor: colors.border,
-      // borderWidth: 2,
-      // borderRadius: 0,
-      backgroundColor: "transparent",
-      position: "absolute",
-      right: -89,
-      top: -12,
-      padding: 0,
-      margin: 0,
-      color: colors.icon,
-      display: !isMobileOrTablet() ? "flex" : "none",
-      width: 24,
-      height: 24,
-      // alignItems: "center",
-      // justifyContent: "center",
-    },
-    swipeableContainer: {
-      display: isMobileOrTablet() ? "flex" : "none",
     },
   });
 
