@@ -6,6 +6,10 @@ import {
   updateDoc,
   collection,
   serverTimestamp,
+  query,
+  where,
+  getDocs,
+  writeBatch,
 } from "firebase/firestore";
 import { db } from "@/firebase";
 
@@ -17,9 +21,31 @@ export async function createJob(name: string) {
   });
 }
 
-// Delete a Job
+// Delete a Job AND all related times
 export async function deleteJob(jobId: string) {
-  await deleteDoc(doc(db, "jobs", jobId));
+  if (!jobId) throw new Error("deleteJob: missing jobId");
+
+  const batch = writeBatch(db);
+
+  // 1. Query all times for this job
+  const timesQuery = query(
+    collection(db, "times"),
+    where("jobId", "==", jobId)
+  );
+
+  const timesSnapshot = await getDocs(timesQuery);
+
+  // 2. Delete each time document
+  timesSnapshot.forEach((docSnap) => {
+    batch.delete(docSnap.ref);
+  });
+
+  // 3. Delete the job itself
+  const jobRef = doc(db, "jobs", jobId);
+  batch.delete(jobRef);
+
+  // 4. Commit atomically
+  await batch.commit();
 }
 
 // Update a Job
