@@ -21,17 +21,18 @@ import Header from "./Header";
 export default function HomeScreen() {
   // hooks
   const navigation = useNavigation();
-  const modal = useModalForm<Job>({
-    onAdd: createJob,
-    onEdit: (job, value) => updateJob(job.id, value),
-  });
-  const { jobs, loading } = useJobs();
+  const { jobs, jobsLoading } = useJobs();
 
   // context
   const { theme } = useTheme();
   const colors = getThemeColors(theme);
   const styles = createHomeStyles(colors);
   const buttonStyles = createButtonStyles(colors);
+
+  const modal = useModalForm<Job>({
+    onAdd: createJob,
+    onEdit: (job, value) => updateJob(job.id, value),
+  });
 
   return (
     //TODO: Make one headbar so its easier to style and change theme / mode

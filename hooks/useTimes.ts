@@ -1,6 +1,3 @@
-// hooks/useTimes.ts
-// this hook is used to query for all times of a specific job the job is passed as an argument
-
 import { useEffect, useState } from "react";
 import {
   collection,
@@ -9,8 +6,10 @@ import {
   where,
   orderBy,
 } from "firebase/firestore";
+import { onAuthStateChanged } from "firebase/auth";
 import { db } from "@/firebase";
 import { Time, TimeData } from "@/types";
+import { auth } from "@/firebase";
 
 export function useTimes(jobId: string) {
   const [times, setTimes] = useState<Time[]>([]);
@@ -19,23 +18,37 @@ export function useTimes(jobId: string) {
   useEffect(() => {
     if (!jobId) return;
 
-    const q = query(
-      collection(db, "times"),
-      where("jobId", "==", jobId),
-      orderBy("start", "desc")
-    );
+    let unsubscribeTimes: (() => void) | undefined;
 
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const data: Time[] = snapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...(doc.data() as TimeData),
-      }));
+    const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
+      if (!user) {
+        setTimes([]);
+        setLoading(false);
+        return;
+      }
 
-      setTimes(data);
-      setLoading(false);
+      const q = query(
+        collection(db, "times"),
+        where("jobId", "==", jobId),
+        where("userId", "==", user.uid),
+        orderBy("start", "desc")
+      );
+
+      unsubscribeTimes = onSnapshot(q, (snapshot) => {
+        const data: Time[] = snapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...(doc.data() as TimeData),
+        }));
+
+        setTimes(data);
+        setLoading(false);
+      });
     });
 
-    return unsubscribe;
+    return () => {
+      unsubscribeTimes?.();
+      unsubscribeAuth();
+    };
   }, [jobId]);
 
   return { times, loading };

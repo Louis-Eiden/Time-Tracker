@@ -25,6 +25,7 @@ export type Days = {
 export interface JobData {
   createdAt: Timestamp;
   name: string;
+  userId: string;
 }
 
 export interface Job extends JobData {

@@ -7,11 +7,7 @@ import {
 import { doc, setDoc, serverTimestamp } from "firebase/firestore";
 import { auth, db } from "@/firebase";
 
-export async function signUpUser(
-  email: string,
-  password: string
-  //   name: string
-) {
+export async function signUpUser(email: string, password: string) {
   // Create auth user
   const userCredential = await createUserWithEmailAndPassword(
     auth,
@@ -23,7 +19,6 @@ export async function signUpUser(
   // Create Firestore document
   await setDoc(doc(db, "users", user.uid), {
     email,
-    name,
     createdAt: serverTimestamp(),
   });
 

@@ -12,17 +12,24 @@ import {
   writeBatch,
 } from "firebase/firestore";
 import { db } from "@/firebase";
+import { auth } from "@/firebase";
 
 // Create a Job
 export async function createJob(name: string) {
+  const user = auth.currentUser;
+  if (!user) throw new Error("Not authenticated");
+
   await addDoc(collection(db, "jobs"), {
     name,
+    userId: user.uid,
     createdAt: serverTimestamp(),
   });
 }
 
 // Delete a Job AND all related times
 export async function deleteJob(jobId: string) {
+  const user = auth.currentUser;
+  if (!user) throw new Error("Not authenticated");
   if (!jobId) throw new Error("deleteJob: missing jobId");
 
   const batch = writeBatch(db);
@@ -30,7 +37,8 @@ export async function deleteJob(jobId: string) {
   // 1. Query all times for this job
   const timesQuery = query(
     collection(db, "times"),
-    where("jobId", "==", jobId)
+    where("jobId", "==", jobId),
+    where("userId", "==", user.uid)
   );
 
   const timesSnapshot = await getDocs(timesQuery);

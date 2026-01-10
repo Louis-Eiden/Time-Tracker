@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useColorScheme } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import type { NativeStackScreenProps } from "@react-navigation/native-stack";
+// import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { Provider as PaperProvider } from "react-native-paper";
 import { View, Text } from "react-native";
 import { ThemeProvider } from "./contexts/ThemeContext";
@@ -14,6 +14,7 @@ import HomeScreen from "@/components/HomeScreen";
 import JobScreen from "@/components/JobScreen";
 import SettingsScreen from "./components/SettingsScreen";
 import { RootStackParamList } from "./types";
+import { AuthProvider } from "./contexts/AuthContext";
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -68,24 +69,26 @@ export default function App() {
 
   return (
     <ErrorBoundary>
-      <ThemeProvider>
-        <TimeProvider>
-          <PaperProvider>
-            <NavigationContainer>
-              <Stack.Navigator
-                screenOptions={{
-                  headerShown: false,
-                }}
-              >
-                <Stack.Screen name="Login" component={LoginScreen} />
-                <Stack.Screen name="Home" component={HomeScreen} />
-                <Stack.Screen name="Job" component={JobScreen} />
-                <Stack.Screen name="Settings" component={SettingsScreen} />
-              </Stack.Navigator>
-            </NavigationContainer>
-          </PaperProvider>
-        </TimeProvider>
-      </ThemeProvider>
+      <AuthProvider>
+        <ThemeProvider>
+          <TimeProvider>
+            <PaperProvider>
+              <NavigationContainer>
+                <Stack.Navigator
+                  screenOptions={{
+                    headerShown: false,
+                  }}
+                >
+                  <Stack.Screen name="Login" component={LoginScreen} />
+                  <Stack.Screen name="Home" component={HomeScreen} />
+                  <Stack.Screen name="Job" component={JobScreen} />
+                  <Stack.Screen name="Settings" component={SettingsScreen} />
+                </Stack.Navigator>
+              </NavigationContainer>
+            </PaperProvider>
+          </TimeProvider>
+        </ThemeProvider>
+      </AuthProvider>
     </ErrorBoundary>
   );
 }

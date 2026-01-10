@@ -1,39 +1,39 @@
-// hooks/useJobs.ts
+import { auth } from "@/firebase";
+import { onAuthStateChanged } from "firebase/auth";
 import { useEffect, useState } from "react";
-import { collection, onSnapshot, query, orderBy } from "firebase/firestore";
+import { collection, query, where, onSnapshot } from "firebase/firestore";
 import { db } from "@/firebase";
-// types
+import { useAuth } from "@/contexts/AuthContext";
 import { Job, JobData } from "@/types";
 
 export function useJobs() {
   const [jobs, setJobs] = useState<Job[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [jobsLoading, setJobsLoading] = useState(true);
+  const { user, loading } = useAuth();
 
   useEffect(() => {
-    console.log(jobs);
-  }, [jobs]);
+    if (loading) return;
 
-  useEffect(() => {
-    const q = query(collection(db, "jobs"), orderBy("createdAt", "desc"));
+    if (!user) {
+      setJobs([]);
+      setJobsLoading(false);
+      return;
+    }
 
-    const unsubscribe = onSnapshot(
-      q,
-      (snapshot) => {
-        const data = snapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        })) as Job[];
+    const q = query(collection(db, "jobs"), where("userId", "==", user.uid));
 
-        setJobs(data);
-        setLoading(false);
-      },
-      (error) => {
-        console.error("🔥 Firestore permission error:", error.code);
-      }
-    );
+    const unsub = onSnapshot(q, (snap) => {
+      const jobs: Job[] = snap.docs.map((d) => ({
+        id: d.id,
+        ...(d.data() as JobData),
+      }));
 
-    return unsubscribe; // unsubscribe on unmount
-  }, []);
+      setJobs(jobs);
+      setJobsLoading(false);
+    });
 
-  return { jobs, loading };
+    return () => unsub();
+  }, [user, loading]);
+
+  return { jobs, jobsLoading };
 }
