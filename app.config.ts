@@ -33,6 +33,7 @@ const config: ExpoConfig = {
   },
 
   web: {
+    bundler: "metro",
     favicon: "./assets/favicon.png",
     config: {
       headTags: [
