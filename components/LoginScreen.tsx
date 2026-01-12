@@ -7,7 +7,6 @@ import { useNavigation } from "@react-navigation/native";
 import { signUpUser, signInUser } from "@/services/users.service";
 import type { NavigationProp } from "@/types";
 import { useTheme, getThemeColors } from "@/contexts/ThemeContext";
-import { createButtonStyles } from "@/theme/buttons";
 import { createHomeStyles } from "@/theme/styles";
 import LoginForm from "@/components/LoginForm";
 import Header from "./Header";
@@ -21,7 +20,6 @@ export default function LoginScreen() {
   const { theme } = useTheme();
   const colors = getThemeColors(theme);
   const styles = createHomeStyles(colors);
-  const buttonStyles = createButtonStyles(colors); // (not used here yet)
 
   const handleSubmit = async (params: {
     email: string;

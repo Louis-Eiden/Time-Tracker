@@ -7,7 +7,7 @@ import { formatDateForDisplay, formatTimeForDisplay } from "@/utils/time";
 import { Text, Button, IconButton } from "react-native-paper";
 import { useNavigation, useRoute, RouteProp } from "@react-navigation/native";
 import { createJobStyles } from "../theme/styles";
-import { createButtonStyles } from "@/theme/buttons";
+import { createCommonStyles } from "@/theme/styles";
 import { handlePrint } from "@/utils/print";
 import { useTimes } from "../hooks/useTimes";
 import { startTimer, stopTimer } from "../services/times.services";
@@ -24,7 +24,7 @@ export default function JobScreen() {
   const { timeFormat } = useTimeFormat();
   const colors = getThemeColors(theme);
   const styles = createJobStyles(colors);
-  const buttonStyles = createButtonStyles(colors);
+  const commonStyles = createCommonStyles(colors);
 
   // ---------------------------------------------------------------------------
   // State
@@ -148,21 +148,21 @@ export default function JobScreen() {
         {/* Back Buttons */}
         {selectedDay === null && (
           <Button
-            style={buttonStyles.backToJobsButton}
+            style={styles.backToJobsButton}
             onPress={() => navigation.goBack()}
             rippleColor="transparent"
           >
-            <Text style={buttonStyles.backButtonText}>← Back to Jobs</Text>
+            <Text style={styles.backButtonText}>← Back to Jobs</Text>
           </Button>
         )}
 
         {selectedDay !== null && (
           <Button
-            style={buttonStyles.backButton}
+            style={styles.backButton}
             onPress={() => setSelectedDay(null)}
             rippleColor="transparent"
           >
-            <Text style={buttonStyles.backButtonText}>← Back to Days</Text>
+            <Text style={styles.backButtonText}>← Back to Days</Text>
           </Button>
         )}
 
@@ -219,11 +219,11 @@ export default function JobScreen() {
           <Button
             mode="outlined"
             onPress={() => handlePrint(jobName, times, timeFormat)}
-            style={buttonStyles.printButton}
+            style={styles.printButton}
             theme={{ colors: { outline: "#000000" } }}
             rippleColor="transparent"
           >
-            <Text style={buttonStyles.printButtonText}>Print</Text>
+            <Text style={styles.printButtonText}>Print</Text>
           </Button>
 
           <IconButton
@@ -231,7 +231,7 @@ export default function JobScreen() {
             size={24}
             mode="outlined"
             onPress={() => setIsTimeModalVisible(true)}
-            style={buttonStyles.addButton}
+            style={commonStyles.addButton}
             rippleColor="transparent"
             iconColor={colors.icon}
             animated={false}

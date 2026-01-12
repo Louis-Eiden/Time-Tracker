@@ -10,7 +10,6 @@ import {
 } from "react-native";
 
 import { createLoginStyles } from "@/theme/styles";
-import { createButtonStyles } from "@/theme/buttons";
 import { getThemeColors, useTheme } from "@/contexts/ThemeContext";
 
 interface LoginFormProps {
@@ -40,7 +39,6 @@ export default function LoginForm({
   const { theme } = useTheme();
   const colors = getThemeColors(theme);
   const styles = createLoginStyles(colors);
-  const buttonStyles = createButtonStyles(colors);
 
   // Separate focus states for each input
   const [emailFocused, setEmailFocused] = useState(false);
@@ -115,11 +113,11 @@ export default function LoginForm({
 
       <View>
         <Pressable
-          style={buttonStyles.loginButton}
+          style={styles.loginButton}
           onPress={handleSubmit}
           disabled={loading}
         >
-          <Text style={buttonStyles.loginButtonText}>
+          <Text style={styles.loginButtonText}>
             {loading ? "Loading..." : isSignUp ? "Sign Up" : "Login"}
           </Text>
         </Pressable>

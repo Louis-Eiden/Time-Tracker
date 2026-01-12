@@ -6,9 +6,11 @@ export const createButtonStyles = (colors: ReturnType<typeof getThemeColors>) =>
     // Login Button
     loginButton: {
       marginTop: 20,
-      padding: 20,
+      // padding: 20,
+      paddingRight: 20,
+      paddingLeft: 20,
       borderRadius: 0,
-      backgroundColor: colors.background,
+      backgroundColor: colors.buttons,
       borderWidth: 2,
       borderColor: colors.border,
       height: 45,
@@ -31,6 +33,7 @@ export const createButtonStyles = (colors: ReturnType<typeof getThemeColors>) =>
       borderWidth: 2,
       borderRadius: 0,
       borderColor: colors.border,
+      backgroundColor: colors.buttons,
     },
 
     addButtonText: {
@@ -44,12 +47,13 @@ export const createButtonStyles = (colors: ReturnType<typeof getThemeColors>) =>
       borderWidth: 2,
       borderRadius: 0,
       borderColor: colors.border,
+      backgroundColor: colors.buttons,
     },
 
     printButtonText: {
       color: colors.text,
-      fontSize: 22,
-      fontWeight: "600",
+      fontSize: 20,
+      fontWeight: "700",
     },
 
     //   Back to days Button
@@ -58,11 +62,13 @@ export const createButtonStyles = (colors: ReturnType<typeof getThemeColors>) =>
       borderWidth: 2,
       borderColor: colors.border,
       borderRadius: 0,
-      padding: 12,
+      padding: 0,
+      // paddingRight: 20,
+      // paddingLeft: 20,
       height: 45,
       justifyContent: "center",
       alignItems: "center",
-      backgroundColor: colors.background,
+      backgroundColor: colors.buttons,
     },
     backButtonText: {
       color: colors.text,
@@ -79,7 +85,7 @@ export const createButtonStyles = (colors: ReturnType<typeof getThemeColors>) =>
       height: 45,
       justifyContent: "center",
       alignItems: "center",
-      backgroundColor: colors.background,
+      backgroundColor: colors.buttons,
       fontSize: 22,
       fontWeight: "600",
     },

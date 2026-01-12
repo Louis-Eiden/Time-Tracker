@@ -3,6 +3,7 @@ import { useColorScheme } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 // import type { NativeStackScreenProps } from "@react-navigation/native-stack";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { Provider as PaperProvider } from "react-native-paper";
 import { View, Text } from "react-native";
 import { ThemeProvider } from "./contexts/ThemeContext";
@@ -69,26 +70,28 @@ export default function App() {
 
   return (
     <ErrorBoundary>
-      <AuthProvider>
-        <ThemeProvider>
-          <TimeProvider>
-            <PaperProvider>
-              <NavigationContainer>
-                <Stack.Navigator
-                  screenOptions={{
-                    headerShown: false,
-                  }}
-                >
-                  <Stack.Screen name="Login" component={LoginScreen} />
-                  <Stack.Screen name="Home" component={HomeScreen} />
-                  <Stack.Screen name="Job" component={JobScreen} />
-                  <Stack.Screen name="Settings" component={SettingsScreen} />
-                </Stack.Navigator>
-              </NavigationContainer>
-            </PaperProvider>
-          </TimeProvider>
-        </ThemeProvider>
-      </AuthProvider>
+      <GestureHandlerRootView style={{ flex: 1 }}>
+        <AuthProvider>
+          <ThemeProvider>
+            <TimeProvider>
+              <PaperProvider>
+                <NavigationContainer>
+                  <Stack.Navigator
+                    screenOptions={{
+                      headerShown: false,
+                    }}
+                  >
+                    <Stack.Screen name="Login" component={LoginScreen} />
+                    <Stack.Screen name="Home" component={HomeScreen} />
+                    <Stack.Screen name="Job" component={JobScreen} />
+                    <Stack.Screen name="Settings" component={SettingsScreen} />
+                  </Stack.Navigator>
+                </NavigationContainer>
+              </PaperProvider>
+            </TimeProvider>
+          </ThemeProvider>
+        </AuthProvider>
+      </GestureHandlerRootView>
     </ErrorBoundary>
   );
 }

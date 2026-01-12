@@ -10,7 +10,7 @@ import { Text, IconButton } from "react-native-paper";
 import { useNavigation } from "@react-navigation/native";
 import { useTheme, getThemeColors } from "@/contexts/ThemeContext";
 import { createHomeStyles, createCommonStyles } from "@/theme/styles";
-import { createButtonStyles } from "@/theme/buttons";
+// import { createButtonStyles } from "@/theme/buttons";
 
 import { useJobs } from "@/hooks/useJobs";
 import { useModalForm } from "@/hooks/useModalForm";
@@ -27,7 +27,7 @@ export default function HomeScreen() {
   const { theme } = useTheme();
   const colors = getThemeColors(theme);
   const styles = createHomeStyles(colors);
-  const buttonStyles = createButtonStyles(colors);
+  const commonStyles = createCommonStyles(colors);
 
   const modal = useModalForm<Job>({
     onAdd: createJob,
@@ -70,7 +70,7 @@ export default function HomeScreen() {
             mode="outlined"
             onPress={modal.openAdd}
             style={[
-              buttonStyles.addButton,
+              commonStyles.addButton,
               {
                 width: "100%",
                 borderLeftWidth: 2,

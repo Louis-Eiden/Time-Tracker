@@ -1,12 +1,13 @@
 import React, { ReactNode, useState } from "react";
-import { View, Modal, TextInput } from "react-native";
-import { Text, Button } from "react-native-paper";
+import { View, Modal, TextInput, Platform } from "react-native";
+import { Text, Button, Portal } from "react-native-paper";
 import { DatePickerModal, TimePickerModal } from "react-native-paper-dates";
 
 import { useTheme, getThemeColors } from "../contexts/ThemeContext";
 import { useTimeFormat } from "@/contexts/TimeContext";
 import { createModalFormStyles } from "../theme/styles";
-import { createButtonStyles } from "../theme/buttons";
+
+// import { createButtonStyles } from "../theme/buttons";
 
 interface ModalFormProps {
   // general
@@ -60,7 +61,7 @@ export default function ModalForm({
   const { theme } = useTheme();
   const colors = getThemeColors(theme);
   const styles = createModalFormStyles(colors);
-  const buttonStyles = createButtonStyles(colors);
+  // const buttonStyles = createButtonStyles(colors);
   const { timeFormat } = useTimeFormat();
 
   // Focus
@@ -76,6 +77,8 @@ export default function ModalForm({
   const [pickedDate, setPickedDate] = useState<Date | undefined>();
   const [newStartTime, setNewStartTime] = useState<Date | undefined>(startTime);
   const [newEndTime, setNewEndTime] = useState<Date | undefined>(endTime);
+
+  const isWeb = Platform.OS === "web";
 
   // Open pickers
   const openStartPicker = () => {
@@ -116,11 +119,8 @@ export default function ModalForm({
           {isTimeEntry ? (
             <>
               {/* START TIME */}
-              <Button
-                style={buttonStyles.loginButton}
-                onPress={openStartPicker}
-              >
-                <Text style={buttonStyles.loginButtonText}>
+              <Button style={styles.openPickerButton} onPress={openStartPicker}>
+                <Text style={styles.openPickerButtonText}>
                   {newStartTime
                     ? `Start: ${newStartTime.toLocaleString()}`
                     : "Pick Start Time"}
@@ -128,54 +128,56 @@ export default function ModalForm({
               </Button>
 
               {/* END TIME */}
-              <Button style={buttonStyles.loginButton} onPress={openEndPicker}>
-                <Text style={buttonStyles.loginButtonText}>
+              <Button style={styles.openPickerButton} onPress={openEndPicker}>
+                <Text style={styles.openPickerButtonText}>
                   {newEndTime
                     ? `End: ${newEndTime.toLocaleString()}`
                     : "Pick End Time"}
                 </Text>
               </Button>
 
-              {/* DATE PICKER */}
-              <DatePickerModal
-                locale={timeFormat === "12h" ? "en" : "de"}
-                mode="single"
-                visible={datePickerVisible}
-                date={pickedDate}
-                onConfirm={({ date }) => {
-                  setDatePickerVisible(false);
-                  setPickedDate(date);
-                  setTimePickerVisible(true);
-                }}
-                onDismiss={() => setDatePickerVisible(false)}
-              />
+              <Portal>
+                {/* DATE PICKER */}
+                <DatePickerModal
+                  locale={timeFormat === "12h" ? "en" : "de"}
+                  mode="single"
+                  visible={datePickerVisible}
+                  date={pickedDate}
+                  onConfirm={({ date }) => {
+                    setDatePickerVisible(false);
+                    setPickedDate(date);
+                    setTimePickerVisible(true);
+                  }}
+                  onDismiss={() => setDatePickerVisible(false)}
+                />
 
-              {/* TIME PICKER */}
-              <TimePickerModal
-                visible={timePickerVisible}
-                use24HourClock={timeFormat === "24h"}
-                onDismiss={() => setTimePickerVisible(false)}
-                onConfirm={({ hours, minutes }) => {
-                  if (!pickedDate || !activePicker) return;
+                {/* TIME PICKER */}
+                <TimePickerModal
+                  visible={timePickerVisible}
+                  use24HourClock={timeFormat === "24h"}
+                  onDismiss={() => setTimePickerVisible(false)}
+                  onConfirm={({ hours, minutes }) => {
+                    if (!pickedDate || !activePicker) return;
 
-                  const combined = combineDateAndTime(
-                    pickedDate,
-                    hours,
-                    minutes
-                  );
+                    const combined = combineDateAndTime(
+                      pickedDate,
+                      hours,
+                      minutes
+                    );
 
-                  if (activePicker === "start") {
-                    setNewStartTime(combined);
-                    onStartTimeChange?.(combined);
-                  } else {
-                    setNewEndTime(combined);
-                    onEndTimeChange?.(combined);
-                  }
+                    if (activePicker === "start") {
+                      setNewStartTime(combined);
+                      onStartTimeChange?.(combined);
+                    } else {
+                      setNewEndTime(combined);
+                      onEndTimeChange?.(combined);
+                    }
 
-                  setTimePickerVisible(false);
-                  setActivePicker(null);
-                }}
-              />
+                    setTimePickerVisible(false);
+                    setActivePicker(null);
+                  }}
+                />
+              </Portal>
             </>
           ) : (
             <TextInput
@@ -190,14 +192,14 @@ export default function ModalForm({
           )}
 
           {/* BUTTONS */}
-          <View style={styles.modalButtons}>
+          <View style={styles.modalButtonContainer}>
             <Button
               mode="outlined"
               onPress={onClose}
               style={styles.modalButton}
               rippleColor="transparent"
             >
-              <Text style={{ color: "#000000" }}>Cancel</Text>
+              <Text style={styles.modalButtonText}>Cancel</Text>
             </Button>
 
             <Button
@@ -209,7 +211,7 @@ export default function ModalForm({
               style={styles.modalButton}
               rippleColor="transparent"
             >
-              <Text style={{ color: "#000000" }}>Confirm</Text>
+              <Text style={styles.modalButtonText}>Confirm</Text>
             </Button>
           </View>
         </View>

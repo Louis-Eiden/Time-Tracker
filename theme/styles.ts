@@ -22,6 +22,23 @@ export const createCommonStyles = (colors: ReturnType<typeof getThemeColors>) =>
     title: {
       color: colors.text,
     },
+
+    // Add Button
+    addButton: {
+      width: "50%",
+      height: 46,
+      margin: 0,
+      borderLeftWidth: 0,
+      borderWidth: 2,
+      borderRadius: 0,
+      borderColor: colors.border,
+      backgroundColor: colors.buttons,
+    },
+
+    addButtonText: {
+      color: colors.text,
+      fontSize: 32,
+    },
   });
 
 export const createHeaderStyles = (colors: ReturnType<typeof getThemeColors>) =>
@@ -69,7 +86,7 @@ export const createListItemStyles = (
       marginVertical: 5,
       height: 45,
       width: "100%",
-      backgroundColor: colors.background,
+      backgroundColor: colors.buttons,
       elevation: 0,
       shadowOpacity: 0,
     },
@@ -150,7 +167,7 @@ export const createModalFormStyles = (
       width: "100%",
       justifyContent: "center",
       alignItems: "center",
-      padding: 20,
+      // padding: 20,
       backgroundColor: colors.background,
       borderWidth: 2,
       borderColor: colors.border,
@@ -161,6 +178,7 @@ export const createModalFormStyles = (
       textAlign: "center",
       color: colors.text,
     },
+
     modalInput: {
       borderWidth: 2,
       borderColor: colors.border,
@@ -168,7 +186,7 @@ export const createModalFormStyles = (
       padding: 10,
       marginBottom: 15,
       height: 40,
-      width: "50%",
+      width: "80%",
       color: colors.text,
     },
     modalInputFocused: {
@@ -177,19 +195,44 @@ export const createModalFormStyles = (
       backgroundColor: "white",
     } as TextStyle,
 
-    modalButtons: {
+    // buttons
+    openPickerButton: {
+      position: "relative",
+      marginTop: 20,
+      // padding: 20,
+      paddingRight: 20,
+      paddingLeft: 20,
+      borderRadius: 0,
+      backgroundColor: colors.buttons,
+      borderWidth: 2,
+      borderColor: colors.border,
+      height: 45,
+      // alignItems: "center",
+      // justifyContent: "center",
+    },
+
+    openPickerButtonText: {
+      color: colors.text,
+      fontSize: 18,
+      fontWeight: "600",
+    },
+    modalButtonContainer: {
       flexDirection: "row",
-      justifyContent: "space-around",
-      width: "50%",
+      justifyContent: "center",
+      width: "80%",
     },
     modalButton: {
+      margin: 20,
       flex: 1,
       marginHorizontal: 5,
       borderRadius: 0,
       borderColor: colors.border,
       borderWidth: 2,
       maxWidth: 276,
-      backgroundColor: "#D3D3D3",
+      backgroundColor: colors.buttons,
+    },
+    modalButtonText: {
+      color: "#000000",
     },
   });
 
@@ -224,6 +267,27 @@ export const createLoginStyles = (colors: ReturnType<typeof getThemeColors>) =>
       color: "red",
       fontSize: 12,
       marginBottom: 4,
+    },
+
+    // Buttons
+
+    loginButton: {
+      marginTop: 20,
+      // padding: 20,
+      paddingRight: 20,
+      paddingLeft: 20,
+      borderRadius: 0,
+      backgroundColor: colors.buttons,
+      borderWidth: 2,
+      borderColor: colors.border,
+      height: 45,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    loginButtonText: {
+      color: colors.text,
+      fontSize: 18,
+      fontWeight: "600",
     },
     toggleButton: {
       marginTop: 16,
@@ -489,18 +553,6 @@ export const createJobStyles = (colors: ReturnType<typeof getThemeColors>) =>
       overflow: "hidden",
     },
 
-    // Start Stop Button
-    button: {
-      borderWidth: 2,
-      borderColor: colors.border,
-      width: 100,
-      height: 100,
-      alignSelf: "center",
-      justifyContent: "center",
-      borderRadius: 0,
-      backgroundColor: colors.background,
-    },
-
     timeEntry: {
       borderColor: colors.border,
       borderWidth: 2,
@@ -509,7 +561,7 @@ export const createJobStyles = (colors: ReturnType<typeof getThemeColors>) =>
       padding: 0,
       height: 45,
       width: 276,
-      backgroundColor: colors.background,
+      backgroundColor: colors.buttons,
       elevation: 0,
       shadowOpacity: 0,
     },
@@ -521,13 +573,13 @@ export const createJobStyles = (colors: ReturnType<typeof getThemeColors>) =>
       flex: 1,
     },
 
-    contextMenuButtons: {
-      backgroundColor: colors.background,
-      right: 0,
-      position: "absolute",
-      color: colors.icon,
-      display: !isMobileOrTablet() ? "flex" : "none",
-    },
+    // contextMenuButtons: {
+    //   backgroundColor: colors.background,
+    //   right: 0,
+    //   position: "absolute",
+    //   color: colors.icon,
+    //   display: !isMobileOrTablet() ? "flex" : "none",
+    // },
     swipeableContainer: {
       display: isMobileOrTablet() ? "flex" : "none",
     },
@@ -574,5 +626,68 @@ export const createJobStyles = (colors: ReturnType<typeof getThemeColors>) =>
     },
     sessionText: {
       color: colors.text,
+    },
+
+    //buttons
+
+    // Start Stop Button
+    button: {
+      borderWidth: 2,
+      borderColor: colors.border,
+      width: 100,
+      height: 100,
+      alignSelf: "center",
+      justifyContent: "center",
+      borderRadius: 0,
+      backgroundColor: colors.background,
+    },
+
+    //   Back to days Button
+    backButton: {
+      marginBottom: 10,
+      borderWidth: 2,
+      borderColor: colors.border,
+      borderRadius: 0,
+      padding: 0,
+      // paddingRight: 20,
+      // paddingLeft: 20,
+      height: 45,
+      justifyContent: "center",
+      alignItems: "center",
+      backgroundColor: colors.buttons,
+    },
+    backButtonText: {
+      color: colors.text,
+      fontSize: 20,
+      fontWeight: "700",
+    },
+    // Back to Jobs Button
+    backToJobsButton: {
+      marginBottom: 10,
+      borderWidth: 2,
+      borderColor: colors.border,
+      borderRadius: 0,
+      padding: 0,
+      height: 45,
+      justifyContent: "center",
+      alignItems: "center",
+      backgroundColor: colors.buttons,
+      fontSize: 22,
+      fontWeight: "600",
+    },
+
+    // Print Button
+    printButton: {
+      width: "50%",
+      borderWidth: 2,
+      borderRadius: 0,
+      borderColor: colors.border,
+      backgroundColor: colors.buttons,
+    },
+
+    printButtonText: {
+      color: colors.text,
+      fontSize: 20,
+      fontWeight: "700",
     },
   });
