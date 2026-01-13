@@ -3,7 +3,7 @@ import type { ExpoConfig } from "expo/config";
 
 const config: ExpoConfig = {
   name: "Time-Tracker",
-  slug: "time-tracker",
+  slug: "Time-Tracker",
   version: "1.0.0",
   orientation: "portrait",
   icon: "./assets/icon.png",
