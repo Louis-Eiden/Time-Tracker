@@ -34,8 +34,8 @@ const config: ExpoConfig = {
 
   web: {
     bundler: "metro",
-    basePath: "/time-tracker",
-    assetPrefix: "/time-tracker/",
+    basePath: "/Time-Tracker",
+    assetPrefix: "/Time-Tracker/",
     favicon: "./assets/favicon.png",
     config: {
       headTags: [

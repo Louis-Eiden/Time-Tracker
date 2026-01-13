@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { useColorScheme } from "react-native";
-import { NavigationContainer } from "@react-navigation/native";
+import { NavigationContainer, LinkingOptions } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 // import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
@@ -8,6 +8,8 @@ import { Provider as PaperProvider } from "react-native-paper";
 import { View, Text } from "react-native";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { TimeProvider } from "./contexts/TimeContext";
+
+import { Platform } from "react-native";
 
 // Screen Components
 import LoginScreen from "./components/LoginScreen";
@@ -18,6 +20,19 @@ import { RootStackParamList } from "./types";
 import { AuthProvider } from "./contexts/AuthContext";
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
+
+// Use Hash Routing for web platform
+const linking: LinkingOptions<RootStackParamList> = {
+  prefixes: Platform.OS === "web" ? ["#/"] : [],
+  config: {
+    screens: {
+      Login: "login",
+      Home: "home",
+      Job: "job",
+      Settings: "settings",
+    },
+  },
+};
 
 interface Props {
   children: React.ReactNode;
@@ -75,7 +90,7 @@ export default function App() {
           <ThemeProvider>
             <TimeProvider>
               <PaperProvider>
-                <NavigationContainer>
+                <NavigationContainer linking={linking}>
                   <Stack.Navigator
                     screenOptions={{
                       headerShown: false,
