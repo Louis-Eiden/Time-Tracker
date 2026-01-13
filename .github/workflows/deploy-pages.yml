@@ -32,7 +32,7 @@ jobs:
               run: bun install
 
             - name: Build Expo web app
-              run: bunx expo export --platform web --base-path /Time-Tracker
+              run: bunx expo export
 
             - name: Deploy to pages branch
               uses: peaceiris/actions-gh-pages@v4
