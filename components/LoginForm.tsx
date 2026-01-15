@@ -9,7 +9,7 @@ import {
   Pressable,
 } from "react-native";
 
-import { createLoginStyles } from "@/theme/styles";
+import { createCommonStyles, createLoginStyles } from "@/theme/styles";
 import { getThemeColors, useTheme } from "@/contexts/ThemeContext";
 
 interface LoginFormProps {
@@ -38,7 +38,8 @@ export default function LoginForm({
 
   const { theme } = useTheme();
   const colors = getThemeColors(theme);
-  const styles = createLoginStyles(colors);
+  const styles = createLoginStyles(colors, theme);
+  const commonStyles = createCommonStyles(colors, theme);
 
   // Separate focus states for each input
   const [emailFocused, setEmailFocused] = useState(false);
@@ -78,7 +79,7 @@ export default function LoginForm({
   };
 
   return (
-    <View style={styles.container}>
+    <>
       <TextInput
         placeholder="Email"
         value={email}
@@ -130,6 +131,6 @@ export default function LoginForm({
             : "Don't have an account? Sign Up"}
         </Text>
       </View>
-    </View>
+    </>
   );
 }

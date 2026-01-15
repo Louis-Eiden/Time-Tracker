@@ -55,34 +55,3 @@ bunx expo install --check
 bunx expo prebuild --clean
 bunx expo run:ios   # or run:android
 ```
-
----
-
-<!-- ## ✅ 3. Version alignment (CRITICAL)
-
-Most build hell comes from version mismatches.
-
-Check:
-
-```
-npx expo doctor
-```
-
-Then ensure:
-
-```
-Expo SDK version
-React Native version
-React version
-Expo modules
-are exactly what Expo expects.
-```
-
-Example:
-
-```
-npx expo install react-native-reanimated
-```
-
-✅ NEVER bun add native Expo modules directly
-✅ ALWAYS expo install -->

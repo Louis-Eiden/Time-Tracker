@@ -12,10 +12,10 @@ import { TimeProvider } from "./contexts/TimeContext";
 import { Platform } from "react-native";
 
 // Screen Components
-import LoginScreen from "./components/LoginScreen";
-import HomeScreen from "@/components/HomeScreen";
-import JobScreen from "@/components/JobScreen";
-import SettingsScreen from "./components/SettingsScreen";
+import LoginScreen from "./screens/LoginScreen";
+import HomeScreen from "@/screens/HomeScreen";
+import JobScreen from "@/screens/JobScreen";
+import SettingsScreen from "./screens/SettingsScreen";
 import { RootStackParamList } from "./types";
 import { AuthProvider } from "./contexts/AuthContext";
 

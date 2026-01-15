@@ -1,36 +1,79 @@
 import { StyleSheet, TextStyle } from "react-native";
 import { isMobileOrTablet } from "../utils/platform";
-import { getThemeColors } from "../contexts/ThemeContext";
+import { getThemeColors, Theme, useTheme } from "@/contexts/ThemeContext";
 import {
   red100,
   white,
 } from "react-native-paper/lib/typescript/styles/themes/v2/colors";
 
 // Common styles that can be reused across components
-export const createCommonStyles = (colors: ReturnType<typeof getThemeColors>) =>
-  StyleSheet.create({
+export const createCommonStyles = (
+  colors: ReturnType<typeof getThemeColors>,
+  theme: Theme,
+  platform: string,
+  routeName: string = ""
+) => {
+  const isClear = theme.startsWith("clear");
+  const isJobScreen = routeName.startsWith("Job");
+  const isWeb = platform === "web";
+
+  return StyleSheet.create({
     container: {
       flex: 1,
       padding: 20,
       backgroundColor: colors.background,
+      alignItems: "center",
+      // justifyContent: "center",
     },
+    // main: {
+    //   flex: 1,
+    //   width: "100%",
+    //   height: "100%",
+    //   alignItems: "center",
+    //   backgroundColor: colors.background,
+    // },
     button: {
-      borderWidth: 2,
-      borderRadius: 0,
+      borderWidth: colors.borderWidth,
+      borderBottomWidth: colors.borderBottomWidth,
+      borderRadius: colors.borderRadius,
       borderColor: colors.border,
     },
     title: {
       color: colors.text,
+      fontSize: 28,
+      fontWeight: "600",
+    },
+
+    text: {
+      color: colors.text,
+      fontSize: 18,
+      fontWeight: "400",
+    },
+
+    listContainer: {
+      minHeight: 300,
+      maxHeight: isWeb ? 400 : isJobScreen ? 400 : 800,
+      flexGrow: 1,
+      width: 300,
+      borderWidth: isClear ? 0 : colors.borderWidth,
+      borderBottomWidth: isClear ? 0 : colors.borderBottomWidth,
+      borderColor: colors.border,
+      borderRadius: colors.borderRadius,
+      padding: 10,
+      backgroundColor: colors.background,
+      position: "relative",
+      overflow: "hidden",
     },
 
     // Add Button
     addButton: {
-      width: "50%",
+      width: isJobScreen ? "50%" : "100%",
       height: 46,
       margin: 0,
-      borderLeftWidth: 0,
-      borderWidth: 2,
-      borderRadius: 0,
+      borderLeftWidth: isJobScreen ? 0 : isClear ? 0 : colors.borderWidth,
+      borderWidth: isClear ? 0 : colors.borderWidth,
+      borderBottomWidth: colors.borderBottomWidth,
+      borderRadius: colors.borderRadius,
       borderColor: colors.border,
       backgroundColor: colors.buttons,
     },
@@ -40,6 +83,7 @@ export const createCommonStyles = (colors: ReturnType<typeof getThemeColors>) =>
       fontSize: 32,
     },
   });
+};
 
 export const createHeaderStyles = (colors: ReturnType<typeof getThemeColors>) =>
   StyleSheet.create({
@@ -54,25 +98,6 @@ export const createHeaderStyles = (colors: ReturnType<typeof getThemeColors>) =>
       marginTop: 10,
       right: 0,
     },
-    // headerIcons: {
-    //   position: "absolute",
-    //   right: 0,
-    //   color: colors.icon,
-    //   elevation: 0, // Android
-    //   shadowOpacity: 0, // iOS
-    //   zIndex: 1,
-    //   shadowColor: "transparent",
-    //   shadowOffset: { height: 0, width: 0 },
-    //   shadowRadius: 0,
-    //   borderWidth: 0,
-    //   padding: 0,
-    //   margin: 0,
-    //   backgroundColor: "transparent",
-    // },
-    title: {
-      fontSize: 28,
-      fontWeight: "600",
-    },
   });
 
 export const createListItemStyles = (
@@ -81,9 +106,10 @@ export const createListItemStyles = (
   StyleSheet.create({
     container: {
       borderColor: colors.border,
-      borderWidth: 2,
-      borderRadius: 0,
-      marginVertical: 5,
+      borderWidth: colors.borderWidth,
+      borderBottomWidth: colors.borderBottomWidth,
+      borderRadius: colors.borderRadius,
+      marginBottom: 10,
       height: 45,
       width: "100%",
       backgroundColor: colors.buttons,
@@ -95,37 +121,8 @@ export const createListItemStyles = (
       alignItems: "center",
       justifyContent: "center",
       width: 225,
-      // borderColor: colors.border,
-      // borderWidth: 0,
-      // borderRadius: 0,
     },
-    text: {
-      // position: "absolute",
-      // top: "50%",
-      // left: "50%",
-      // transform: [{ translateX: -50 }, { translateY: -50 }],
-      color: colors.text,
-      fontSize: 18,
-      fontWeight: "400",
-      // flex: 1,
-    },
-    // contextMenuButton: {
-    //   // borderColor: colors.border,
-    //   // borderWidth: 2,
-    //   // borderRadius: 0,
-    //   backgroundColor: "transparent",
-    //   position: "absolute",
-    //   right: -89,
-    //   top: -12,
-    //   padding: 0,
-    //   margin: 0,
-    //   color: colors.icon,
-    //   display: !isMobileOrTablet() ? "flex" : "none",
-    //   width: 24,
-    //   height: 24,
-    //   // alignItems: "center",
-    //   // justifyContent: "center",
-    // },
+
     swipeableContainer: {
       display: isMobileOrTablet() ? "flex" : "none",
     },
@@ -169,7 +166,8 @@ export const createModalFormStyles = (
       alignItems: "center",
       // padding: 20,
       backgroundColor: colors.background,
-      borderWidth: 2,
+      borderWidth: colors.borderWidth,
+      borderBottomWidth: colors.borderBottomWidth,
       borderColor: colors.border,
     },
     modalTitle: {
@@ -180,9 +178,10 @@ export const createModalFormStyles = (
     },
 
     modalInput: {
-      borderWidth: 2,
+      borderWidth: colors.borderWidth,
+      borderBottomWidth: colors.borderBottomWidth,
       borderColor: colors.border,
-      borderRadius: 0,
+      borderRadius: colors.borderRadius,
       padding: 10,
       marginBottom: 15,
       height: 40,
@@ -202,9 +201,10 @@ export const createModalFormStyles = (
       // padding: 20,
       paddingRight: 20,
       paddingLeft: 20,
-      borderRadius: 0,
+      borderRadius: colors.borderRadius,
       backgroundColor: colors.buttons,
-      borderWidth: 2,
+      borderWidth: colors.borderWidth,
+      borderBottomWidth: colors.borderBottomWidth,
       borderColor: colors.border,
       height: 45,
       // alignItems: "center",
@@ -225,9 +225,10 @@ export const createModalFormStyles = (
       margin: 20,
       flex: 1,
       marginHorizontal: 5,
-      borderRadius: 0,
+      borderRadius: colors.borderRadius,
       borderColor: colors.border,
-      borderWidth: 2,
+      borderWidth: colors.borderWidth,
+      borderBottomWidth: colors.borderBottomWidth,
       maxWidth: 276,
       backgroundColor: colors.buttons,
     },
@@ -236,19 +237,34 @@ export const createModalFormStyles = (
     },
   });
 
-export const createLoginStyles = (colors: ReturnType<typeof getThemeColors>) =>
-  StyleSheet.create({
-    container: {
+export const createLoginStyles = (
+  colors: ReturnType<typeof getThemeColors>,
+  theme: Theme
+) => {
+  const isClear = theme.startsWith("clear");
+
+  return StyleSheet.create({
+    loginListContainer: {
+      minHeight: 300,
+      maxHeight: 400,
       flex: 1,
-      padding: 20,
-      backgroundColor: colors.background,
-      alignItems: "center",
       justifyContent: "center",
-    },
-    input: {
-      borderWidth: 2,
+      width: 300,
+      borderWidth: isClear ? 0 : colors.borderWidth,
+      borderBottomWidth: isClear ? 0 : colors.borderBottomWidth,
       borderColor: colors.border,
-      borderRadius: 0,
+      borderRadius: colors.borderRadius,
+      padding: 30,
+      backgroundColor: colors.background,
+      // position: "relative",
+      // overflow: "hidden",
+    },
+
+    input: {
+      borderWidth: colors.borderWidth,
+      borderBottomWidth: colors.borderBottomWidth,
+      borderColor: colors.border,
+      borderRadius: colors.borderRadius,
       backgroundColor: colors.background,
       padding: 10,
       marginBottom: 15,
@@ -276,9 +292,10 @@ export const createLoginStyles = (colors: ReturnType<typeof getThemeColors>) =>
       // padding: 20,
       paddingRight: 20,
       paddingLeft: 20,
-      borderRadius: 0,
+      borderRadius: colors.borderRadius,
       backgroundColor: colors.buttons,
-      borderWidth: 2,
+      borderWidth: colors.borderWidth,
+      borderBottomWidth: colors.borderBottomWidth,
       borderColor: colors.border,
       height: 45,
       alignItems: "center",
@@ -297,207 +314,129 @@ export const createLoginStyles = (colors: ReturnType<typeof getThemeColors>) =>
       textAlign: "center",
     },
   });
+};
 
-export const createHomeStyles = (colors: ReturnType<typeof getThemeColors>) =>
-  StyleSheet.create({
-    container: {
-      height: "100%",
-      width: "100%",
-      flex: 1,
-      padding: 20,
-      alignItems: "center",
-      backgroundColor: colors.background,
-      position: "absolute",
-    },
-    header: {
-      width: "100%",
-      height: 50,
-      flexDirection: "row",
-      justifyContent: "center",
-      alignItems: "center",
-      marginBottom: 30,
-      position: "relative",
-      marginTop: 10,
-      right: 0,
-    },
-    settingsIcon: {
-      position: "absolute",
-      right: 0,
-      color: colors.icon,
-      elevation: 0, // Android
-      shadowOpacity: 0, // iOS
-      zIndex: 1,
-      shadowColor: "transparent",
-      shadowOffset: { height: 0, width: 0 },
-      shadowRadius: 0,
-      borderWidth: 0,
-      padding: 0,
-      margin: 0,
-      backgroundColor: "transparent",
-    },
-    main: {
-      flex: 1,
-      width: "100%",
-      height: "100%",
-      justifyContent: "center",
-      alignItems: "center",
-      backgroundColor: colors.background,
-    },
-    title: {
-      fontSize: 28,
-      fontWeight: "600",
-    },
-    jobList: {
-      minHeight: 500,
-      width: 300,
-      borderWidth: 2,
-      borderRadius: 0,
-      padding: 10,
-    },
-    jobItem: {
-      // padding: 12,
-      borderWidth: 2,
-      marginBottom: 10,
-      height: 45,
-      // justifyContent: "center",
-      // alignItems: "center",
-    },
-    jobButton: {
-      borderColor: colors.border,
-      borderWidth: 2,
-      borderRadius: 0,
-      marginVertical: 5,
-      height: 45,
-      width: 276,
-      backgroundColor: colors.background,
-      elevation: 0,
-      shadowOpacity: 0,
-    },
-    buttonContent: {
-      borderRadius: 0,
-      width: 225,
-      flexDirection: "row",
-    },
-    jobButtonText: {
-      color: colors.text,
-      fontSize: 18,
-      fontWeight: "400",
-      flex: 1,
-    },
-    contextMenuButtons: {
-      // backgroundColor: "transparent",
-      borderWidth: 0,
-      position: "absolute",
-      right: -1,
-      top: -2,
-      zIndex: 1000,
-      padding: 0,
-      margin: 0,
-      color: colors.icon,
-      display: !isMobileOrTablet() ? "flex" : "none",
-      width: 24,
-      height: 24,
-      alignItems: "center",
-      justifyContent: "center",
-    },
+// export const createHomeStyles = (colors: ReturnType<typeof getThemeColors>) =>
+//   StyleSheet.create({
+//     jobButton: {
+//       borderColor: colors.border,
+//       borderWidth: colors.borderWidth,
+//       borderBottomWidth: colors.borderBottomWidth,
+//       borderRadius: colors.borderRadius,
+//       marginVertical: 5,
+//       height: 45,
+//       width: 276,
+//       backgroundColor: colors.background,
+//       elevation: 0,
+//       shadowOpacity: 0,
+//     },
+//     buttonContent: {
+//       borderRadius: colors.borderRadius,
+//       width: 225,
+//       flexDirection: "row",
+//     },
+//     jobButtonText: {
+//       color: colors.text,
+//       fontSize: 18,
+//       fontWeight: "400",
+//       flex: 1,
+//     },
+//     contextMenuButtons: {
+//       // backgroundColor: "transparent",
+//       borderWidth: colors.borderWidth,
+//       borderBottomWidth: colors.borderBottomWidth,
+//       position: "absolute",
+//       right: -1,
+//       top: -2,
+//       zIndex: 1000,
+//       padding: 0,
+//       margin: 0,
+//       color: colors.icon,
+//       display: !isMobileOrTablet() ? "flex" : "none",
+//       width: 24,
+//       height: 24,
+//       alignItems: "center",
+//       justifyContent: "center",
+//     },
 
-    swipeableContainer: {
-      display: isMobileOrTablet() ? "flex" : "none",
-    },
+//     swipeableContainer: {
+//       display: isMobileOrTablet() ? "flex" : "none",
+//     },
 
-    modalContainer: {
-      flex: 1,
-      justifyContent: "center",
-      alignItems: "center",
-      backgroundColor: "rgba(0, 0, 0, 0.5)",
-    },
-    modalContent: {
-      flex: 1,
-      width: "100%",
-      justifyContent: "center",
-      alignItems: "center",
-      padding: 20,
-      backgroundColor: colors.background,
-      borderWidth: 2,
-      borderColor: colors.border,
-    },
-    modalTitle: {
-      fontSize: 18,
-      marginBottom: 15,
-      textAlign: "center",
-    },
-    input: {
-      borderWidth: 1,
-      padding: 10,
-      marginBottom: 15,
-      height: 40,
-    },
-    modalButtons: {
-      flexDirection: "row",
-      justifyContent: "space-between",
-      width: "100%",
-    },
-    modalButton: {
-      flex: 1,
-      marginHorizontal: 5,
-      borderRadius: 0,
-      borderColor: colors.border,
-      borderWidth: 2,
-    },
-    modalInput: {
-      borderWidth: 2,
-      borderColor: colors.border,
-      borderRadius: 0,
-      padding: 10,
-      marginBottom: 15,
-      height: 40,
-      width: "100%",
-    },
-    modalActionButton: {
-      borderColor: "#000000",
-      borderRadius: 0,
-      backgroundColor: "#D3D3D3",
-    },
-  });
+//     modalContainer: {
+//       flex: 1,
+//       justifyContent: "center",
+//       alignItems: "center",
+//       backgroundColor: "rgba(0, 0, 0, 0.5)",
+//     },
+//     modalContent: {
+//       flex: 1,
+//       width: "100%",
+//       justifyContent: "center",
+//       alignItems: "center",
+//       padding: 20,
+//       backgroundColor: colors.background,
+//       borderWidth: colors.borderWidth,
+//       borderBottomWidth: colors.borderBottomWidth,
+//       borderColor: colors.border,
+//     },
+//     modalTitle: {
+//       fontSize: 18,
+//       marginBottom: 15,
+//       textAlign: "center",
+//     },
+//     input: {
+//       borderWidth: colors.borderWidth,
+//       borderBottomWidth: colors.borderBottomWidth,
+//       padding: 10,
+//       marginBottom: 15,
+//       height: 40,
+//     },
+//     modalButtons: {
+//       flexDirection: "row",
+//       justifyContent: "space-between",
+//       width: "100%",
+//     },
+//     modalButton: {
+//       flex: 1,
+//       marginHorizontal: 5,
+//       borderRadius: colors.borderRadius,
+//       borderColor: colors.border,
+//       borderWidth: colors.borderWidth,
+//       borderBottomWidth: colors.borderBottomWidth,
+//     },
+//     modalInput: {
+//       borderWidth: colors.borderWidth,
+//       borderBottomWidth: colors.borderBottomWidth,
+//       borderColor: colors.border,
+//       borderRadius: colors.borderRadius,
+//       padding: 10,
+//       marginBottom: 15,
+//       height: 40,
+//       width: "100%",
+//     },
+//     modalActionButton: {
+//       borderColor: "#000000",
+//       borderRadius: colors.borderRadius,
+//       backgroundColor: "#D3D3D3",
+//     },
+//   });
 
 export const createSettingsStyles = (
   colors: ReturnType<typeof getThemeColors>
 ) =>
   StyleSheet.create({
-    container: {
-      flex: 1,
-      padding: 20,
-      backgroundColor: colors.background,
-      alignItems: "center",
-    },
-    header: {
-      width: "100%",
-      height: 50,
-      flexDirection: "row",
-      justifyContent: "space-between",
-      alignItems: "center",
-      marginBottom: 30,
-      marginTop: 10,
-      marginRight: 0,
-      paddingRight: 0,
-    },
-    title: {
-      fontSize: 24,
-      fontWeight: "600",
-      color: colors.text,
-    },
     placeholder: {
       width: 48,
     },
     button: {
       width: 300,
-      borderWidth: 2,
+      borderWidth: colors.borderWidth,
+      borderBottomWidth: colors.borderBottomWidth,
       borderColor: colors.border,
       marginBottom: 15,
       height: 45,
-      // justifyContent: "center",
-      // alignItems: "center",
-      borderRadius: 0,
+      borderRadius: colors.borderRadius,
     },
     languageButtonText: {
       color: colors.text,
@@ -509,28 +448,6 @@ export const createSettingsStyles = (
 
 export const createJobStyles = (colors: ReturnType<typeof getThemeColors>) =>
   StyleSheet.create({
-    container: {
-      flex: 1,
-      padding: 20,
-      backgroundColor: colors.background,
-      alignItems: "center",
-    },
-    header: {
-      width: "100%",
-      height: 50,
-      flexDirection: "row",
-      justifyContent: "space-between",
-      alignItems: "center",
-      marginBottom: 30,
-      position: "relative",
-      marginTop: 10,
-      right: 0,
-    },
-    title: {
-      fontSize: 24,
-      fontWeight: "600",
-      color: colors.text,
-    },
     timer: {
       fontSize: 56,
       textAlign: "center",
@@ -544,9 +461,10 @@ export const createJobStyles = (colors: ReturnType<typeof getThemeColors>) =>
       maxHeight: 400,
       flexGrow: 1,
       width: 300,
-      borderWidth: 2,
+      borderWidth: colors.borderWidth,
+      borderBottomWidth: colors.borderBottomWidth,
       borderColor: colors.border,
-      borderRadius: 0,
+      borderRadius: colors.borderRadius,
       padding: 10,
       backgroundColor: colors.background,
       position: "relative",
@@ -555,8 +473,9 @@ export const createJobStyles = (colors: ReturnType<typeof getThemeColors>) =>
 
     timeEntry: {
       borderColor: colors.border,
-      borderWidth: 2,
-      borderRadius: 0,
+      borderWidth: colors.borderWidth,
+      borderBottomWidth: colors.borderBottomWidth,
+      borderRadius: colors.borderRadius,
       marginVertical: 5,
       padding: 0,
       height: 45,
@@ -573,13 +492,6 @@ export const createJobStyles = (colors: ReturnType<typeof getThemeColors>) =>
       flex: 1,
     },
 
-    // contextMenuButtons: {
-    //   backgroundColor: colors.background,
-    //   right: 0,
-    //   position: "absolute",
-    //   color: colors.icon,
-    //   display: !isMobileOrTablet() ? "flex" : "none",
-    // },
     swipeableContainer: {
       display: isMobileOrTablet() ? "flex" : "none",
     },
@@ -595,18 +507,13 @@ export const createJobStyles = (colors: ReturnType<typeof getThemeColors>) =>
       alignItems: "center",
       marginBottom: 30,
     },
+
     buttonContent: {
       flexDirection: "row",
       justifyContent: "space-around",
       width: "100%",
       marginBottom: 30,
     },
-
-    // buttonContent: {
-    //   borderRadius: 0,
-    //   width: 225,
-    //   flexDirection: "row",
-    // },
 
     buttonText: {
       fontSize: 16,
@@ -620,7 +527,8 @@ export const createJobStyles = (colors: ReturnType<typeof getThemeColors>) =>
       flexDirection: "row",
       justifyContent: "space-between",
       padding: 10,
-      borderWidth: 2,
+      borderWidth: colors.borderWidth,
+      borderBottomWidth: colors.borderBottomWidth,
       borderColor: colors.border,
       marginBottom: 10,
     },
@@ -628,26 +536,29 @@ export const createJobStyles = (colors: ReturnType<typeof getThemeColors>) =>
       color: colors.text,
     },
 
-    //buttons
+    // ---------------------------------------------------------------------------
+    // buttons
+    // ---------------------------------------------------------------------------
 
     // Start Stop Button
-    button: {
+    timerButton: {
       borderWidth: 2,
       borderColor: colors.border,
       width: 100,
       height: 100,
       alignSelf: "center",
       justifyContent: "center",
-      borderRadius: 0,
+      borderRadius: colors.borderRadius,
       backgroundColor: colors.background,
     },
 
     //   Back to days Button
     backButton: {
       marginBottom: 10,
-      borderWidth: 2,
+      borderWidth: colors.borderWidth,
+      borderBottomWidth: colors.borderBottomWidth,
       borderColor: colors.border,
-      borderRadius: 0,
+      borderRadius: colors.borderRadius,
       padding: 0,
       // paddingRight: 20,
       // paddingLeft: 20,
@@ -664,9 +575,10 @@ export const createJobStyles = (colors: ReturnType<typeof getThemeColors>) =>
     // Back to Jobs Button
     backToJobsButton: {
       marginBottom: 10,
-      borderWidth: 2,
+      borderWidth: colors.borderWidth,
+      borderBottomWidth: colors.borderBottomWidth,
       borderColor: colors.border,
-      borderRadius: 0,
+      borderRadius: colors.borderRadius,
       padding: 0,
       height: 45,
       justifyContent: "center",
@@ -679,8 +591,9 @@ export const createJobStyles = (colors: ReturnType<typeof getThemeColors>) =>
     // Print Button
     printButton: {
       width: "50%",
-      borderWidth: 2,
-      borderRadius: 0,
+      borderWidth: colors.borderWidth,
+      borderBottomWidth: colors.borderBottomWidth,
+      borderRadius: colors.borderRadius,
       borderColor: colors.border,
       backgroundColor: colors.buttons,
     },

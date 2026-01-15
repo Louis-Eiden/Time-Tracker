@@ -1,49 +1,65 @@
 import React, { useState, useEffect, useMemo } from "react";
-import ListItem from "./ListItem";
-import { View, FlatList } from "react-native";
-import { useTheme, getThemeColors } from "../contexts/ThemeContext";
-import { useTimeFormat } from "@/contexts/TimeContext";
-import { formatDateForDisplay, formatTimeForDisplay } from "@/utils/time";
+import { View, FlatList, Platform } from "react-native";
 import { Text, Button, IconButton } from "react-native-paper";
 import { useNavigation, useRoute, RouteProp } from "@react-navigation/native";
-import { createJobStyles } from "../theme/styles";
-import { createCommonStyles } from "@/theme/styles";
+// Contexts
+import { useTheme, getThemeColors } from "@/contexts/ThemeContext";
+import { useTimeFormat } from "@/contexts/TimeContext";
+// Styles
+import { createCommonStyles, createJobStyles } from "../theme/styles";
+// Utils / Hooks
 import { handlePrint } from "@/utils/print";
+import { formatDateForDisplay, formatTimeForDisplay } from "@/utils/time";
 import { useTimes } from "../hooks/useTimes";
+// Services
 import { startTimer, stopTimer } from "../services/times.services";
-import ModalForm from "./ModalForm";
 import { createTime, deleteTime } from "@/services/times.services";
+// Components
+import Header from "../components/Header";
+import ModalForm from "../components/ModalForm";
+import ListItem from "../components/ListItem";
+
 import { Time, Days } from "@/types";
-import Header from "./Header";
 
 export default function JobScreen() {
+  // ---------------------------------------------------------------------------
+  // Navigation and Route
+  // ---------------------------------------------------------------------------
+  const navigation = useNavigation();
+  const routeProp =
+    useRoute<
+      RouteProp<{ params: { jobId: string; jobName: string } }, "params">
+    >();
+  const route = useRoute();
   // ---------------------------------------------------------------------------
   // Theme & styles
   // ---------------------------------------------------------------------------
   const { theme } = useTheme();
-  const { timeFormat } = useTimeFormat();
   const colors = getThemeColors(theme);
   const styles = createJobStyles(colors);
-  const commonStyles = createCommonStyles(colors);
+  const commonStyles = createCommonStyles(
+    colors,
+    theme,
+    Platform.OS,
+    route.name
+  );
+
+  useEffect(() => {
+    console.log(route.name);
+  }, [route]);
 
   // ---------------------------------------------------------------------------
-  // State
+  // local State
   // ---------------------------------------------------------------------------
   const [isTimeModalVisible, setIsTimeModalVisible] = useState(false);
   const [startTime, setStartTime] = useState<Date | undefined>();
   const [endTime, setEndTime] = useState<Date | undefined>();
 
   // ---------------------------------------------------------------------------
-  // Navigation and Route
+  // local variables
   // ---------------------------------------------------------------------------
-  const navigation = useNavigation();
-  const route =
-    useRoute<
-      RouteProp<{ params: { jobId: string; jobName: string } }, "params">
-    >();
-
-  const { jobId, jobName } = route.params;
-
+  const { timeFormat } = useTimeFormat();
+  const { jobId, jobName } = routeProp.params;
   const [selectedDay, setSelectedDay] = useState<string | null>(null);
   const { times } = useTimes(jobId);
   const activeEntry = times.find((t) => t.end === null) ?? null;
@@ -118,7 +134,7 @@ export default function JobScreen() {
   // JSX
   // ---------------------------------------------------------------------------
   return (
-    <View style={styles.container}>
+    <View style={commonStyles.container}>
       <Header jobName={jobName} />
 
       {/* ===================================================================== */}
@@ -133,8 +149,7 @@ export default function JobScreen() {
         <Button
           mode="outlined"
           onPress={handleStartStop}
-          style={styles.button}
-          theme={{ colors: { outline: "#000000" } }}
+          style={styles.timerButton}
           rippleColor="transparent"
         >
           <Text style={styles.buttonText}>{activeEntry ? "⏸" : "▶"}</Text>
@@ -144,7 +159,7 @@ export default function JobScreen() {
       {/* ===================================================================== */}
       {/* List Container */}
       {/* ===================================================================== */}
-      <View style={styles.timeEntryList}>
+      <View style={commonStyles.listContainer}>
         {/* Back Buttons */}
         {selectedDay === null && (
           <Button
@@ -220,7 +235,6 @@ export default function JobScreen() {
             mode="outlined"
             onPress={() => handlePrint(jobName, times, timeFormat)}
             style={styles.printButton}
-            theme={{ colors: { outline: "#000000" } }}
             rippleColor="transparent"
           >
             <Text style={styles.printButtonText}>Print</Text>

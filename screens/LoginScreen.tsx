@@ -1,15 +1,15 @@
 // LoginScreen.tsx
 import React, { useState } from "react";
-import { View } from "react-native";
+import { Platform, View } from "react-native";
 import { Text, IconButton } from "react-native-paper";
 import { useNavigation } from "@react-navigation/native";
 
 import { signUpUser, signInUser } from "@/services/users.service";
 import type { NavigationProp } from "@/types";
 import { useTheme, getThemeColors } from "@/contexts/ThemeContext";
-import { createHomeStyles } from "@/theme/styles";
+import { createCommonStyles, createLoginStyles } from "@/theme/styles";
 import LoginForm from "@/components/LoginForm";
-import Header from "./Header";
+import Header from "../components/Header";
 
 export default function LoginScreen() {
   const [isSignUp, setIsSignUp] = useState(false);
@@ -19,7 +19,8 @@ export default function LoginScreen() {
   const navigation = useNavigation<NavigationProp>();
   const { theme } = useTheme();
   const colors = getThemeColors(theme);
-  const styles = createHomeStyles(colors);
+  const styles = createLoginStyles(colors, theme);
+  const commonStyles = createCommonStyles(colors, theme, Platform.OS);
 
   const handleSubmit = async (params: {
     email: string;
@@ -45,27 +46,31 @@ export default function LoginScreen() {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={commonStyles.container}>
       <Header />
+      {/* ===================================================================== */}
+      {/* Placeholder for Timer */}
+      {/* ===================================================================== */}
+      {Platform.OS === "web" ? <View style={{ height: 105 }} /> : ""}
 
-      <View style={styles.main}>
-        <View style={[styles.jobList, { borderColor: colors.border }]}>
-          <Text style={[styles.title, { color: colors.text }]}>
-            {isSignUp ? "Sign Up" : "Login"}
-          </Text>
+      {/* ===================================================================== */}
+      {/* Placeholder Start / Stop Button */}
+      {/* ===================================================================== */}
+      {Platform.OS === "web" ? <View style={{ height: 130 }} /> : ""}
 
-          {error ? (
-            <Text style={{ color: "red", marginBottom: 8 }}>{error}</Text>
-          ) : null}
-
-          <LoginForm
-            loading={loading}
-            initialIsSignUp={isSignUp}
-            onSubmit={handleSubmit}
-            onToggleMode={setIsSignUp}
-          />
-        </View>
+      {/* <View style={commonStyles.main}> */}
+      <View style={styles.loginListContainer}>
+        <LoginForm
+          loading={loading}
+          initialIsSignUp={isSignUp}
+          onSubmit={handleSubmit}
+          onToggleMode={setIsSignUp}
+        />
+        {error ? (
+          <Text style={{ color: "red", marginBottom: 8 }}>{error}</Text>
+        ) : null}
       </View>
+      {/* </View> */}
     </View>
   );
 }

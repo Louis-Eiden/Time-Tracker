@@ -8,9 +8,9 @@ import {
 } from "react-native";
 import { Text, Button, IconButton, Menu } from "react-native-paper";
 import { Swipeable } from "react-native-gesture-handler";
-// import { isMobileOrTablet } from "../utils/platform";
+
 import { useTheme, getThemeColors } from "../contexts/ThemeContext";
-import { createListItemStyles } from "../theme/styles";
+import { createCommonStyles, createListItemStyles } from "../theme/styles";
 
 interface ListItemProps {
   text: string;
@@ -40,16 +40,18 @@ export default function ListItem({
   rightSwipeActions,
   leftSwipeActions,
 }: ListItemProps) {
-  // const [menuVisible, setMenuVisible] = useState(false);
+  // Styles
   const { theme } = useTheme();
   const colors = getThemeColors(theme);
   const styles = createListItemStyles(colors);
+  const commonStyles = createCommonStyles(colors, theme);
+
   const [isSwiping, setIsSwiping] = useState(false);
   const swipeRef = useRef<Swipeable>(null);
 
   // Delete Confirmation
   const confirmDelete = (onConfirm: () => void) => {
-    // ✅ WEB: use native browser confirm
+    // WEB: use native browser confirm
     if (Platform.OS === "web") {
       const confirmed = window.confirm(
         "Are you sure you want to delete this item?\nThis action cannot be undone."
@@ -60,7 +62,7 @@ export default function ListItem({
       return;
     }
 
-    // ✅ NATIVE: use Alert.alert
+    // NATIVE: use Alert.alert
     Alert.alert(
       "Delete item",
       "Are you sure you want to delete this item? This action cannot be undone.",
@@ -71,30 +73,6 @@ export default function ListItem({
       { cancelable: true }
     );
   };
-
-  // Default menu items if onEdit and onDelete are provided
-  // const defaultMenuItems = [];
-  // if (onEdit) {
-  //   defaultMenuItems.push({
-  //     title: "Edit",
-  //     onPress: () => {
-  //       onEdit();
-  //       setMenuVisible(false);
-  //     },
-  //   });
-  // }
-  // if (onDelete) {
-  //   defaultMenuItems.push({
-  //     title: "Delete",
-  //     onPress: () => {
-  //       onDelete();
-  //       setMenuVisible(false);
-  //     },
-  //   });
-  // }
-
-  // // Combine default and custom menu items
-  // const allMenuItems = [...defaultMenuItems, ...menuItems];
 
   // Right swipe actions renderer (Delete)
   const renderRightActions = (
@@ -114,7 +92,6 @@ export default function ListItem({
   };
 
   // Left swipe actions renderer (Edit)
-
   const renderLeftActions = (
     progress: Animated.AnimatedInterpolation<number>,
     dragX: Animated.AnimatedInterpolation<number>
@@ -156,41 +133,7 @@ export default function ListItem({
         rippleColor="transparent"
       >
         <View style={styles.content}>
-          <Text style={styles.text}>{text}</Text>
-
-          {/* {!isMobileOrTablet() && allMenuItems.length > 0 && (
-            <Menu
-              visible={menuVisible}
-              onDismiss={() => setMenuVisible(false)}
-              anchor={
-                <IconButton
-                  icon="dots-vertical"
-                  size={20}
-                  iconColor={colors.icon}
-                  style={styles.contextMenuButton}
-                  rippleColor="transparent"
-                  containerColor="transparent"
-                  theme={{
-                    colors: {
-                      secondaryContainer: "transparent",
-                    },
-                  }}
-                  onPress={(e) => {
-                    e.stopPropagation();
-                    setMenuVisible(true);
-                  }}
-                />
-              }
-            >
-              {allMenuItems.map((item, index) => (
-                <Menu.Item
-                  key={index}
-                  onPress={item.onPress}
-                  title={item.title}
-                />
-              ))}
-            </Menu>
-          )} */}
+          <Text style={commonStyles.text}>{text}</Text>
         </View>
       </Button>
     </Swipeable>
