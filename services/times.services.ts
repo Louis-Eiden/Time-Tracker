@@ -1,3 +1,4 @@
+// services/times.services.ts
 import {
   Timestamp,
   addDoc,
@@ -6,35 +7,74 @@ import {
   updateDoc,
   serverTimestamp,
   deleteDoc,
+  getDoc,
 } from "firebase/firestore";
-import { db } from "@/firebase";
-import { auth } from "@/firebase";
+import { db, auth } from "@/firebase";
+import {
+  showTimerNotification,
+  cancelTimerNotification,
+} from "./notifications.services";
 
 export async function startTimer(jobId: string) {
   const user = auth.currentUser;
   if (!user) throw new Error("Not authenticated");
-  if (!jobId) throw new Error("deleteJob: missing jobId");
+  if (!jobId) throw new Error("Missing jobId");
 
-  await addDoc(collection(db, "times"), {
+  // 1. Get Start Time for Notification
+  // We use Date.now() for the notification because it needs a number,
+  // while Firestore prefers serverTimestamp() for database accuracy.
+  const startTimeJs = Date.now();
+
+  // 2. Create in Firestore
+  const docRef = await addDoc(collection(db, "times"), {
     jobId,
     userId: user.uid,
-    start: serverTimestamp(),
+    start: serverTimestamp(), // Firestore timestamp
     end: null,
     createdAt: serverTimestamp(),
   });
+
+  // 3. Fetch Job Name
+  let jobName = "Job";
+  try {
+    const jobSnap = await getDoc(doc(db, "jobs", jobId));
+    if (jobSnap.exists()) {
+      jobName = jobSnap.data().name;
+    }
+  } catch (e) {
+    console.log("Error fetching job name", e);
+  }
+
+  // 4. Show Notification with Ticking Chronometer
+  await showTimerNotification(docRef.id, jobName, startTimeJs);
+
+  return docRef.id;
 }
 
 export async function stopTimer(timeId: string) {
   if (!timeId) throw new Error("Missing timeId");
 
+  // 1. Update Firestore
   await updateDoc(doc(db, "times", timeId), {
     end: serverTimestamp(),
   });
+
+  // 2. Kill the specific notification
+  await cancelTimerNotification(timeId);
 }
 
+// ... createTime and deleteTime remain the same ...
+// Note: You might want to add cancelTimerNotification(timeId) to deleteTime as well
+// in case a user deletes a currently running timer.
+export async function deleteTime(timeId: string) {
+  await deleteDoc(doc(db, "times", timeId));
+  await cancelTimerNotification(timeId);
+}
+
+// ... createTime remains the same ...
 export async function createTime(params: {
   jobId: string;
-  start: Date; //decouple Timestamp dataformat from UI use Date
+  start: Date;
   end: Date;
 }) {
   const { jobId, start, end } = params;
@@ -56,8 +96,4 @@ export async function createTime(params: {
     end: Timestamp.fromDate(end),
     createdAt: serverTimestamp(),
   });
-}
-
-export async function deleteTime(timeId: string) {
-  await deleteDoc(doc(db, "times", timeId));
 }

@@ -39,11 +39,14 @@ bunx expo start -c
 This fixes ~80% of “my build never works” cases.
 
 ```
+bun pm cache rm
 rm -rf node_modules
 rm -rf ios android
 rm -rf ~/.gradle
 rm -rf ~/Library/Developer/Xcode/DerivedData
 rm -rf $TMPDIR/metro-*
+rm bun.lockb
+rm bun.lock
 ```
 
 then

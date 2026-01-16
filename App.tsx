@@ -1,15 +1,12 @@
-import React from "react";
-import { useColorScheme } from "react-native";
+import React, { useEffect } from "react"; // Add useEffect
+import { useColorScheme, Platform, View, Text } from "react-native"; // Add Platform
 import { NavigationContainer, LinkingOptions } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-// import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { Provider as PaperProvider } from "react-native-paper";
-import { View, Text } from "react-native";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { TimeProvider } from "./contexts/TimeContext";
-
-import { Platform } from "react-native";
+import notifee, { EventType } from "@notifee/react-native"; // Import Notifee
 
 // Screen Components
 import LoginScreen from "./screens/LoginScreen";
@@ -19,9 +16,19 @@ import SettingsScreen from "./screens/SettingsScreen";
 import { RootStackParamList } from "./types";
 import { AuthProvider } from "./contexts/AuthContext";
 
+// Import Notification Helpers
+import {
+  backgroundNotificationHandler,
+  setupNotificationChannel,
+} from "./services/notifications.services";
+
+// --- REGISTER BACKGROUND HANDLER ---
+// This must be outside of any component
+notifee.onBackgroundEvent(backgroundNotificationHandler);
+
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
-// Use Hash Routing for web platform
+// Linking Options
 const linking: LinkingOptions<RootStackParamList> = {
   prefixes: Platform.OS === "web" ? ["#/"] : [],
   config: {
@@ -34,6 +41,7 @@ const linking: LinkingOptions<RootStackParamList> = {
   },
 };
 
+// ErrorBoundary
 interface Props {
   children: React.ReactNode;
 }
@@ -48,7 +56,6 @@ class ErrorBoundary extends React.Component<Props> {
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
     console.error("Error:", error);
     console.error("Error Info:", errorInfo);
-    // Log to your preferred error tracking service here
   }
 
   render() {
@@ -66,22 +73,21 @@ class ErrorBoundary extends React.Component<Props> {
 }
 
 export default function App() {
-  // const [isReady, setIsReady] = useState(false);
   const theme = useColorScheme();
 
-  // useEffect(() => {
-  //   console.log("App mounting...");
-  //   try {
-  //     setIsReady(true);
-  //     console.log("App ready");
-  //   } catch (error) {
-  //     console.error("Error during app initialization:", error);
-  //   }
-  // }, []);
+  // Setup Notification Channel on App Launch
+  useEffect(() => {
+    if (Platform.OS === "android") {
+      setupNotificationChannel();
 
-  // if (!isReady) {
-  //   return null;
-  // }
+      // Optional: Handle foreground events (if app is open and user clicks Stop in notification tray)
+      const unsubscribe = notifee.onForegroundEvent(({ type, detail }) => {
+        // Reuse the background logic since it does the same thing
+        backgroundNotificationHandler({ type, detail });
+      });
+      return unsubscribe;
+    }
+  }, []);
 
   return (
     <ErrorBoundary>
@@ -91,11 +97,7 @@ export default function App() {
             <TimeProvider>
               <PaperProvider>
                 <NavigationContainer linking={linking}>
-                  <Stack.Navigator
-                    screenOptions={{
-                      headerShown: false,
-                    }}
-                  >
+                  <Stack.Navigator screenOptions={{ headerShown: false }}>
                     <Stack.Screen name="Login" component={LoginScreen} />
                     <Stack.Screen name="Home" component={HomeScreen} />
                     <Stack.Screen name="Job" component={JobScreen} />

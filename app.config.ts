@@ -25,7 +25,12 @@ const config: ExpoConfig = {
   android: {
     package: "time.tracker",
     googleServicesFile: "./google-services.json",
-    permissions: ["WRITE_EXTERNAL_STORAGE", "READ_EXTERNAL_STORAGE"],
+    permissions: [
+      "WRITE_EXTERNAL_STORAGE",
+      "READ_EXTERNAL_STORAGE",
+      "FOREGROUND_SERVICE",
+      "WAKE_LOCK",
+    ],
     adaptiveIcon: {
       foregroundImage: "./assets/adaptive-icon.png",
       backgroundColor: "#ffffff",
