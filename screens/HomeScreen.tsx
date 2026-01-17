@@ -30,7 +30,7 @@ export default function HomeScreen() {
   // ---------------------------------------------------------------------------
   const { theme } = useTheme();
   const colors = getThemeColors(theme);
-  const commonStyles = createCommonStyles(colors, theme, Platform.OS);
+  const commonStyles = createCommonStyles(colors, theme, Platform.OS, "Home");
 
   const modal = useModalForm<Job>({
     onAdd: createJob,

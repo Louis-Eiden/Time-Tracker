@@ -1,86 +1,164 @@
-// services/notifications.service.ts
 import notifee, {
   AndroidImportance,
   EventType,
   Event,
 } from "@notifee/react-native";
+// Assuming this is where your stop logic lives based on previous context
 import { stopTimer } from "./times.services";
 
-// 1. Create the channel (required for Android)
 export async function setupNotificationChannel() {
   await notifee.createChannel({
     id: "timer_channel",
     name: "Active Timers",
-    lights: false,
+    importance: AndroidImportance.LOW, // LOW prevents sound/vibration on every update
     vibration: false,
-    importance: AndroidImportance.LOW, // Low means no sound/popup, just shows up in list/lockscreen
   });
 }
 
-// 2. Show Ticking Notification
 export async function showTimerNotification(
   timeId: string,
   jobName: string,
-  startTime: number // <--- We need the start time (in milliseconds)
+  startTime: number,
 ) {
-  // Request permissions first (Android 13+)
   await notifee.requestPermission();
 
+  // Check if there is already a foreground service running
+  const displayed = await notifee.getDisplayedNotifications();
+  const hasActiveService = displayed.some(
+    (n) => n.notification.android?.asForegroundService,
+  );
+
+  // Only the first timer gets to be the "Foreground Service"
+  const isForegroundService = !hasActiveService;
+
+  // Ensure we have a valid string, fallback to "Active Timer" if empty
+  const safeTitle = jobName || "Active Timer";
+
   await notifee.displayNotification({
-    id: timeId, // Use timeId as ID so we can cancel specific timers
-    title: jobName, // Job Name as the main title
-    body: "Tracking time...", // Subtext
+    id: timeId,
+    title: safeTitle,
+    body: "Tracking time...",
     android: {
       channelId: "timer_channel",
-      asForegroundService: true, // This keeps it alive on lockscreen
+      asForegroundService: isForegroundService,
       ongoing: true, // Prevents user from swiping it away
-      color: "#4caf50", // Green color
-
-      // --- THE MAGIC PART (Native Ticking) ---
-      showChronometer: true, // Tells Android to show a timer
-      timestamp: startTime, // The time the timer started (Date.now())
-      // ---------------------------------------
-
+      color: "#4caf50",
+      showChronometer: true, // Shows the counting timer
+      timestamp: startTime, // Sets the start time for the chronometer
+      pressAction: {
+        id: "default",
+      },
       actions: [
         {
           title: "Stop",
           pressAction: {
             id: "stop_timer",
-            launchActivity: "default", // Keeps app in background, just runs logic
           },
         },
       ],
     },
+    // IMPORTANT: We save the data here so we can retrieve it later
+    // if we need to promote this notification to be the service leader.
     data: {
-      timeId, // Pass the ID so the event handler knows what to stop
+      timeId,
+      jobName: safeTitle,
+      startTime,
     },
   });
 }
 
-// 3. Cancel Notification
 export async function cancelTimerNotification(timeId: string) {
-  await notifee.cancelNotification(timeId);
-  // Note: If you have multiple timers, stopForegroundService might kill all.
-  // Usually, for multiple timers, we just cancel the specific ID.
-  // If this is the LAST timer, Notifee handles stopping the service automatically usually.
+  const displayed = await notifee.getDisplayedNotifications();
+  const notificationToCancel = displayed.find((n) => n.id === timeId);
+
+  // If notification doesn't exist, just try to cancel by ID and return
+  if (!notificationToCancel) {
+    await notifee.cancelNotification(timeId);
+    return;
+  }
+
+  // Find other timers that are NOT the one we are cancelling
+  const remainingTimers = displayed.filter(
+    (n) =>
+      n.notification.android?.channelId === "timer_channel" && n.id !== timeId,
+  );
+
+  if (remainingTimers.length === 0) {
+    // SCENARIO 1: No timers left.
+    // Stop the service completely and remove the notification.
+    await notifee.stopForegroundService();
+    await notifee.cancelNotification(timeId);
+  } else {
+    // SCENARIO 2: There are other timers running.
+    const wasForegroundService =
+      notificationToCancel.notification.android?.asForegroundService;
+
+    if (wasForegroundService) {
+      // If we are cancelling the "Leader" (Service), we must promote another one.
+
+      // 1. Stop the current service lock temporarily
+      await notifee.stopForegroundService();
+
+      // 2. Pick the next available timer to be the leader
+      const nextLeader = remainingTimers[0];
+
+      // 3. Extract data safely to prevent "Job" or "undefined" titles
+      const existingData = nextLeader.notification.data || {};
+
+      // Priority:
+      // 1. The title currently on screen (most accurate)
+      // 2. The jobName saved in data
+      // 3. Fallback string
+      const safeTitle =
+        nextLeader.notification.title ||
+        (existingData.jobName as string) ||
+        "Active Timer";
+
+      const safeStartTime = (existingData.startTime as number) || Date.now();
+
+      // 4. Re-display the next leader as the Foreground Service
+      if (nextLeader.id) {
+        await notifee.displayNotification({
+          id: nextLeader.id,
+          title: safeTitle,
+          body: nextLeader.notification.body,
+          android: {
+            ...nextLeader.notification.android,
+            channelId: "timer_channel",
+            asForegroundService: true, // It is now the Service
+            ongoing: true,
+            showChronometer: true,
+            timestamp: safeStartTime,
+          },
+          // CRITICAL: Pass the data object back in!
+          // If we don't do this, the next time this specific timer is cancelled,
+          // it won't have data and might bug out.
+          data: existingData,
+        });
+      }
+
+      // 5. Finally, remove the old one
+      await notifee.cancelNotification(timeId);
+    } else {
+      // If we are cancelling a regular notification (not the service), just remove it.
+      await notifee.cancelNotification(timeId);
+    }
+  }
 }
 
-// 4. Background Event Handler (Headless JS)
-// This runs even if the app is in the background/locked
-export const backgroundNotificationHandler = async ({
-  type,
-  detail,
-}: Event) => {
+export async function backgroundNotificationHandler({ type, detail }: Event) {
   const { notification, pressAction } = detail;
 
-  // Check if the user pressed the "Stop Timer" button
+  // Handle the "Stop" button press
   if (type === EventType.ACTION_PRESS && pressAction?.id === "stop_timer") {
     const timeId = notification?.data?.timeId as string;
+
     if (timeId) {
-      // Stop in Firestore
+      // 1. Stop the logic in your database/state
       await stopTimer(timeId);
-      // Remove notification
+
+      // 2. Update the UI (Cancel notification and handle service promotion)
       await cancelTimerNotification(timeId);
     }
   }
-};
+}

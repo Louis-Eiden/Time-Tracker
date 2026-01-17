@@ -6,7 +6,7 @@ import {
   Alert,
   Platform,
 } from "react-native";
-import { Text, Button, IconButton, Menu } from "react-native-paper";
+import { Text, TouchableRipple } from "react-native-paper";
 import { Swipeable } from "react-native-gesture-handler";
 
 import { useTheme, getThemeColors } from "../contexts/ThemeContext";
@@ -15,12 +15,6 @@ import { createCommonStyles, createListItemStyles } from "../theme/styles";
 interface ListItemProps {
   text: string;
   onPress?: () => void;
-  onEdit?: () => void;
-  onDelete?: () => void;
-  menuItems?: Array<{
-    title: string;
-    onPress: () => void;
-  }>;
   rightSwipeActions?: {
     label: string;
     onPress: () => void;
@@ -34,17 +28,14 @@ interface ListItemProps {
 export default function ListItem({
   text,
   onPress,
-  onEdit,
-  onDelete,
-  menuItems = [],
   rightSwipeActions,
   leftSwipeActions,
 }: ListItemProps) {
   // Styles
   const { theme } = useTheme();
   const colors = getThemeColors(theme);
-  const styles = createListItemStyles(colors);
-  const commonStyles = createCommonStyles(colors, theme);
+  const styles = createListItemStyles(colors, Platform.OS);
+  const commonStyles = createCommonStyles(colors, theme, Platform.OS, "Job");
 
   const [isSwiping, setIsSwiping] = useState(false);
   const swipeRef = useRef<Swipeable>(null);
@@ -54,7 +45,7 @@ export default function ListItem({
     // WEB: use native browser confirm
     if (Platform.OS === "web") {
       const confirmed = window.confirm(
-        "Are you sure you want to delete this item?\nThis action cannot be undone."
+        "Are you sure you want to delete this item?\nThis action cannot be undone.",
       );
       if (confirmed) {
         onConfirm();
@@ -70,14 +61,14 @@ export default function ListItem({
         { text: "Cancel", style: "cancel" },
         { text: "Delete", style: "destructive", onPress: onConfirm },
       ],
-      { cancelable: true }
+      { cancelable: true },
     );
   };
 
   // Right swipe actions renderer (Delete)
   const renderRightActions = (
     progress: Animated.AnimatedInterpolation<number>,
-    dragX: Animated.AnimatedInterpolation<number>
+    dragX: Animated.AnimatedInterpolation<number>,
   ) => {
     if (!rightSwipeActions) return null;
 
@@ -94,7 +85,7 @@ export default function ListItem({
   // Left swipe actions renderer (Edit)
   const renderLeftActions = (
     progress: Animated.AnimatedInterpolation<number>,
-    dragX: Animated.AnimatedInterpolation<number>
+    dragX: Animated.AnimatedInterpolation<number>,
   ) => {
     if (!leftSwipeActions) return null;
 
@@ -122,20 +113,25 @@ export default function ListItem({
         setTimeout(() => setIsSwiping(false), 50);
       }}
     >
-      <Button
-        mode="outlined"
+      <TouchableRipple
         onPress={() => {
           if (isSwiping) return;
           onPress?.();
         }}
+        // We manually add the border styles here because TouchableRipple
+        // doesn't have a 'mode="outlined"' prop like Button does.
         style={styles.container}
-        theme={{ colors: { outline: colors.border } }}
-        rippleColor="transparent"
+        rippleColor={colors.buttons} // Slight primary color ripple
       >
         <View style={styles.content}>
-          <Text style={commonStyles.text}>{text}</Text>
+          <Text
+            style={commonStyles.text}
+            numberOfLines={0} // 0 means "unlimited lines" (allows wrapping)
+          >
+            {text}
+          </Text>
         </View>
-      </Button>
+      </TouchableRipple>
     </Swipeable>
   );
 }

@@ -1,4 +1,4 @@
-import { StyleSheet, TextStyle } from "react-native";
+import { Platform, StyleSheet, TextStyle } from "react-native";
 import { isMobileOrTablet } from "../utils/platform";
 import { getThemeColors, Theme, useTheme } from "@/contexts/ThemeContext";
 import {
@@ -11,10 +11,10 @@ export const createCommonStyles = (
   colors: ReturnType<typeof getThemeColors>,
   theme: Theme,
   platform: string,
-  routeName: string = ""
+  routeName?: string,
 ) => {
-  const isClear = theme.startsWith("clear");
-  const isJobScreen = routeName.startsWith("Job");
+  const isClear = theme?.startsWith("clear") ?? false;
+  const isJobScreen = routeName?.startsWith("Job") ?? false;
   const isWeb = platform === "web";
 
   return StyleSheet.create({
@@ -23,15 +23,15 @@ export const createCommonStyles = (
       padding: 20,
       backgroundColor: colors.background,
       alignItems: "center",
-      // justifyContent: "center",
     },
-    // main: {
-    //   flex: 1,
-    //   width: "100%",
-    //   height: "100%",
-    //   alignItems: "center",
-    //   backgroundColor: colors.background,
-    // },
+    main: {
+      flex: 1,
+      width: "100%",
+      height: "100%",
+      alignItems: "center",
+      justifyContent: isWeb ? undefined : "center",
+      backgroundColor: colors.background,
+    },
     button: {
       borderWidth: colors.borderWidth,
       borderBottomWidth: colors.borderBottomWidth,
@@ -101,9 +101,12 @@ export const createHeaderStyles = (colors: ReturnType<typeof getThemeColors>) =>
   });
 
 export const createListItemStyles = (
-  colors: ReturnType<typeof getThemeColors>
-) =>
-  StyleSheet.create({
+  colors: ReturnType<typeof getThemeColors>,
+  platform: string,
+) => {
+  const isWeb = platform === "web";
+
+  return StyleSheet.create({
     container: {
       borderColor: colors.border,
       borderWidth: colors.borderWidth,
@@ -111,10 +114,14 @@ export const createListItemStyles = (
       borderRadius: colors.borderRadius,
       marginBottom: 10,
       height: 45,
+      padding: isWeb ? 10 : 0,
       width: "100%",
       backgroundColor: colors.buttons,
       elevation: 0,
       shadowOpacity: 0,
+      flex: 1,
+      justifyContent: "center",
+      alignItems: "center",
     },
     content: {
       flexDirection: "row",
@@ -130,8 +137,9 @@ export const createListItemStyles = (
       backgroundColor: "blue",
       justifyContent: "center",
       alignItems: "center",
+      borderRadius: colors.borderRadius,
       width: 70,
-      marginTop: 5,
+      marginTop: 0,
       height: 45,
     },
 
@@ -139,8 +147,9 @@ export const createListItemStyles = (
       backgroundColor: "red",
       justifyContent: "center",
       alignItems: "center",
+      borderRadius: colors.borderRadius,
       width: 70,
-      marginTop: 5,
+      marginTop: 0,
       height: 45,
     },
 
@@ -148,11 +157,15 @@ export const createListItemStyles = (
       color: "white",
     },
   });
+};
 
 export const createModalFormStyles = (
-  colors: ReturnType<typeof getThemeColors>
-) =>
-  StyleSheet.create({
+  colors: ReturnType<typeof getThemeColors>,
+  platform: string,
+) => {
+  const isWeb = platform === "web";
+
+  return StyleSheet.create({
     modalContainer: {
       flex: 1,
       justifyContent: "center",
@@ -185,7 +198,7 @@ export const createModalFormStyles = (
       padding: 10,
       marginBottom: 15,
       height: 40,
-      width: "80%",
+      width: isWeb ? "50%" : "80%",
       color: colors.text,
     },
     modalInputFocused: {
@@ -236,12 +249,17 @@ export const createModalFormStyles = (
       color: "#000000",
     },
   });
+};
 
 export const createLoginStyles = (
   colors: ReturnType<typeof getThemeColors>,
-  theme: Theme
+  theme: Theme,
+  platform: string,
+  routeName?: string,
 ) => {
-  const isClear = theme.startsWith("clear");
+  const isClear = theme?.startsWith("clear") ?? false;
+  const isJobScreen = routeName?.startsWith("Job") ?? false;
+  const isWeb = platform === "web";
 
   return StyleSheet.create({
     loginListContainer: {
@@ -249,6 +267,7 @@ export const createLoginStyles = (
       maxHeight: 400,
       flex: 1,
       justifyContent: "center",
+      alignItems: "center",
       width: 300,
       borderWidth: isClear ? 0 : colors.borderWidth,
       borderBottomWidth: isClear ? 0 : colors.borderBottomWidth,
@@ -423,7 +442,7 @@ export const createLoginStyles = (
 //   });
 
 export const createSettingsStyles = (
-  colors: ReturnType<typeof getThemeColors>
+  colors: ReturnType<typeof getThemeColors>,
 ) =>
   StyleSheet.create({
     placeholder: {

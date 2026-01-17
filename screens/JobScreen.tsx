@@ -41,12 +41,8 @@ export default function JobScreen() {
     colors,
     theme,
     Platform.OS,
-    route.name
+    route.name,
   );
-
-  useEffect(() => {
-    console.log(route.name);
-  }, [route]);
 
   // ---------------------------------------------------------------------------
   // local State
@@ -94,7 +90,7 @@ export default function JobScreen() {
     const secs = seconds % 60;
     return `${String(hrs).padStart(2, "0")}:${String(mins).padStart(
       2,
-      "0"
+      "0",
     )}:${String(secs).padStart(2, "0")}`;
   };
 
@@ -146,14 +142,13 @@ export default function JobScreen() {
       {/* Start / Stop Button */}
       {/* ===================================================================== */}
       <View style={styles.timerContainer}>
-        <Button
-          mode="outlined"
-          onPress={handleStartStop}
+        <IconButton
+          icon={activeEntry ? "pause" : "play"}
+          iconColor={colors.icon}
           style={styles.timerButton}
-          rippleColor="transparent"
-        >
-          <Text style={styles.buttonText}>{activeEntry ? "⏸" : "▶"}</Text>
-        </Button>
+          size={20}
+          onPress={handleStartStop}
+        />
       </View>
 
       {/* ===================================================================== */}
@@ -212,7 +207,7 @@ export default function JobScreen() {
               <ListItem
                 text={`${formatTimeForDisplay(
                   item.start.toDate(),
-                  timeFormat
+                  timeFormat,
                 )} - ${
                   item.end
                     ? formatTimeForDisplay(item.end.toDate(), timeFormat)

@@ -9,11 +9,11 @@ export type Theme =
   | "retro-dark"
   | "retro-color"
   | "clear-light"
-  | "clear-dark"
-  | "clear-color"
-  | "round-light"
-  | "round-dark"
-  | "round-color";
+  // | "clear-dark"
+  // | "clear-color"
+  | "round-light";
+// | "round-dark"
+// | "round-color"
 
 interface ThemeContextType {
   theme: Theme;
@@ -111,29 +111,29 @@ export const getThemeColors = (theme: Theme) => {
         link: "#0066cc",
       };
 
-    case "clear-dark":
-      return {
-        text: "#ffffff",
-        background: "#121212",
-        border: "#2a2a2a",
-        borderRadius: radius,
-        borderWidth: 0,
-        borderBottomWidth: 2,
-        icon: "#ffffff",
-        link: "#4da3ff",
-      };
+    // case "clear-dark":
+    //   return {
+    //     text: "#ffffff",
+    //     background: "#121212",
+    //     border: "#2a2a2a",
+    //     borderRadius: radius,
+    //     borderWidth: 0,
+    //     borderBottomWidth: 2,
+    //     icon: "#ffffff",
+    //     link: "#4da3ff",
+    //   };
 
-    case "clear-color":
-      return {
-        text: "#ffffff",
-        background: "#4f8cff",
-        border: "#1e3a8a",
-        borderRadius: radius,
-        borderWidth: 0,
-        borderBottomWidth: 2,
-        icon: "#ffffff",
-        link: "#ffdd57",
-      };
+    // case "clear-color":
+    //   return {
+    //     text: "#ffffff",
+    //     background: "#4f8cff",
+    //     border: "#1e3a8a",
+    //     borderRadius: radius,
+    //     borderWidth: 0,
+    //     borderBottomWidth: 2,
+    //     icon: "#ffffff",
+    //     link: "#ffdd57",
+    //   };
 
     /* -------- Round -------- */
     case "round-light":
@@ -148,29 +148,29 @@ export const getThemeColors = (theme: Theme) => {
         link: "#2563eb",
       };
 
-    case "round-dark":
-      return {
-        text: "#f9fafb",
-        background: "#111827",
-        border: "#374151",
-        borderRadius: 10,
-        borderWidth: 2,
-        borderBottomWidth: 2,
-        icon: "#f9fafb",
-        link: "#60a5fa",
-      };
+    // case "round-dark":
+    //   return {
+    //     text: "#f9fafb",
+    //     background: "#111827",
+    //     border: "#374151",
+    //     borderRadius: 10,
+    //     borderWidth: 2,
+    //     borderBottomWidth: 2,
+    //     icon: "#f9fafb",
+    //     link: "#60a5fa",
+    //   };
 
-    case "round-color":
-      return {
-        text: "#ffffff",
-        background: "#10b981",
-        border: "#065f46",
-        borderRadius: 10,
-        borderWidth: 2,
-        borderBottomWidth: 2,
-        icon: "#ffffff",
-        link: "#facc15",
-      };
+    // case "round-color":
+    //   return {
+    //     text: "#ffffff",
+    //     background: "#10b981",
+    //     border: "#065f46",
+    //     borderRadius: 10,
+    //     borderWidth: 2,
+    //     borderBottomWidth: 2,
+    //     icon: "#ffffff",
+    //     link: "#facc15",
+    //   };
 
     default:
       return {

@@ -60,7 +60,7 @@ export default function ModalForm({
   // Theme / styles
   const { theme } = useTheme();
   const colors = getThemeColors(theme);
-  const styles = createModalFormStyles(colors);
+  const styles = createModalFormStyles(colors, Platform.OS);
   // const buttonStyles = createButtonStyles(colors);
   const { timeFormat } = useTimeFormat();
 
@@ -69,7 +69,7 @@ export default function ModalForm({
 
   // Picker state
   const [activePicker, setActivePicker] = useState<"start" | "end" | null>(
-    null
+    null,
   );
   const [datePickerVisible, setDatePickerVisible] = useState(false);
   const [timePickerVisible, setTimePickerVisible] = useState(false);
@@ -162,7 +162,7 @@ export default function ModalForm({
                     const combined = combineDateAndTime(
                       pickedDate,
                       hours,
-                      minutes
+                      minutes,
                     );
 
                     if (activePicker === "start") {

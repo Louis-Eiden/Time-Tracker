@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, Text } from "react-native";
+import { View, Text, Platform } from "react-native";
 import { IconButton } from "react-native-paper";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { signOutUser } from "@/services/users.service";
@@ -16,7 +16,12 @@ export default function Header({ jobName }: { jobName?: string }) {
   const { theme } = useTheme();
   const colors = getThemeColors(theme);
   const styles = createHeaderStyles(colors);
-  const commonStyles = createCommonStyles(colors, theme, route.name);
+  const commonStyles = createCommonStyles(
+    colors,
+    theme,
+    Platform.OS,
+    route.name
+  );
   // local
   const hideLeftIcon = route.name === "Login";
   const hideRightIcon = route.name === "Settings";

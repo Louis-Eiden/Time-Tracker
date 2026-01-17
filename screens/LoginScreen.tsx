@@ -19,8 +19,8 @@ export default function LoginScreen() {
   const navigation = useNavigation<NavigationProp>();
   const { theme } = useTheme();
   const colors = getThemeColors(theme);
-  const styles = createLoginStyles(colors, theme);
-  const commonStyles = createCommonStyles(colors, theme, Platform.OS);
+  const styles = createLoginStyles(colors, theme, Platform.OS, "Login");
+  const commonStyles = createCommonStyles(colors, theme, Platform.OS, "Login");
 
   const handleSubmit = async (params: {
     email: string;
@@ -58,19 +58,19 @@ export default function LoginScreen() {
       {/* ===================================================================== */}
       {Platform.OS === "web" ? <View style={{ height: 130 }} /> : ""}
 
-      {/* <View style={commonStyles.main}> */}
-      <View style={styles.loginListContainer}>
-        <LoginForm
-          loading={loading}
-          initialIsSignUp={isSignUp}
-          onSubmit={handleSubmit}
-          onToggleMode={setIsSignUp}
-        />
-        {error ? (
-          <Text style={{ color: "red", marginBottom: 8 }}>{error}</Text>
-        ) : null}
+      <View style={commonStyles.main}>
+        <View style={styles.loginListContainer}>
+          <LoginForm
+            loading={loading}
+            initialIsSignUp={isSignUp}
+            onSubmit={handleSubmit}
+            onToggleMode={setIsSignUp}
+          />
+          {error ? (
+            <Text style={{ color: "red", marginBottom: 8 }}>{error}</Text>
+          ) : null}
+        </View>
       </View>
-      {/* </View> */}
     </View>
   );
 }

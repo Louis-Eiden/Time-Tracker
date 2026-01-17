@@ -27,13 +27,13 @@ export default function ThemeSwitcher() {
       <Menu.Item onPress={() => setTheme("retro-dark")} title="Retro Dark" />
       <Menu.Item onPress={() => setTheme("retro-color")} title="Retro Color" />
 
-      <Menu.Item onPress={() => setTheme("clear-light")} title="Clear Light" />
-      <Menu.Item onPress={() => setTheme("clear-dark")} title="Clear Dark" />
-      <Menu.Item onPress={() => setTheme("clear-color")} title="Clear Color" />
+      <Menu.Item onPress={() => setTheme("clear-light")} title="Clear" />
+      {/* <Menu.Item onPress={() => setTheme("clear-dark")} title="Clear Dark" />
+      <Menu.Item onPress={() => setTheme("clear-color")} title="Clear Color" /> */}
 
-      <Menu.Item onPress={() => setTheme("round-light")} title="Round Light" />
-      <Menu.Item onPress={() => setTheme("round-dark")} title="Round Dark" />
-      <Menu.Item onPress={() => setTheme("round-color")} title="Round Color" />
+      <Menu.Item onPress={() => setTheme("round-light")} title="Round" />
+      {/* <Menu.Item onPress={() => setTheme("round-dark")} title="Round Dark" />
+      <Menu.Item onPress={() => setTheme("round-color")} title="Round Color" /> */}
     </Menu>
   );
 }
