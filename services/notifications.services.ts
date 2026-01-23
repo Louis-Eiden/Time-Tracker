@@ -47,6 +47,7 @@ export async function showTimerNotification(
       timestamp: startTime, // Sets the start time for the chronometer
       pressAction: {
         id: "default",
+        launchActivity: "default",
       },
       actions: [
         {

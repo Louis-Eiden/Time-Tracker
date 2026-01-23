@@ -1,12 +1,12 @@
-import React, { useEffect } from "react"; // Add useEffect
-import { useColorScheme, Platform, View, Text } from "react-native"; // Add Platform
+import React, { useEffect } from "react";
+import { useColorScheme, Platform, View, Text } from "react-native";
 import { NavigationContainer, LinkingOptions } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { Provider as PaperProvider } from "react-native-paper";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { TimeProvider } from "./contexts/TimeContext";
-import notifee, { EventType } from "@notifee/react-native"; // Import Notifee
+import notifee, { EventType } from "@notifee/react-native";
 
 // Screen Components
 import LoginScreen from "./screens/LoginScreen";
@@ -23,8 +23,17 @@ import {
 } from "./services/notifications.services";
 
 // --- REGISTER BACKGROUND HANDLER ---
-// This must be outside of any component
+// This handles events when the app is killed or in background (e.g. pressing "Stop")
 notifee.onBackgroundEvent(backgroundNotificationHandler);
+
+// --- REGISTER FOREGROUND SERVICE (FIX FOR WARNING) ---
+// This is required when displaying a notification with `asForegroundService: true`
+notifee.registerForegroundService((notification) => {
+  return new Promise(() => {
+    // We return a promise that never resolves to keep the service alive
+    // until the timer is stopped (which cancels the notification).
+  });
+});
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 

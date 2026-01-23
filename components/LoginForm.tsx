@@ -7,6 +7,7 @@ import {
   Text,
   StyleSheet,
   Pressable,
+  Platform,
 } from "react-native";
 
 import { createCommonStyles, createLoginStyles } from "@/theme/styles";
@@ -14,32 +15,31 @@ import { getThemeColors, useTheme } from "@/contexts/ThemeContext";
 
 interface LoginFormProps {
   loading?: boolean;
-  initialIsSignUp?: boolean;
+  isSignUp: boolean;
   onSubmit: (params: {
     email: string;
     password: string;
     isSignUp: boolean;
   }) => void;
-  onToggleMode?: (isSignUp: boolean) => void;
+  onToggleMode: (isSignUp: boolean) => void;
 }
 
 export default function LoginForm({
   onSubmit,
   loading = false,
-  initialIsSignUp = false,
+  isSignUp,
   onToggleMode,
 }: LoginFormProps) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [isSignUp, setIsSignUp] = useState(initialIsSignUp);
   const [errors, setErrors] = useState<{ email?: string; password?: string }>(
-    {}
+    {},
   );
 
   const { theme } = useTheme();
   const colors = getThemeColors(theme);
-  const styles = createLoginStyles(colors, theme);
-  const commonStyles = createCommonStyles(colors, theme);
+  const styles = createLoginStyles(colors, theme, Platform.OS, "Login");
+  const commonStyles = createCommonStyles(colors, theme, Platform.OS, "Login");
 
   // Separate focus states for each input
   const [emailFocused, setEmailFocused] = useState(false);
@@ -71,11 +71,7 @@ export default function LoginForm({
   };
 
   const handleToggleMode = () => {
-    setIsSignUp((prev) => {
-      const next = !prev;
-      onToggleMode?.(next);
-      return next;
-    });
+    onToggleMode(!isSignUp);
   };
 
   return (

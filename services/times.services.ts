@@ -10,10 +10,7 @@ import {
   getDoc,
 } from "firebase/firestore";
 import { db, auth } from "@/firebase";
-import {
-  showTimerNotification,
-  cancelTimerNotification,
-} from "./notifications.services";
+import { showTimerNotification } from "./notifications.services";
 
 export async function startTimer(jobId: string) {
   const user = auth.currentUser;
@@ -59,6 +56,8 @@ export async function stopTimer(timeId: string) {
     end: serverTimestamp(),
   });
 
+  const { cancelTimerNotification } = require("./notifications.services");
+
   // 2. Kill the specific notification
   await cancelTimerNotification(timeId);
 }
@@ -67,6 +66,8 @@ export async function stopTimer(timeId: string) {
 // Note: You might want to add cancelTimerNotification(timeId) to deleteTime as well
 // in case a user deletes a currently running timer.
 export async function deleteTime(timeId: string) {
+  const { cancelTimerNotification } = require("./notifications.services");
+
   await deleteDoc(doc(db, "times", timeId));
   await cancelTimerNotification(timeId);
 }

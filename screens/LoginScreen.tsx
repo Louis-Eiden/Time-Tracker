@@ -62,7 +62,7 @@ export default function LoginScreen() {
         <View style={styles.loginListContainer}>
           <LoginForm
             loading={loading}
-            initialIsSignUp={isSignUp}
+            isSignUp={isSignUp}
             onSubmit={handleSubmit}
             onToggleMode={setIsSignUp}
           />

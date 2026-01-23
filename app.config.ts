@@ -23,18 +23,22 @@ const config: ExpoConfig = {
   },
 
   android: {
-    package: "time.tracker",
+    package: "com.louiseiden.timetracker",
     googleServicesFile: "./google-services.json",
     permissions: [
-      "WRITE_EXTERNAL_STORAGE",
-      "READ_EXTERNAL_STORAGE",
       "FOREGROUND_SERVICE",
       "WAKE_LOCK",
+      // Android 14 requires specific types.
+      // 'systemExempted' is often used by Notifee internally,
+      // but for a timer, standard FOREGROUND_SERVICE is the base.
+      // If you target Android 14+, you might need:
+      // "FOREGROUND_SERVICE_SPECIAL_USE"
     ],
     adaptiveIcon: {
       foregroundImage: "./assets/adaptive-icon.png",
       backgroundColor: "#ffffff",
     },
+    newArchEnabled: true,
   },
 
   web: {
