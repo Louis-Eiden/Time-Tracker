@@ -17,6 +17,9 @@ expo-env.d.ts
 ios/
 android/
 
+# Keystore
+keystore/
+
 # Native
 *.orig.*
 *.jks
@@ -47,3 +50,4 @@ yarn-error.*
 .aider.tags.cache.v3/
 .aider.tags.cache.v4/
 .env
+
