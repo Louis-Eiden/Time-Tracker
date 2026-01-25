@@ -4,16 +4,24 @@ import React, { createContext, useContext, useState } from "react";
 /* Theme Definitions  */
 /* ------------------ */
 
-export type Theme =
-  | "retro-light"
-  | "retro-dark"
-  | "retro-color"
-  | "clear-light"
-  // | "clear-dark"
-  // | "clear-color"
-  | "round-light";
-// | "round-dark"
-// | "round-color"
+export type Theme = "retro-light" | "retro-dark" | "retro-blue" | "minimal";
+
+export interface ThemeColors {
+  text: string;
+  background: string; // The main screen background
+  surface: string; // Cards, Modals, Dropdowns
+  buttons: string; // Primary action color
+  border: string;
+  icon: string;
+  link: string;
+  danger: string;
+  success: string;
+
+  // Structural Properties
+  borderRadius: number;
+  borderWidth: number;
+  shadowOffset: number; // For that retro hard shadow
+}
 
 interface ThemeContextType {
   theme: Theme;
@@ -54,134 +62,86 @@ export const useTheme = () => {
 /* Theme Colors       */
 /* ------------------ */
 
-export const getThemeColors = (theme: Theme) => {
-  const radius = 0;
-
+export const getThemeColors = (theme: Theme): ThemeColors => {
   switch (theme) {
-    /* -------- Retro -------- */
     case "retro-light":
       return {
         text: "#000000",
-        background: "#D3D3D3",
-        buttons: "#D3D3D3",
+        background: "#F2F0E9", // Your requested Retro off-white
+        surface: "#FFFFFF",
+        buttons: "#FF9F1C", // Your requested Orange
         border: "#000000",
-        borderRadius: radius,
-        borderWidth: 2,
-        borderBottomWidth: 2,
         icon: "#000000",
         link: "#000000",
+        danger: "#FF6B6B",
+        success: "#2EC4B6",
+        borderRadius: 12,
+        borderWidth: 2,
+        shadowOffset: 4,
       };
 
     case "retro-dark":
       return {
-        text: "#D3D3D3",
-        background: "#000000",
-        buttons: "#000000",
-        border: "#D3D3D3",
-        borderRadius: radius,
+        text: "#F2F0E9",
+        background: "#121212",
+        surface: "#1E1E1E",
+        buttons: "#FF9F1C", // Keep the orange pop
+        border: "#F2F0E9", // Light border on dark
+        icon: "#F2F0E9",
+        link: "#FF9F1C",
+        danger: "#FF6B6B",
+        success: "#2EC4B6",
+        borderRadius: 12,
         borderWidth: 2,
-        borderBottomWidth: 2,
-        icon: "#D3D3D3",
-        link: "#D3D3D3",
+        shadowOffset: 4,
       };
 
-    case "retro-color":
-      return {
-        text: "#FFFFFF",
-        background: "#a987c9ff",
-        buttons: "#ff7300ff",
-        border: "#000000",
-        borderRadius: radius,
-        borderWidth: 2,
-        borderBottomWidth: 2,
-        icon: "#000000",
-        link: "#000000",
-      };
-
-    /* -------- Clear -------- */
-    case "clear-light":
+    case "retro-blue":
       return {
         text: "#000000",
-        background: "#ffffff",
-        border: "#d0d0d0",
-        borderRadius: radius,
-        borderWidth: 0,
-        borderBottomWidth: 2,
-        icon: "#000000",
-        link: "#0066cc",
+        background: "#E0F7FA",
+        surface: "#FFFFFF",
+        buttons: "#00BCD4", // Cyan/Blue
+        border: "#006064",
+        icon: "#006064",
+        link: "#006064",
+        danger: "#FF5252",
+        success: "#009688",
+        borderRadius: 12,
+        borderWidth: 2,
+        shadowOffset: 4,
       };
 
-    // case "clear-dark":
-    //   return {
-    //     text: "#ffffff",
-    //     background: "#121212",
-    //     border: "#2a2a2a",
-    //     borderRadius: radius,
-    //     borderWidth: 0,
-    //     borderBottomWidth: 2,
-    //     icon: "#ffffff",
-    //     link: "#4da3ff",
-    //   };
-
-    // case "clear-color":
-    //   return {
-    //     text: "#ffffff",
-    //     background: "#4f8cff",
-    //     border: "#1e3a8a",
-    //     borderRadius: radius,
-    //     borderWidth: 0,
-    //     borderBottomWidth: 2,
-    //     icon: "#ffffff",
-    //     link: "#ffdd57",
-    //   };
-
-    /* -------- Round -------- */
-    case "round-light":
+    case "minimal":
       return {
         text: "#111827",
-        background: "#f9fafb",
-        border: "#d1d5db",
-        borderRadius: 10,
-        borderWidth: 2,
-        borderBottomWidth: 2,
+        background: "#F9FAFB",
+        surface: "#FFFFFF",
+        buttons: "#111827", // Black buttons
+        border: "#E5E7EB", // Soft grey border
         icon: "#111827",
-        link: "#2563eb",
+        link: "#2563EB",
+        danger: "#EF4444",
+        success: "#10B981",
+        borderRadius: 8,
+        borderWidth: 1,
+        shadowOffset: 0, // No retro hard shadow
       };
-
-    // case "round-dark":
-    //   return {
-    //     text: "#f9fafb",
-    //     background: "#111827",
-    //     border: "#374151",
-    //     borderRadius: 10,
-    //     borderWidth: 2,
-    //     borderBottomWidth: 2,
-    //     icon: "#f9fafb",
-    //     link: "#60a5fa",
-    //   };
-
-    // case "round-color":
-    //   return {
-    //     text: "#ffffff",
-    //     background: "#10b981",
-    //     border: "#065f46",
-    //     borderRadius: 10,
-    //     borderWidth: 2,
-    //     borderBottomWidth: 2,
-    //     icon: "#ffffff",
-    //     link: "#facc15",
-    //   };
 
     default:
       return {
         text: "#000000",
-        background: "#ffffff",
+        background: "#F2F0E9",
+        surface: "#FFFFFF",
+        buttons: "#FF9F1C",
         border: "#000000",
-        borderRadius: radius,
-        borderWidth: 2,
-        borderBottomWidth: 2,
         icon: "#000000",
         link: "#000000",
+        danger: "#FF6B6B",
+        success: "#2EC4B6",
+        borderRadius: 12,
+        borderWidth: 2,
+        shadowOffset: 4,
       };
   }
 };

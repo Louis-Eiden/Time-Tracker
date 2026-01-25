@@ -1,87 +1,103 @@
-import { Platform, StyleSheet, TextStyle } from "react-native";
+import { Platform, StyleSheet, ViewStyle, TextStyle } from "react-native";
 import { isMobileOrTablet } from "../utils/platform";
-import { getThemeColors, Theme, useTheme } from "@/contexts/ThemeContext";
-import {
-  red100,
-  white,
-} from "react-native-paper/lib/typescript/styles/themes/v2/colors";
+import { getThemeColors, Theme } from "@/contexts/ThemeContext";
 
-// Common styles that can be reused across components
+// --- Retro Design Constants ---
+const BORDER_WIDTH = 2;
+const SHADOW_OFFSET = 4;
+
 export const createCommonStyles = (
   colors: ReturnType<typeof getThemeColors>,
   theme: Theme,
   platform: string,
   routeName?: string,
 ) => {
-  const isClear = theme?.startsWith("clear") ?? false;
-  const isJobScreen = routeName?.startsWith("Job") ?? false;
   const isWeb = platform === "web";
 
   return StyleSheet.create({
     container: {
       flex: 1,
-      padding: 20,
       backgroundColor: colors.background,
-      alignItems: "center",
     },
+    // UPDATED: Added maxWidth and alignSelf to match the listContainer logic
     main: {
       flex: 1,
       width: "100%",
-      height: "100%",
-      alignItems: "center",
-      justifyContent: isWeb ? undefined : "center",
+      maxWidth: 600, // Limits the width on large screens
+      alignSelf: "center", // Centers the content container
+      padding: 16,
       backgroundColor: colors.background,
     },
-    button: {
-      borderWidth: colors.borderWidth,
-      borderBottomWidth: colors.borderBottomWidth,
-      borderRadius: colors.borderRadius,
+    // Retro Card Style
+    card: {
+      backgroundColor: "#FFFFFF",
+      borderWidth: BORDER_WIDTH,
       borderColor: colors.border,
-    },
+      padding: 20,
+      marginBottom: 16,
+      // Hard Shadow
+      shadowColor: colors.border,
+      shadowOffset: { width: SHADOW_OFFSET, height: SHADOW_OFFSET },
+      shadowOpacity: 1,
+      shadowRadius: 0,
+      // FIXED: Android needs elevation to show any shadow at all
+      elevation: 4,
+    } as ViewStyle,
+
     title: {
       color: colors.text,
-      fontSize: 28,
-      fontWeight: "600",
-    },
+      fontSize: 24,
+      fontWeight: "900",
+      textTransform: "uppercase",
+      letterSpacing: -0.5,
+      marginBottom: 8,
+    } as TextStyle,
 
     text: {
       color: colors.text,
-      fontSize: 18,
-      fontWeight: "400",
-    },
+      fontSize: 14,
+      fontWeight: "500",
+    } as TextStyle,
 
+    label: {
+      fontSize: 12,
+      fontWeight: "bold",
+      textTransform: "uppercase",
+      letterSpacing: 1,
+      color: "#4B5563",
+      marginBottom: 6,
+    } as TextStyle,
+
+    // List Container
     listContainer: {
-      minHeight: 300,
-      maxHeight: isWeb ? 400 : isJobScreen ? 400 : 800,
-      flexGrow: 1,
-      width: 300,
-      borderWidth: isClear ? 0 : colors.borderWidth,
-      borderBottomWidth: isClear ? 0 : colors.borderBottomWidth,
-      borderColor: colors.border,
-      borderRadius: colors.borderRadius,
-      padding: 10,
-      backgroundColor: colors.background,
-      position: "relative",
-      overflow: "hidden",
+      flex: 1,
+      width: "100%",
+      maxWidth: 600,
+      alignSelf: "center",
+      paddingBottom: 80, // Space for FAB
     },
 
-    // Add Button
-    addButton: {
-      width: isJobScreen ? "50%" : "100%",
-      height: 46,
-      margin: 0,
-      borderLeftWidth: isJobScreen ? 0 : isClear ? 0 : colors.borderWidth,
-      borderWidth: isClear ? 0 : colors.borderWidth,
-      borderBottomWidth: colors.borderBottomWidth,
-      borderRadius: colors.borderRadius,
+    // Floating Action Button (FAB)
+    fab: {
+      position: "absolute",
+      bottom: 24,
+      right: 24,
+      width: 56,
+      height: 56,
+      backgroundColor: "#2EC4B6", // Teal
+      borderWidth: BORDER_WIDTH,
       borderColor: colors.border,
-      backgroundColor: colors.buttons,
-    },
-
-    addButtonText: {
-      color: colors.text,
-      fontSize: 32,
-    },
+      alignItems: "center",
+      justifyContent: "center",
+      // Hard Shadow
+      shadowColor: colors.border,
+      shadowOffset: { width: SHADOW_OFFSET, height: SHADOW_OFFSET },
+      shadowOpacity: 1,
+      shadowRadius: 0,
+      zIndex: 20,
+      // FIXED: Android Elevation
+      elevation: 6,
+    } as ViewStyle,
   });
 };
 
@@ -89,14 +105,31 @@ export const createHeaderStyles = (colors: ReturnType<typeof getThemeColors>) =>
   StyleSheet.create({
     header: {
       width: "100%",
-      height: 50,
+      height: 60,
       flexDirection: "row",
       justifyContent: "space-between",
       alignItems: "center",
-      marginBottom: 30,
-      position: "relative",
-      marginTop: 10,
-      right: 0,
+      paddingHorizontal: 16,
+      backgroundColor: "#FFFFFF",
+      borderBottomWidth: BORDER_WIDTH,
+      borderColor: colors.border,
+      zIndex: 10,
+    },
+    titleGroup: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 12,
+    },
+    headerTitle: {
+      fontSize: 20,
+      fontWeight: "900",
+      textTransform: "uppercase",
+      color: colors.text,
+    },
+    iconButton: {
+      padding: 8,
+      justifyContent: "center",
+      alignItems: "center",
     },
   });
 
@@ -104,57 +137,102 @@ export const createListItemStyles = (
   colors: ReturnType<typeof getThemeColors>,
   platform: string,
 ) => {
-  const isWeb = platform === "web";
-
   return StyleSheet.create({
     container: {
+      backgroundColor: "#FFFFFF",
+      borderWidth: BORDER_WIDTH,
       borderColor: colors.border,
-      borderWidth: colors.borderWidth,
-      borderBottomWidth: colors.borderBottomWidth,
-      borderRadius: colors.borderRadius,
-      marginBottom: 10,
-      height: 45,
-      padding: isWeb ? 10 : 0,
-      width: "100%",
-      backgroundColor: colors.buttons,
-      elevation: 0,
-      shadowOpacity: 0,
-      flex: 1,
-      justifyContent: "center",
-      alignItems: "center",
+      marginBottom: 12,
+      // Small Hard Shadow
+      shadowColor: "rgba(0,0,0,0.1)",
+      shadowOffset: { width: 3, height: 3 },
+      shadowOpacity: 1,
+      shadowRadius: 0,
+      // FIXED: Removed overflow: 'hidden' because it cuts off shadows on iOS
+      // overflow: "hidden",
+      // FIXED: Added elevation for Android
+      elevation: 3,
     },
-    content: {
+    touchable: {
+      padding: 16,
+      paddingTop: 20,
+    },
+    headerRow: {
       flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+    },
+    idTag: {
+      position: "absolute",
+      top: 0,
+      left: 0,
+      backgroundColor: colors.border,
+      paddingHorizontal: 8,
+      paddingVertical: 2,
+      zIndex: 1,
+    },
+    idTagText: {
+      color: "#FFFFFF",
+      fontSize: 10,
+      fontWeight: "bold",
+    },
+    itemTitle: {
+      fontSize: 18,
+      fontWeight: "bold",
+      color: colors.text,
+    },
+    itemSubtitle: {
+      fontSize: 12,
+      color: "#6B7280",
+      marginTop: 4,
+    },
+    iconBox: {
+      width: 32,
+      height: 32,
+      borderWidth: 2,
+      borderColor: colors.border,
+      borderRadius: 16, // Circle
       alignItems: "center",
       justifyContent: "center",
-      width: 225,
     },
-
-    swipeableContainer: {
-      display: isMobileOrTablet() ? "flex" : "none",
+    progressBarContainer: {
+      height: 8,
+      width: "100%",
+      borderTopWidth: 2,
+      borderColor: colors.border,
+      backgroundColor: "transparent",
+      flexDirection: "row",
+      marginTop: 12,
+    },
+    progressBarFill: {
+      backgroundColor: "#FF9F1C", // Orange
+      height: "100%",
+    },
+    // Swipe Actions
+    rightSwipeActions: {
+      backgroundColor: "#FF6B6B", // Red
+      justifyContent: "center",
+      alignItems: "center",
+      width: 80,
+      paddingBottom: 12,
+      height: "100%",
+      borderLeftWidth: 2,
+      borderColor: colors.border,
     },
     leftSwipeActions: {
-      backgroundColor: "blue",
+      backgroundColor: "#2EC4B6", // Teal
       justifyContent: "center",
       alignItems: "center",
-      borderRadius: colors.borderRadius,
-      width: 70,
-      marginTop: 0,
-      height: 45,
+      width: 80,
+      paddingBottom: 12,
+      height: "100%",
+      borderRightWidth: 2,
+      borderColor: colors.border,
     },
-
-    rightSwipeActions: {
-      backgroundColor: "red",
-      justifyContent: "center",
-      alignItems: "center",
-      borderRadius: colors.borderRadius,
-      width: 70,
-      marginTop: 0,
-      height: 45,
-    },
-
-    touchableText: {
-      color: "white",
+    swipeText: {
+      color: colors.text,
+      fontWeight: "bold",
+      fontSize: 12,
     },
   });
 };
@@ -164,89 +242,90 @@ export const createModalFormStyles = (
   platform: string,
 ) => {
   const isWeb = platform === "web";
-
   return StyleSheet.create({
-    modalContainer: {
+    modalOverlay: {
       flex: 1,
       justifyContent: "center",
       alignItems: "center",
       backgroundColor: "rgba(0, 0, 0, 0.5)",
+      padding: 20,
     },
     modalContent: {
-      flex: 1,
       width: "100%",
-      justifyContent: "center",
-      alignItems: "center",
-      // padding: 20,
-      backgroundColor: colors.background,
-      borderWidth: colors.borderWidth,
-      borderBottomWidth: colors.borderBottomWidth,
+      maxWidth: 320,
+      backgroundColor: "#FFFFFF",
+      borderWidth: BORDER_WIDTH,
       borderColor: colors.border,
+      padding: 20,
+      // Hard Shadow
+      shadowColor: colors.border,
+      shadowOffset: { width: SHADOW_OFFSET, height: SHADOW_OFFSET },
+      shadowOpacity: 1,
+      shadowRadius: 0,
+      // FIXED: Android Elevation
+      elevation: 5,
     },
     modalTitle: {
-      fontSize: 18,
-      marginBottom: 15,
-      textAlign: "center",
+      fontSize: 20,
+      fontWeight: "900",
+      textTransform: "uppercase",
+      marginBottom: 24,
+      borderBottomWidth: 2,
+      borderColor: colors.border,
+      paddingBottom: 8,
       color: colors.text,
     },
-
-    modalInput: {
-      borderWidth: colors.borderWidth,
-      borderBottomWidth: colors.borderBottomWidth,
+    inputGroup: {
+      marginBottom: 16,
+    },
+    label: {
+      fontSize: 12,
+      fontWeight: "bold",
+      textTransform: "uppercase",
+      letterSpacing: 1,
+      color: "#4B5563",
+      marginBottom: 6,
+    },
+    input: {
+      width: "100%",
+      backgroundColor: "#FFFFFF",
+      borderWidth: 2,
       borderColor: colors.border,
-      borderRadius: colors.borderRadius,
-      padding: 10,
-      marginBottom: 15,
-      height: 40,
-      width: isWeb ? "50%" : "80%",
+      padding: 12,
+      fontSize: 14,
       color: colors.text,
+      // Inner shadow simulation via margin/padding trick or just flat
     },
-    modalInputFocused: {
-      borderColor: colors.border,
-      outlineStyle: "none",
-      backgroundColor: "white",
-    } as TextStyle,
-
-    // buttons
-    openPickerButton: {
-      position: "relative",
-      marginTop: 20,
-      // padding: 20,
-      paddingRight: 20,
-      paddingLeft: 20,
-      borderRadius: colors.borderRadius,
-      backgroundColor: colors.buttons,
-      borderWidth: colors.borderWidth,
-      borderBottomWidth: colors.borderBottomWidth,
-      borderColor: colors.border,
-      height: 45,
-      // alignItems: "center",
-      // justifyContent: "center",
-    },
-
-    openPickerButtonText: {
-      color: colors.text,
-      fontSize: 18,
-      fontWeight: "600",
-    },
-    modalButtonContainer: {
+    buttonContainer: {
       flexDirection: "row",
-      justifyContent: "center",
-      width: "80%",
+      gap: 12,
+      marginTop: 16,
     },
-    modalButton: {
-      margin: 20,
+    button: {
       flex: 1,
-      marginHorizontal: 5,
-      borderRadius: colors.borderRadius,
+      height: 45,
+      borderWidth: 2,
       borderColor: colors.border,
-      borderWidth: colors.borderWidth,
-      borderBottomWidth: colors.borderBottomWidth,
-      maxWidth: 276,
-      backgroundColor: colors.buttons,
+      justifyContent: "center",
+      alignItems: "center",
+      shadowColor: colors.border,
+      shadowOffset: { width: 4, height: 4 },
+      shadowOpacity: 1,
+      shadowRadius: 0,
+      // FIXED: Android Elevation
+      elevation: 4,
     },
-    modalButtonText: {
-      color: "#000000",
+    cancelButton: {
+      backgroundColor: "#FFFFFF",
+    },
+    confirmButton: {
+      backgroundColor: "#FF9F1C",
+    },
+    buttonText: {
+      fontWeight: "bold",
+      fontSize: 14,
+      color: colors.text,
+      textTransform: "uppercase",
     },
   });
 };
@@ -257,369 +336,282 @@ export const createLoginStyles = (
   platform: string,
   routeName?: string,
 ) => {
-  const isClear = theme?.startsWith("clear") ?? false;
-  const isJobScreen = routeName?.startsWith("Job") ?? false;
-  const isWeb = platform === "web";
-
   return StyleSheet.create({
-    loginListContainer: {
-      minHeight: 300,
-      maxHeight: 400,
+    container: {
       flex: 1,
       justifyContent: "center",
       alignItems: "center",
-      width: 300,
-      borderWidth: isClear ? 0 : colors.borderWidth,
-      borderBottomWidth: isClear ? 0 : colors.borderBottomWidth,
-      borderColor: colors.border,
-      borderRadius: colors.borderRadius,
-      padding: 30,
       backgroundColor: colors.background,
-      // position: "relative",
-      // overflow: "hidden",
+      padding: 20,
     },
-
-    input: {
-      borderWidth: colors.borderWidth,
-      borderBottomWidth: colors.borderBottomWidth,
-      borderColor: colors.border,
-      borderRadius: colors.borderRadius,
-      backgroundColor: colors.background,
-      padding: 10,
-      marginBottom: 15,
-      height: 40,
+    card: {
       width: "100%",
+      maxWidth: 320,
+      backgroundColor: "#FFFFFF",
+      borderWidth: 2,
+      borderColor: colors.border,
+      padding: 24,
+      alignItems: "center",
+      shadowColor: colors.border,
+      shadowOffset: { width: 4, height: 4 },
+      shadowOpacity: 1,
+      shadowRadius: 0,
+      // FIXED: Android Elevation
+      elevation: 4,
+    },
+    logoBox: {
+      width: 64,
+      height: 64,
+      backgroundColor: "#000000",
+      justifyContent: "center",
+      alignItems: "center",
+      marginBottom: 16,
+      borderWidth: 2,
+      borderColor: "#000000",
+      shadowColor: "#FF9F1C",
+      shadowOffset: { width: 4, height: 4 },
+      shadowOpacity: 1,
+      shadowRadius: 0,
+      // FIXED: Android Elevation
+      elevation: 4,
+    },
+    title: {
+      fontSize: 24,
+      fontWeight: "900",
+      textTransform: "uppercase",
+      marginBottom: 8,
       color: colors.text,
     },
-    inputFocused: {
-      borderColor: colors.border,
-      outlineStyle: "none",
-      appearance: "none",
-      backgroundColor: "white",
-    } as TextStyle,
-
-    errorText: {
-      color: "red",
+    subtitle: {
       fontSize: 12,
-      marginBottom: 4,
+      color: "#6B7280",
+      marginBottom: 24,
     },
-
-    // Buttons
-
-    loginButton: {
-      marginTop: 20,
-      // padding: 20,
-      paddingRight: 20,
-      paddingLeft: 20,
-      borderRadius: colors.borderRadius,
-      backgroundColor: colors.buttons,
-      borderWidth: colors.borderWidth,
-      borderBottomWidth: colors.borderBottomWidth,
+    inputGroup: {
+      width: "100%",
+      marginBottom: 16,
+    },
+    input: {
+      width: "100%",
+      backgroundColor: "#FFFFFF",
+      borderWidth: 2,
       borderColor: colors.border,
-      height: 45,
-      alignItems: "center",
+      padding: 12,
+      fontSize: 14,
+      color: colors.text,
+    },
+    loginButton: {
+      width: "100%",
+      height: 48,
+      backgroundColor: "#FF9F1C",
+      borderWidth: 2,
+      borderColor: colors.border,
       justifyContent: "center",
+      alignItems: "center",
+      marginTop: 8,
+      shadowColor: colors.border,
+      shadowOffset: { width: 4, height: 4 },
+      shadowOpacity: 1,
+      shadowRadius: 0,
+      // FIXED: Android Elevation
+      elevation: 4,
     },
     loginButtonText: {
+      fontWeight: "bold",
+      fontSize: 14,
+      textTransform: "uppercase",
       color: colors.text,
-      fontSize: 18,
-      fontWeight: "600",
     },
     toggleButton: {
       marginTop: 16,
     },
     toggleText: {
-      color: colors.text,
-      textAlign: "center",
+      fontSize: 12,
+      textDecorationLine: "underline",
+      color: "#6B7280",
+    },
+    errorText: {
+      color: "#FF6B6B",
+      fontSize: 12,
+      marginBottom: 4,
+      alignSelf: "flex-start",
     },
   });
 };
 
-// export const createHomeStyles = (colors: ReturnType<typeof getThemeColors>) =>
-//   StyleSheet.create({
-//     jobButton: {
-//       borderColor: colors.border,
-//       borderWidth: colors.borderWidth,
-//       borderBottomWidth: colors.borderBottomWidth,
-//       borderRadius: colors.borderRadius,
-//       marginVertical: 5,
-//       height: 45,
-//       width: 276,
-//       backgroundColor: colors.background,
-//       elevation: 0,
-//       shadowOpacity: 0,
-//     },
-//     buttonContent: {
-//       borderRadius: colors.borderRadius,
-//       width: 225,
-//       flexDirection: "row",
-//     },
-//     jobButtonText: {
-//       color: colors.text,
-//       fontSize: 18,
-//       fontWeight: "400",
-//       flex: 1,
-//     },
-//     contextMenuButtons: {
-//       // backgroundColor: "transparent",
-//       borderWidth: colors.borderWidth,
-//       borderBottomWidth: colors.borderBottomWidth,
-//       position: "absolute",
-//       right: -1,
-//       top: -2,
-//       zIndex: 1000,
-//       padding: 0,
-//       margin: 0,
-//       color: colors.icon,
-//       display: !isMobileOrTablet() ? "flex" : "none",
-//       width: 24,
-//       height: 24,
-//       alignItems: "center",
-//       justifyContent: "center",
-//     },
+export const createJobStyles = (colors: ReturnType<typeof getThemeColors>) =>
+  StyleSheet.create({
+    timerCard: {
+      backgroundColor: "#FDFBF7",
+      borderWidth: 2,
+      borderColor: colors.border,
+      padding: 20,
+      alignItems: "center",
+      marginBottom: 16,
+      shadowColor: colors.border,
+      shadowOffset: { width: 4, height: 4 },
+      shadowOpacity: 1,
+      shadowRadius: 0,
+      // FIXED: Android Elevation
+      elevation: 4,
+    },
+    timerLabel: {
+      fontSize: 12,
+      textTransform: "uppercase",
+      letterSpacing: 2,
+      marginBottom: 8,
+      color: "#6B7280",
+    },
+    timerDisplay: {
+      fontSize: 48,
+      fontWeight: "900",
+      letterSpacing: 2,
+      marginBottom: 32,
+      color: colors.text,
+      fontVariant: ["tabular-nums"],
+    },
+    controlButton: {
+      width: 120,
+      height: 48,
+      borderWidth: 2,
+      borderColor: colors.border,
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "center",
+      gap: 8,
+      shadowColor: colors.border,
+      shadowOffset: { width: 4, height: 4 },
+      shadowOpacity: 1,
+      shadowRadius: 0,
+      // FIXED: Android Elevation
+      elevation: 4,
+    },
+    startBtn: { backgroundColor: "#FF9F1C" },
+    stopBtn: { backgroundColor: "#FF6B6B" },
+    btnText: {
+      fontWeight: "bold",
+      textTransform: "uppercase",
+      color: colors.text,
+    },
 
-//     swipeableContainer: {
-//       display: isMobileOrTablet() ? "flex" : "none",
-//     },
+    // Action Grid
+    actionGrid: {
+      flexDirection: "row",
+      gap: 12,
+      marginBottom: 24,
+    },
+    actionButton: {
+      flex: 1,
+      backgroundColor: "#FFFFFF",
+      borderWidth: 2,
+      borderColor: colors.border,
+      padding: 12,
+      alignItems: "center",
+      justifyContent: "center",
+      flexDirection: "row",
+      gap: 8,
+      shadowColor: colors.border,
+      shadowOffset: { width: 4, height: 4 },
+      shadowOpacity: 1,
+      shadowRadius: 0,
+      // FIXED: Android Elevation
+      elevation: 4,
+    },
 
-//     modalContainer: {
-//       flex: 1,
-//       justifyContent: "center",
-//       alignItems: "center",
-//       backgroundColor: "rgba(0, 0, 0, 0.5)",
-//     },
-//     modalContent: {
-//       flex: 1,
-//       width: "100%",
-//       justifyContent: "center",
-//       alignItems: "center",
-//       padding: 20,
-//       backgroundColor: colors.background,
-//       borderWidth: colors.borderWidth,
-//       borderBottomWidth: colors.borderBottomWidth,
-//       borderColor: colors.border,
-//     },
-//     modalTitle: {
-//       fontSize: 18,
-//       marginBottom: 15,
-//       textAlign: "center",
-//     },
-//     input: {
-//       borderWidth: colors.borderWidth,
-//       borderBottomWidth: colors.borderBottomWidth,
-//       padding: 10,
-//       marginBottom: 15,
-//       height: 40,
-//     },
-//     modalButtons: {
-//       flexDirection: "row",
-//       justifyContent: "space-between",
-//       width: "100%",
-//     },
-//     modalButton: {
-//       flex: 1,
-//       marginHorizontal: 5,
-//       borderRadius: colors.borderRadius,
-//       borderColor: colors.border,
-//       borderWidth: colors.borderWidth,
-//       borderBottomWidth: colors.borderBottomWidth,
-//     },
-//     modalInput: {
-//       borderWidth: colors.borderWidth,
-//       borderBottomWidth: colors.borderBottomWidth,
-//       borderColor: colors.border,
-//       borderRadius: colors.borderRadius,
-//       padding: 10,
-//       marginBottom: 15,
-//       height: 40,
-//       width: "100%",
-//     },
-//     modalActionButton: {
-//       borderColor: "#000000",
-//       borderRadius: colors.borderRadius,
-//       backgroundColor: "#D3D3D3",
-//     },
-//   });
+    sectionTitle: {
+      fontSize: 14,
+      fontWeight: "bold",
+      textTransform: "uppercase",
+      borderBottomWidth: 2,
+      borderColor: colors.border,
+      alignSelf: "flex-start",
+      marginBottom: 12,
+      color: colors.text,
+    },
+  });
 
 export const createSettingsStyles = (
   colors: ReturnType<typeof getThemeColors>,
 ) =>
   StyleSheet.create({
-    placeholder: {
-      width: 48,
+    section: {
+      marginBottom: 24,
+    },
+    sectionHeader: {
+      fontSize: 12,
+      fontWeight: "bold",
+      textTransform: "uppercase",
+      letterSpacing: 1,
+      color: "#4B5563",
+      marginBottom: 12,
+      marginLeft: 4,
+    },
+    settingsCard: {
+      backgroundColor: "#FFFFFF",
+      borderWidth: 2,
+      borderColor: colors.border,
+      shadowColor: colors.border,
+      shadowOffset: { width: 4, height: 4 },
+      shadowOpacity: 1,
+      shadowRadius: 0,
+      // FIXED: Android Elevation
+      elevation: 4,
+    },
+    row: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      padding: 16,
+      borderBottomWidth: 2,
+      borderColor: colors.border,
+    },
+    rowLast: {
+      borderBottomWidth: 0,
+    },
+    rowLabel: {
+      fontWeight: "bold",
+      color: colors.text,
+    },
+    valueBadge: {
+      fontSize: 12,
+      backgroundColor: "#FF9F1C",
+      paddingHorizontal: 8,
+      paddingVertical: 4,
+      borderWidth: 1,
+      borderColor: colors.border,
+      fontWeight: "bold",
+      color: colors.text,
     },
     button: {
-      width: 300,
-      borderWidth: colors.borderWidth,
-      borderBottomWidth: colors.borderBottomWidth,
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      paddingHorizontal: 12,
+      paddingVertical: 8,
+      backgroundColor: colors.surface,
       borderColor: colors.border,
-      marginBottom: 15,
-      height: 45,
+      borderWidth: colors.borderWidth,
       borderRadius: colors.borderRadius,
-    },
-    languageButtonText: {
-      color: colors.text,
     },
     themeButtonText: {
       color: colors.text,
-    },
-  });
-
-export const createJobStyles = (colors: ReturnType<typeof getThemeColors>) =>
-  StyleSheet.create({
-    timer: {
-      fontSize: 56,
-      textAlign: "center",
-      marginVertical: 20,
-      fontWeight: "400",
-      color: colors.text,
-    },
-
-    timeEntryList: {
-      minHeight: 300,
-      maxHeight: 400,
-      flexGrow: 1,
-      width: 300,
-      borderWidth: colors.borderWidth,
-      borderBottomWidth: colors.borderBottomWidth,
-      borderColor: colors.border,
-      borderRadius: colors.borderRadius,
-      padding: 10,
-      backgroundColor: colors.background,
-      position: "relative",
-      overflow: "hidden",
-    },
-
-    timeEntry: {
-      borderColor: colors.border,
-      borderWidth: colors.borderWidth,
-      borderBottomWidth: colors.borderBottomWidth,
-      borderRadius: colors.borderRadius,
-      marginVertical: 5,
-      padding: 0,
-      height: 45,
-      width: 276,
-      backgroundColor: colors.buttons,
-      elevation: 0,
-      shadowOpacity: 0,
-    },
-    timeEntryText: {
-      color: colors.text,
-      fontSize: 18,
-      fontWeight: "400",
-      textAlign: "left",
-      flex: 1,
-    },
-
-    swipeableContainer: {
-      display: isMobileOrTablet() ? "flex" : "none",
-    },
-
-    backIcon: {
-      color: colors.icon,
-    },
-    content: {
-      flex: 1,
-      alignItems: "center",
-    },
-    timerContainer: {
-      alignItems: "center",
-      marginBottom: 30,
-    },
-
-    buttonContent: {
-      flexDirection: "row",
-      justifyContent: "space-around",
-      width: "100%",
-      marginBottom: 30,
-    },
-
-    buttonText: {
-      fontSize: 16,
-      color: colors.text,
-      textAlign: "center",
-    },
-    sessionList: {
-      width: "100%",
-    },
-    sessionItem: {
-      flexDirection: "row",
-      justifyContent: "space-between",
-      padding: 10,
-      borderWidth: colors.borderWidth,
-      borderBottomWidth: colors.borderBottomWidth,
-      borderColor: colors.border,
-      marginBottom: 10,
-    },
-    sessionText: {
-      color: colors.text,
-    },
-
-    // ---------------------------------------------------------------------------
-    // buttons
-    // ---------------------------------------------------------------------------
-
-    // Start Stop Button
-    timerButton: {
-      borderWidth: 2,
-      borderColor: colors.border,
-      width: 100,
-      height: 100,
-      alignSelf: "center",
-      justifyContent: "center",
-      borderRadius: colors.borderRadius,
-      backgroundColor: colors.background,
-    },
-
-    //   Back to days Button
-    backButton: {
-      marginBottom: 10,
-      borderWidth: colors.borderWidth,
-      borderBottomWidth: colors.borderBottomWidth,
-      borderColor: colors.border,
-      borderRadius: colors.borderRadius,
-      padding: 0,
-      // paddingRight: 20,
-      // paddingLeft: 20,
-      height: 45,
-      justifyContent: "center",
-      alignItems: "center",
-      backgroundColor: colors.buttons,
-    },
-    backButtonText: {
-      color: colors.text,
-      fontSize: 20,
-      fontWeight: "700",
-    },
-    // Back to Jobs Button
-    backToJobsButton: {
-      marginBottom: 10,
-      borderWidth: colors.borderWidth,
-      borderBottomWidth: colors.borderBottomWidth,
-      borderColor: colors.border,
-      borderRadius: colors.borderRadius,
-      padding: 0,
-      height: 45,
-      justifyContent: "center",
-      alignItems: "center",
-      backgroundColor: colors.buttons,
-      fontSize: 22,
+      fontSize: 14,
       fontWeight: "600",
     },
-
-    // Print Button
-    printButton: {
-      width: "50%",
-      borderWidth: colors.borderWidth,
-      borderBottomWidth: colors.borderBottomWidth,
-      borderRadius: colors.borderRadius,
+    logoutButton: {
+      backgroundColor: "#FF6B6B",
+      borderWidth: 2,
       borderColor: colors.border,
-      backgroundColor: colors.buttons,
-    },
-
-    printButtonText: {
-      color: colors.text,
-      fontSize: 20,
-      fontWeight: "700",
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "center",
+      padding: 16,
+      gap: 8,
+      shadowColor: colors.border,
+      shadowOffset: { width: 4, height: 4 },
+      shadowOpacity: 1,
+      shadowRadius: 0,
+      // FIXED: Android Elevation
+      elevation: 4,
     },
   });

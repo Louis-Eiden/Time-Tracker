@@ -1,69 +1,60 @@
-import React, { useEffect, useState } from "react";
-import { View, Text, Platform } from "react-native";
-import { IconButton } from "react-native-paper";
+import React from "react";
+import { View, Text, TouchableOpacity } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
+import { ArrowLeft, LogOut, Settings } from "lucide-react-native";
 import { signOutUser } from "@/services/users.service";
 import type { NavigationProp } from "@/types";
 
-import { createHeaderStyles, createCommonStyles } from "@/theme/styles";
+import { createHeaderStyles } from "@/theme/styles";
 import { getThemeColors, useTheme } from "@/contexts/ThemeContext";
 
 export default function Header({ jobName }: { jobName?: string }) {
-  // Navigation
   const navigation = useNavigation<NavigationProp>();
   const route = useRoute();
-  // Styles
   const { theme } = useTheme();
   const colors = getThemeColors(theme);
   const styles = createHeaderStyles(colors);
-  const commonStyles = createCommonStyles(
-    colors,
-    theme,
-    Platform.OS,
-    route.name
-  );
-  // local
+
   const hideLeftIcon = route.name === "Login";
   const hideRightIcon = route.name === "Settings";
 
+  const handleLeftPress = async () => {
+    if (route.name === "Home") {
+      await signOutUser();
+      navigation.goBack(); // Or navigate to Login
+    } else {
+      navigation.goBack();
+    }
+  };
+
   return (
     <View style={styles.header}>
-      {hideLeftIcon ? (
-        // Invisible placeholder to preserve layout
-        <View style={{ width: 52, height: 40 }} />
-      ) : (
-        <IconButton
-          icon={route.name === "Home" ? "logout" : "arrow-left"}
-          onPress={async () => {
-            if (route.name === "Home") {
-              await signOutUser();
-              navigation.goBack();
-            } else {
-              navigation.goBack();
-            }
-          }}
-          rippleColor="transparent"
-          iconColor={colors.icon}
-        />
-      )}
-      <Text style={commonStyles.title}>
-        {route.name === "Settings"
-          ? "Settings"
-          : jobName
-          ? jobName
-          : "Time Tracker"}
-      </Text>
+      <View style={styles.titleGroup}>
+        {!hideLeftIcon && (
+          <TouchableOpacity onPress={handleLeftPress} style={styles.iconButton}>
+            {route.name === "Home" ? (
+              <LogOut size={24} color={colors.icon} />
+            ) : (
+              <ArrowLeft size={24} color={colors.icon} />
+            )}
+          </TouchableOpacity>
+        )}
+        <Text style={styles.headerTitle} numberOfLines={1}>
+          {route.name === "Settings"
+            ? "Settings"
+            : jobName
+              ? jobName
+              : "Time Tracker"}
+        </Text>
+      </View>
 
-      {hideRightIcon ? (
-        // Invisible placeholder to preserve layout
-        <View style={{ width: 52, height: 40 }} />
-      ) : (
-        <IconButton
-          icon="cog"
+      {!hideRightIcon && (
+        <TouchableOpacity
           onPress={() => navigation.navigate("Settings")}
-          iconColor={colors.icon}
-          rippleColor="transparent"
-        />
+          style={styles.iconButton}
+        >
+          <Settings size={24} color={colors.icon} />
+        </TouchableOpacity>
       )}
     </View>
   );

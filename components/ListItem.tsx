@@ -1,19 +1,22 @@
-import React, { useRef, useState } from "react";
+import React, { useRef } from "react";
 import {
   View,
   TouchableOpacity,
+  Text,
   Animated,
   Alert,
   Platform,
 } from "react-native";
-import { Text, TouchableRipple } from "react-native-paper";
 import { Swipeable } from "react-native-gesture-handler";
+import { Play } from "lucide-react-native";
 
 import { useTheme, getThemeColors } from "../contexts/ThemeContext";
-import { createCommonStyles, createListItemStyles } from "../theme/styles";
+import { createListItemStyles } from "../theme/styles";
 
 interface ListItemProps {
   text: string;
+  subText?: string;
+  id?: string; // e.g. "001"
   onPress?: () => void;
   rightSwipeActions?: {
     label: string;
@@ -27,68 +30,42 @@ interface ListItemProps {
 
 export default function ListItem({
   text,
+  subText,
+  id,
   onPress,
   rightSwipeActions,
   leftSwipeActions,
 }: ListItemProps) {
-  // Styles
   const { theme } = useTheme();
   const colors = getThemeColors(theme);
   const styles = createListItemStyles(colors, Platform.OS);
-  const commonStyles = createCommonStyles(colors, theme, Platform.OS, "Job");
-
-  const [isSwiping, setIsSwiping] = useState(false);
   const swipeRef = useRef<Swipeable>(null);
 
-  // Delete Confirmation
   const confirmDelete = (onConfirm: () => void) => {
-    // WEB: use native browser confirm
     if (Platform.OS === "web") {
-      const confirmed = window.confirm(
-        "Are you sure you want to delete this item?\nThis action cannot be undone.",
-      );
-      if (confirmed) {
-        onConfirm();
-      }
+      if (window.confirm("Delete this item?")) onConfirm();
       return;
     }
-
-    // NATIVE: use Alert.alert
-    Alert.alert(
-      "Delete item",
-      "Are you sure you want to delete this item? This action cannot be undone.",
-      [
-        { text: "Cancel", style: "cancel" },
-        { text: "Delete", style: "destructive", onPress: onConfirm },
-      ],
-      { cancelable: true },
-    );
+    Alert.alert("Delete item", "Are you sure?", [
+      { text: "Cancel", style: "cancel" },
+      { text: "Delete", style: "destructive", onPress: onConfirm },
+    ]);
   };
 
-  // Right swipe actions renderer (Delete)
-  const renderRightActions = (
-    progress: Animated.AnimatedInterpolation<number>,
-    dragX: Animated.AnimatedInterpolation<number>,
-  ) => {
+  const renderRightActions = () => {
     if (!rightSwipeActions) return null;
-
     return (
       <TouchableOpacity
         style={styles.rightSwipeActions}
         onPress={() => confirmDelete(rightSwipeActions.onPress)}
       >
-        <Text style={styles.touchableText}>{rightSwipeActions.label}</Text>
+        <Text style={styles.swipeText}>{rightSwipeActions.label}</Text>
       </TouchableOpacity>
     );
   };
 
-  // Left swipe actions renderer (Edit)
-  const renderLeftActions = (
-    progress: Animated.AnimatedInterpolation<number>,
-    dragX: Animated.AnimatedInterpolation<number>,
-  ) => {
+  const renderLeftActions = () => {
     if (!leftSwipeActions) return null;
-
     return (
       <TouchableOpacity
         style={styles.leftSwipeActions}
@@ -97,41 +74,49 @@ export default function ListItem({
           leftSwipeActions.onPress();
         }}
       >
-        <Text style={styles.touchableText}>{leftSwipeActions.label}</Text>
+        <Text style={styles.swipeText}>{leftSwipeActions.label}</Text>
       </TouchableOpacity>
     );
   };
+
+  // Generate a random progress bar width based on text length for visual flair
+  // const progressWidth = `${(text.length * 7) % 100}%`;
 
   return (
     <Swipeable
       ref={swipeRef}
       renderRightActions={renderRightActions}
       renderLeftActions={renderLeftActions}
-      onSwipeableWillOpen={() => setIsSwiping(true)}
-      onSwipeableClose={() => {
-        // small delay to avoid click firing right after swipe
-        setTimeout(() => setIsSwiping(false), 50);
-      }}
     >
-      <TouchableRipple
-        onPress={() => {
-          if (isSwiping) return;
-          onPress?.();
-        }}
-        // We manually add the border styles here because TouchableRipple
-        // doesn't have a 'mode="outlined"' prop like Button does.
-        style={styles.container}
-        rippleColor={colors.buttons} // Slight primary color ripple
-      >
-        <View style={styles.content}>
-          <Text
-            style={commonStyles.text}
-            numberOfLines={0} // 0 means "unlimited lines" (allows wrapping)
-          >
-            {text}
-          </Text>
-        </View>
-      </TouchableRipple>
+      <View style={styles.container}>
+        {id && (
+          <View style={styles.idTag}>
+            <Text style={styles.idTagText}>#{id.substring(0, 4)}</Text>
+          </View>
+        )}
+
+        <TouchableOpacity
+          onPress={onPress}
+          activeOpacity={0.7}
+          style={styles.touchable}
+        >
+          <View style={styles.headerRow}>
+            <View style={{ flex: 1, marginRight: 10 }}>
+              <Text style={styles.itemTitle} numberOfLines={1}>
+                {text}
+              </Text>
+              {subText && <Text style={styles.itemSubtitle}>{subText}</Text>}
+            </View>
+            <View style={styles.iconBox}>
+              <Play size={14} color="#000000" fill="#000000" />
+            </View>
+          </View>
+
+          <View style={styles.progressBarContainer}>
+            <View style={[styles.progressBarFill, { width: "100%" }]} />
+          </View>
+        </TouchableOpacity>
+      </View>
     </Swipeable>
   );
 }
