@@ -80,3 +80,8 @@ bunx expo run:ios   # or run:android
 # already run on the device:
 bunx expo start --clear
 ```
+
+# Version History
+
+1.0.0 - first version
+1.1.0 - new UI color sheme, button styling and placement.
