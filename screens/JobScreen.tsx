@@ -20,6 +20,7 @@ import { Time, Days } from "@/types";
 import Header from "../components/Header";
 import ModalForm from "../components/ModalForm";
 import ListItem from "../components/ListItem";
+import RetroButton from "../components/RetroButton";
 
 export default function JobScreen() {
   const navigation = useNavigation();
@@ -32,12 +33,7 @@ export default function JobScreen() {
   const { theme } = useTheme();
   const colors = getThemeColors(theme);
   const styles = createJobStyles(colors);
-  const commonStyles = createCommonStyles(
-    colors,
-    theme,
-    Platform.OS,
-    route.name,
-  );
+  const commonStyles = createCommonStyles(colors);
 
   const [isTimeModalVisible, setIsTimeModalVisible] = useState(false);
   const [startTime, setStartTime] = useState<Date | undefined>();
@@ -84,51 +80,71 @@ export default function JobScreen() {
     return Array.from(map.entries()).map(([date, times]) => ({ date, times }));
   }, [times]);
 
+  const handleDeleteDay = async (dateStr: string) => {
+    const dayData = days.find((d) => d.date === dateStr);
+    if (!dayData) return;
+
+    const deletePromises = dayData.times.map((t) => deleteTime(t.id));
+    await Promise.all(deletePromises);
+  };
+
   return (
     <View style={commonStyles.container}>
       <Header jobName={jobName} />
 
       <View style={commonStyles.main}>
-        {/* Timer Card */}
-        <View style={styles.timerCard}>
-          <Text style={styles.timerLabel}>SESSION DURATION</Text>
-          <Text style={styles.timerDisplay}>{formatTimer(elapsedSeconds)}</Text>
+        {/* --- RETRO TIMER CARD (Layered) --- */}
+        <View style={commonStyles.retroCardWrapper}>
+          {/* 1. Hard Shadow */}
+          <View style={commonStyles.retroCardShadow} />
 
-          <TouchableOpacity
-            style={[
-              styles.controlButton,
-              activeEntry ? styles.stopBtn : styles.startBtn,
-            ]}
-            onPress={handleStartStop}
-          >
-            {activeEntry ? (
-              <Pause size={20} color={colors.text} />
-            ) : (
-              <Play size={20} color={colors.text} />
-            )}
-            <Text style={styles.btnText}>
-              {activeEntry ? "PAUSE" : "START"}
+          {/* 2. Main Card Content */}
+          <View style={[commonStyles.retroCardMain, styles.timerCard]}>
+            <Text style={styles.timerLabel}>SESSION DURATION</Text>
+            <Text style={styles.timerDisplay}>
+              {formatTimer(elapsedSeconds)}
             </Text>
-          </TouchableOpacity>
+
+            <RetroButton
+              style={[
+                styles.controlButton,
+                activeEntry ? styles.stopBtn : styles.startBtn,
+              ]}
+              onPress={handleStartStop}
+              shadowColor={colors.border}
+            >
+              {activeEntry ? (
+                <Pause size={20} color={colors.text} />
+              ) : (
+                <Play size={20} color={colors.text} />
+              )}
+              <Text style={styles.btnText}>
+                {activeEntry ? "PAUSE" : "START"}
+              </Text>
+            </RetroButton>
+          </View>
         </View>
+        {/* ---------------------------------- */}
 
         {/* Action Grid */}
         <View style={styles.actionGrid}>
-          <TouchableOpacity
+          <RetroButton
             style={styles.actionButton}
             onPress={() => setIsTimeModalVisible(true)}
+            shadowColor={colors.border}
           >
             <Clock size={16} color={colors.text} />
             <Text style={styles.btnText}>MANUAL</Text>
-          </TouchableOpacity>
+          </RetroButton>
 
-          <TouchableOpacity
+          <RetroButton
             style={styles.actionButton}
             onPress={() => handlePrint(jobName, times, timeFormat)}
+            shadowColor={colors.border}
           >
             <Printer size={16} color={colors.text} />
             <Text style={styles.btnText}>PRINT</Text>
-          </TouchableOpacity>
+          </RetroButton>
         </View>
 
         {/* List Section */}
@@ -139,13 +155,22 @@ export default function JobScreen() {
               : "RECENT LOGS"}
           </Text>
 
-          {selectedDay !== null && (
+          {selectedDay !== null ? (
             <TouchableOpacity
               onPress={() => setSelectedDay(null)}
               style={{ marginBottom: 10 }}
             >
               <Text style={{ color: "#6B7280", fontWeight: "bold" }}>
                 ← BACK TO DAYS
+              </Text>
+            </TouchableOpacity>
+          ) : (
+            <TouchableOpacity
+              onPress={() => navigation.goBack()}
+              style={{ marginBottom: 10 }}
+            >
+              <Text style={{ color: "#6B7280", fontWeight: "bold" }}>
+                ← BACK TO JOBS
               </Text>
             </TouchableOpacity>
           )}
@@ -180,6 +205,10 @@ export default function JobScreen() {
                     text={formatDateForDisplay(new Date(d.date), timeFormat)}
                     subText={`${d.times.length} entries`}
                     onPress={() => setSelectedDay(d.date)}
+                    rightSwipeActions={{
+                      label: "DELETE",
+                      onPress: () => handleDeleteDay(d.date),
+                    }}
                   />
                 );
               }

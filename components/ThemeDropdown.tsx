@@ -10,12 +10,16 @@ import {
 } from "react-native";
 import { ChevronDown, Check } from "lucide-react-native";
 import { useTheme, Theme, getThemeColors } from "@/contexts/ThemeContext";
-import { createSettingsStyles } from "@/theme/styles";
+import {
+  createSettingsStyles,
+  createThemeDropdownStyles,
+} from "@/theme/styles";
 
 export default function ThemeSwitcher() {
   const { theme, setTheme } = useTheme();
   const colors = getThemeColors(theme);
   const styles = createSettingsStyles(colors);
+  const dropdownStyles = createThemeDropdownStyles();
   const [visible, setVisible] = useState(false);
 
   const themeOptions: { label: string; value: Theme }[] = [
@@ -30,15 +34,19 @@ export default function ThemeSwitcher() {
     setVisible(false);
   };
 
+  // Find the label for the current theme
+  const currentLabel =
+    themeOptions.find((opt) => opt.value === theme)?.label || theme;
+
   return (
     <View>
       {/* Trigger Button */}
       <TouchableOpacity
-        style={styles.button}
         onPress={() => setVisible(true)}
-        activeOpacity={0.8}
+        activeOpacity={0.7}
+        style={[styles.row, { alignItems: "center" }]}
       >
-        <Text style={styles.themeButtonText}>Theme: {theme}</Text>
+        <Text style={styles.themeButtonText}>{currentLabel}</Text>
         <ChevronDown size={16} color={colors.text} style={{ marginLeft: 8 }} />
       </TouchableOpacity>
 
@@ -50,11 +58,11 @@ export default function ThemeSwitcher() {
         onRequestClose={() => setVisible(false)}
       >
         <TouchableWithoutFeedback onPress={() => setVisible(false)}>
-          <View style={localStyles.modalOverlay}>
+          <View style={dropdownStyles.modalOverlay}>
             <TouchableWithoutFeedback>
               <View
                 style={[
-                  localStyles.dropdownContainer,
+                  dropdownStyles.dropdownContainer,
                   {
                     backgroundColor: colors.surface, // Use surface, not background
                     borderColor: colors.border,
@@ -80,7 +88,7 @@ export default function ThemeSwitcher() {
               >
                 <View
                   style={[
-                    localStyles.header,
+                    dropdownStyles.header,
                     {
                       borderBottomColor: colors.border,
                       borderBottomWidth: colors.borderWidth,
@@ -88,7 +96,7 @@ export default function ThemeSwitcher() {
                   ]}
                 >
                   <Text
-                    style={[localStyles.headerText, { color: colors.text }]}
+                    style={[dropdownStyles.headerText, { color: colors.text }]}
                   >
                     Select Theme
                   </Text>
@@ -100,7 +108,7 @@ export default function ThemeSwitcher() {
                     <TouchableOpacity
                       key={option.value}
                       style={[
-                        localStyles.optionRow,
+                        dropdownStyles.optionRow,
                         index !== themeOptions.length - 1 && {
                           borderBottomWidth: 1,
                           borderBottomColor: colors.border,
@@ -113,7 +121,7 @@ export default function ThemeSwitcher() {
                     >
                       <Text
                         style={[
-                          localStyles.optionText,
+                          dropdownStyles.optionText,
                           {
                             color: colors.text,
                             fontWeight: isSelected ? "bold" : "normal",
@@ -134,36 +142,3 @@ export default function ThemeSwitcher() {
     </View>
   );
 }
-
-const localStyles = StyleSheet.create({
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: "rgba(0,0,0,0.5)",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  dropdownContainer: {
-    width: 300,
-    overflow: "hidden",
-  },
-  header: {
-    padding: 16,
-    alignItems: "center",
-  },
-  headerText: {
-    fontSize: 16,
-    fontWeight: "bold",
-    textTransform: "uppercase",
-    letterSpacing: 1,
-  },
-  optionRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingVertical: 16,
-    paddingHorizontal: 20,
-  },
-  optionText: {
-    fontSize: 16,
-  },
-});

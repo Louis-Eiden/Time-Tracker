@@ -1,17 +1,11 @@
 import React, { useState } from "react";
-import {
-  View,
-  Modal,
-  TextInput,
-  Platform,
-  Text,
-  TouchableOpacity,
-} from "react-native";
-import { DatePickerModal, TimePickerModal } from "react-native-paper-dates"; // Keep for logic, but style container
+import { View, Modal, TextInput, Text } from "react-native";
+import { DatePickerModal, TimePickerModal } from "react-native-paper-dates";
 
 import { useTheme, getThemeColors } from "../contexts/ThemeContext";
 import { useTimeFormat } from "@/contexts/TimeContext";
 import { createModalFormStyles } from "../theme/styles";
+import RetroButton from "./RetroButton";
 
 interface ModalFormProps {
   visible: boolean;
@@ -53,7 +47,7 @@ export default function ModalForm({
 }: ModalFormProps) {
   const { theme } = useTheme();
   const colors = getThemeColors(theme);
-  const styles = createModalFormStyles(colors, Platform.OS);
+  const styles = createModalFormStyles(colors);
   const { timeFormat } = useTimeFormat();
 
   const [activePicker, setActivePicker] = useState<"start" | "end" | null>(
@@ -99,23 +93,22 @@ export default function ModalForm({
           <Text style={styles.modalTitle}>{title}</Text>
 
           {isTimeEntry ? (
-            <View style={{ gap: 12 }}>
-              <TouchableOpacity style={styles.button} onPress={openStartPicker}>
+            <View style={styles.pickerContainer}>
+              <RetroButton style={styles.button} onPress={openStartPicker}>
                 <Text style={styles.buttonText}>
                   {newStartTime
                     ? `START: ${newStartTime.toLocaleString()}`
                     : "PICK START TIME"}
                 </Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.button} onPress={openEndPicker}>
+              </RetroButton>
+              <RetroButton style={styles.button} onPress={openEndPicker}>
                 <Text style={styles.buttonText}>
                   {newEndTime
                     ? `END: ${newEndTime.toLocaleString()}`
                     : "PICK END TIME"}
                 </Text>
-              </TouchableOpacity>
+              </RetroButton>
 
-              {/* Keep Paper Dates logic but render invisibly/overlay if needed, or wrap in Portal */}
               <DatePickerModal
                 locale="en"
                 mode="single"
@@ -166,18 +159,20 @@ export default function ModalForm({
           )}
 
           <View style={styles.buttonContainer}>
-            <TouchableOpacity
+            <RetroButton
               style={[styles.button, styles.cancelButton]}
               onPress={onClose}
+              shadowColor={colors.border}
             >
               <Text style={styles.buttonText}>CANCEL</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
+            </RetroButton>
+            <RetroButton
               style={[styles.button, styles.confirmButton]}
               onPress={handleConfirm}
+              shadowColor={colors.border}
             >
               <Text style={styles.buttonText}>CONFIRM</Text>
-            </TouchableOpacity>
+            </RetroButton>
           </View>
         </View>
       </View>

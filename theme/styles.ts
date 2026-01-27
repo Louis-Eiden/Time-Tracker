@@ -1,6 +1,5 @@
-import { Platform, StyleSheet, ViewStyle, TextStyle } from "react-native";
-import { isMobileOrTablet } from "../utils/platform";
-import { getThemeColors, Theme } from "@/contexts/ThemeContext";
+import { StyleSheet, ViewStyle, TextStyle } from "react-native";
+import { getThemeColors } from "@/contexts/ThemeContext";
 
 // --- Retro Design Constants ---
 const BORDER_WIDTH = 2;
@@ -8,39 +7,57 @@ const SHADOW_OFFSET = 4;
 
 export const createCommonStyles = (
   colors: ReturnType<typeof getThemeColors>,
-  theme: Theme,
-  platform: string,
-  routeName?: string,
 ) => {
-  const isWeb = platform === "web";
-
   return StyleSheet.create({
     container: {
       flex: 1,
       backgroundColor: colors.background,
     },
-    // UPDATED: Added maxWidth and alignSelf to match the listContainer logic
     main: {
       flex: 1,
       width: "100%",
-      maxWidth: 600, // Limits the width on large screens
-      alignSelf: "center", // Centers the content container
+      maxWidth: 600,
+      alignSelf: "center",
       padding: 16,
       backgroundColor: colors.background,
     },
-    // Retro Card Style
+
+    // --- SHARED RETRO CARD STYLES (Hard Shadow) ---
+    retroCardWrapper: {
+      position: "relative",
+      width: "100%",
+      marginBottom: 16,
+    } as ViewStyle,
+
+    retroCardShadow: {
+      position: "absolute",
+      top: 4,
+      left: 4,
+      width: "100%",
+      height: "100%",
+      backgroundColor: "#000000", // Hard Black Shadow
+    } as ViewStyle,
+
+    retroCardMain: {
+      backgroundColor: "#FFFFFF",
+      borderWidth: BORDER_WIDTH,
+      borderColor: colors.border,
+      elevation: 0, // Disable native Android shadow
+      zIndex: 2, // Ensure it sits above the shadow
+    } as ViewStyle,
+    // ----------------------------------------------
+
+    // Old soft shadow card (kept for settings/other lists if needed)
     card: {
       backgroundColor: "#FFFFFF",
       borderWidth: BORDER_WIDTH,
       borderColor: colors.border,
       padding: 20,
       marginBottom: 16,
-      // Hard Shadow
       shadowColor: colors.border,
       shadowOffset: { width: SHADOW_OFFSET, height: SHADOW_OFFSET },
       shadowOpacity: 1,
       shadowRadius: 0,
-      // FIXED: Android needs elevation to show any shadow at all
       elevation: 4,
     } as ViewStyle,
 
@@ -68,35 +85,26 @@ export const createCommonStyles = (
       marginBottom: 6,
     } as TextStyle,
 
-    // List Container
     listContainer: {
       flex: 1,
       width: "100%",
       maxWidth: 600,
       alignSelf: "center",
-      paddingBottom: 80, // Space for FAB
+      paddingBottom: 80,
     },
 
-    // Floating Action Button (FAB)
     fab: {
       position: "absolute",
       bottom: 24,
       right: 24,
       width: 56,
       height: 56,
-      backgroundColor: "#2EC4B6", // Teal
+      backgroundColor: "#2EC4B6",
       borderWidth: BORDER_WIDTH,
       borderColor: colors.border,
       alignItems: "center",
       justifyContent: "center",
-      // Hard Shadow
-      shadowColor: colors.border,
-      shadowOffset: { width: SHADOW_OFFSET, height: SHADOW_OFFSET },
-      shadowOpacity: 1,
-      shadowRadius: 0,
       zIndex: 20,
-      // FIXED: Android Elevation
-      elevation: 6,
     } as ViewStyle,
   });
 };
@@ -138,20 +146,13 @@ export const createListItemStyles = (
   platform: string,
 ) => {
   return StyleSheet.create({
+    swipeWrapper: {
+      marginBottom: 12,
+    },
     container: {
       backgroundColor: "#FFFFFF",
       borderWidth: BORDER_WIDTH,
       borderColor: colors.border,
-      marginBottom: 12,
-      // Small Hard Shadow
-      shadowColor: "rgba(0,0,0,0.1)",
-      shadowOffset: { width: 3, height: 3 },
-      shadowOpacity: 1,
-      shadowRadius: 0,
-      // FIXED: Removed overflow: 'hidden' because it cuts off shadows on iOS
-      // overflow: "hidden",
-      // FIXED: Added elevation for Android
-      elevation: 3,
     },
     touchable: {
       padding: 16,
@@ -191,7 +192,7 @@ export const createListItemStyles = (
       height: 32,
       borderWidth: 2,
       borderColor: colors.border,
-      borderRadius: 16, // Circle
+      borderRadius: 16,
       alignItems: "center",
       justifyContent: "center",
     },
@@ -205,12 +206,11 @@ export const createListItemStyles = (
       marginTop: 12,
     },
     progressBarFill: {
-      backgroundColor: "#FF9F1C", // Orange
+      backgroundColor: "#FF9F1C",
       height: "100%",
     },
-    // Swipe Actions
     rightSwipeActions: {
-      backgroundColor: "#FF6B6B", // Red
+      backgroundColor: "#FF6B6B",
       justifyContent: "center",
       alignItems: "center",
       width: 80,
@@ -219,7 +219,7 @@ export const createListItemStyles = (
       borderColor: colors.border,
     },
     leftSwipeActions: {
-      backgroundColor: "#2EC4B6", // Teal
+      backgroundColor: "#2EC4B6",
       justifyContent: "center",
       alignItems: "center",
       width: 80,
@@ -237,9 +237,7 @@ export const createListItemStyles = (
 
 export const createModalFormStyles = (
   colors: ReturnType<typeof getThemeColors>,
-  platform: string,
 ) => {
-  const isWeb = platform === "web";
   return StyleSheet.create({
     modalOverlay: {
       flex: 1,
@@ -252,15 +250,13 @@ export const createModalFormStyles = (
       width: "100%",
       maxWidth: 320,
       backgroundColor: "#FFFFFF",
-      borderWidth: BORDER_WIDTH,
+      borderWidth: 2,
       borderColor: colors.border,
       padding: 20,
-      // Hard Shadow
       shadowColor: colors.border,
-      shadowOffset: { width: SHADOW_OFFSET, height: SHADOW_OFFSET },
+      shadowOffset: { width: 4, height: 4 },
       shadowOpacity: 1,
       shadowRadius: 0,
-      // FIXED: Android Elevation
       elevation: 5,
     },
     modalTitle: {
@@ -292,26 +288,26 @@ export const createModalFormStyles = (
       padding: 12,
       fontSize: 14,
       color: colors.text,
-      // Inner shadow simulation via margin/padding trick or just flat
     },
     buttonContainer: {
       flexDirection: "row",
       gap: 12,
       marginTop: 16,
     },
+    pickerContainer: {
+      gap: 12,
+      height: 96,
+    },
     button: {
       flex: 1,
-      height: 45,
       borderWidth: 2,
       borderColor: colors.border,
       justifyContent: "center",
       alignItems: "center",
-      shadowColor: colors.border,
-      shadowOffset: { width: 4, height: 4 },
-      shadowOpacity: 1,
-      shadowRadius: 0,
-      // FIXED: Android Elevation
-      elevation: 4,
+      flexDirection: "row",
+      paddingHorizontal: 12,
+      paddingVertical: 8,
+      height: 42,
     },
     cancelButton: {
       backgroundColor: "#FFFFFF",
@@ -320,19 +316,18 @@ export const createModalFormStyles = (
       backgroundColor: "#FF9F1C",
     },
     buttonText: {
-      fontWeight: "bold",
+      fontWeight: "600",
       fontSize: 14,
       color: colors.text,
       textTransform: "uppercase",
+      marginVertical: 3,
+      textAlign: "center",
     },
   });
 };
 
 export const createLoginStyles = (
   colors: ReturnType<typeof getThemeColors>,
-  theme: Theme,
-  platform: string,
-  routeName?: string,
 ) => {
   return StyleSheet.create({
     container: {
@@ -342,36 +337,37 @@ export const createLoginStyles = (
       backgroundColor: colors.background,
       padding: 20,
     },
-    card: {
-      width: "100%",
+    // Specific wrapper sizing for Login
+    loginCardWrapper: {
       maxWidth: 320,
-      backgroundColor: "#FFFFFF",
-      borderWidth: 2,
-      borderColor: colors.border,
+    },
+    // Specific internal padding for Login
+    loginCardContent: {
       padding: 24,
       alignItems: "center",
-      shadowColor: colors.border,
-      shadowOffset: { width: 4, height: 4 },
-      shadowOpacity: 1,
-      shadowRadius: 0,
-      // FIXED: Android Elevation
-      elevation: 4,
     },
-    logoBox: {
+    logoWrapper: {
       width: 64,
       height: 64,
+      marginBottom: 16,
+      position: "relative",
+    },
+    logoShadow: {
+      position: "absolute",
+      top: 4,
+      left: 4,
+      width: "100%",
+      height: "100%",
+      backgroundColor: "#FF9F1C",
+    },
+    logoMain: {
+      width: "100%",
+      height: "100%",
       backgroundColor: "#000000",
       justifyContent: "center",
       alignItems: "center",
-      marginBottom: 16,
       borderWidth: 2,
       borderColor: "#000000",
-      shadowColor: "#FF9F1C",
-      shadowOffset: { width: 4, height: 4 },
-      shadowOpacity: 1,
-      shadowRadius: 0,
-      // FIXED: Android Elevation
-      elevation: 4,
     },
     title: {
       fontSize: 24,
@@ -406,13 +402,8 @@ export const createLoginStyles = (
       borderColor: colors.border,
       justifyContent: "center",
       alignItems: "center",
+      padding: 8,
       marginTop: 8,
-      shadowColor: colors.border,
-      shadowOffset: { width: 4, height: 4 },
-      shadowOpacity: 1,
-      shadowRadius: 0,
-      // FIXED: Android Elevation
-      elevation: 4,
     },
     loginButtonText: {
       fontWeight: "bold",
@@ -439,19 +430,14 @@ export const createLoginStyles = (
 
 export const createJobStyles = (colors: ReturnType<typeof getThemeColors>) =>
   StyleSheet.create({
+    // Updated: Removed native shadow props, as we use the retroCard wrapper now
     timerCard: {
       backgroundColor: "#FDFBF7",
-      borderWidth: 2,
-      borderColor: colors.border,
+      // Border is handled by wrapper usually, but we keep it here if we want specific color
+      // or we can let the wrapper handle border.
+      // For safety, let's keep padding/align here, but remove shadow/elevation.
       padding: 20,
       alignItems: "center",
-      marginBottom: 16,
-      shadowColor: colors.border,
-      shadowOffset: { width: 4, height: 4 },
-      shadowOpacity: 1,
-      shadowRadius: 0,
-      // FIXED: Android Elevation
-      elevation: 4,
     },
     timerLabel: {
       fontSize: 12,
@@ -477,12 +463,6 @@ export const createJobStyles = (colors: ReturnType<typeof getThemeColors>) =>
       alignItems: "center",
       justifyContent: "center",
       gap: 8,
-      shadowColor: colors.border,
-      shadowOffset: { width: 4, height: 4 },
-      shadowOpacity: 1,
-      shadowRadius: 0,
-      // FIXED: Android Elevation
-      elevation: 4,
     },
     startBtn: { backgroundColor: "#FF9F1C" },
     stopBtn: { backgroundColor: "#FF6B6B" },
@@ -491,10 +471,9 @@ export const createJobStyles = (colors: ReturnType<typeof getThemeColors>) =>
       textTransform: "uppercase",
       color: colors.text,
     },
-
-    // Action Grid
     actionGrid: {
       flexDirection: "row",
+      width: "100%",
       gap: 12,
       marginBottom: 24,
     },
@@ -508,14 +487,8 @@ export const createJobStyles = (colors: ReturnType<typeof getThemeColors>) =>
       justifyContent: "center",
       flexDirection: "row",
       gap: 8,
-      shadowColor: colors.border,
-      shadowOffset: { width: 4, height: 4 },
-      shadowOpacity: 1,
-      shadowRadius: 0,
-      // FIXED: Android Elevation
-      elevation: 4,
+      height: 44,
     },
-
     sectionTitle: {
       fontSize: 14,
       fontWeight: "bold",
@@ -552,7 +525,6 @@ export const createSettingsStyles = (
       shadowOffset: { width: 4, height: 4 },
       shadowOpacity: 1,
       shadowRadius: 0,
-      // FIXED: Android Elevation
       elevation: 4,
     },
     row: {
@@ -587,12 +559,11 @@ export const createSettingsStyles = (
       paddingHorizontal: 12,
       paddingVertical: 8,
       backgroundColor: colors.surface,
-      borderColor: colors.border,
-      borderWidth: colors.borderWidth,
       borderRadius: colors.borderRadius,
     },
     themeButtonText: {
       color: colors.text,
+      marginVertical: 3,
       fontSize: 14,
       fontWeight: "600",
     },
@@ -605,11 +576,40 @@ export const createSettingsStyles = (
       justifyContent: "center",
       padding: 16,
       gap: 8,
-      shadowColor: colors.border,
-      shadowOffset: { width: 4, height: 4 },
-      shadowOpacity: 1,
-      shadowRadius: 0,
-      // FIXED: Android Elevation
-      elevation: 4,
+      height: 56,
+    },
+  });
+
+export const createThemeDropdownStyles = () =>
+  StyleSheet.create({
+    modalOverlay: {
+      flex: 1,
+      backgroundColor: "rgba(0,0,0,0.5)",
+      justifyContent: "center",
+      alignItems: "center",
+    },
+    dropdownContainer: {
+      width: 300,
+      overflow: "hidden",
+    },
+    header: {
+      padding: 16,
+      alignItems: "center",
+    },
+    headerText: {
+      fontSize: 16,
+      fontWeight: "bold",
+      textTransform: "uppercase",
+      letterSpacing: 1,
+    },
+    optionRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      paddingVertical: 16,
+      paddingHorizontal: 20,
+    },
+    optionText: {
+      fontSize: 16,
     },
   });

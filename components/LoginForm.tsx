@@ -9,6 +9,7 @@ import {
 
 import { createLoginStyles } from "@/theme/styles";
 import { getThemeColors, useTheme } from "@/contexts/ThemeContext";
+import RetroButton from "./RetroButton"; // Import RetroButton
 
 interface LoginFormProps {
   loading?: boolean;
@@ -35,7 +36,7 @@ export default function LoginForm({
 
   const { theme } = useTheme();
   const colors = getThemeColors(theme);
-  const styles = createLoginStyles(colors, theme, Platform.OS, "Login");
+  const styles = createLoginStyles(colors);
 
   const validate = () => {
     const newErrors: { email?: string; password?: string } = {};
@@ -89,10 +90,11 @@ export default function LoginForm({
         )}
       </View>
 
-      <TouchableOpacity
+      <RetroButton
         style={styles.loginButton}
         onPress={handleSubmit}
         disabled={loading}
+        shadowColor={colors.border}
       >
         <Text style={styles.loginButtonText}>
           {loading
@@ -101,7 +103,7 @@ export default function LoginForm({
               ? "CREATE ACCOUNT"
               : "ACCESS SYSTEM"}
         </Text>
-      </TouchableOpacity>
+      </RetroButton>
 
       <TouchableOpacity
         onPress={() => onToggleMode(!isSignUp)}

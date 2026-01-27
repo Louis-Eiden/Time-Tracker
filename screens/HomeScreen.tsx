@@ -1,5 +1,5 @@
 import React from "react";
-import { View, FlatList, Platform, TouchableOpacity } from "react-native";
+import { View, FlatList, Platform } from "react-native";
 import { Plus } from "lucide-react-native";
 import { useNavigation } from "@react-navigation/native";
 
@@ -13,13 +13,14 @@ import { createJob, deleteJob, updateJob } from "@/services/jobs.services";
 import Header from "../components/Header";
 import ModalForm from "../components/ModalForm";
 import ListItem from "../components/ListItem";
+import RetroButton from "../components/RetroButton"; // Import here
 
 export default function HomeScreen() {
   const navigation = useNavigation();
   const { jobs } = useJobs();
   const { theme } = useTheme();
   const colors = getThemeColors(theme);
-  const styles = createCommonStyles(colors, theme, Platform.OS, "Home");
+  const styles = createCommonStyles(colors);
 
   const modal = useModalForm<Job>({
     onAdd: createJob,
@@ -59,13 +60,10 @@ export default function HomeScreen() {
           />
         </View>
 
-        <TouchableOpacity
-          style={styles.fab}
-          onPress={modal.openAdd}
-          activeOpacity={0.8}
-        >
+        {/* REPLACED TouchableOpacity with RetroButton */}
+        <RetroButton style={styles.fab} onPress={modal.openAdd}>
           <Plus size={32} color="#000000" strokeWidth={3} />
-        </TouchableOpacity>
+        </RetroButton>
       </View>
 
       <ModalForm

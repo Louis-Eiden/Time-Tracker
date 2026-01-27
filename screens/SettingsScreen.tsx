@@ -14,26 +14,21 @@ import { useTimeFormat } from "@/contexts/TimeContext";
 import { signOutUser } from "@/services/users.service";
 import { createCommonStyles, createSettingsStyles } from "../theme/styles";
 import Header from "../components/Header";
-import ThemeSwitcher from "../components/ThemeDropdown"; // Import the dropdown
+import ThemeSwitcher from "../components/ThemeDropdown";
+import RetroButton from "../components/RetroButton";
 
 export default function SettingsScreen() {
   const navigation = useNavigation();
-  const { theme } = useTheme(); // setTheme is no longer needed here, handled by dropdown
+  const { theme } = useTheme();
   const { timeFormat, toggleTimeFormat } = useTimeFormat();
 
   // Styles
   const colors = getThemeColors(theme);
   const styles = createSettingsStyles(colors);
-  const commonStyles = createCommonStyles(
-    colors,
-    theme,
-    Platform.OS,
-    "Settings",
-  );
+  const commonStyles = createCommonStyles(colors);
 
   const handleLogout = async () => {
     await signOutUser();
-    // Assuming the navigation stack resets or goes to Login
     navigation.reset({
       index: 0,
       routes: [{ name: "Login" as never }],
@@ -50,20 +45,9 @@ export default function SettingsScreen() {
           <Text style={styles.sectionHeader}>Appearance</Text>
 
           <View style={styles.settingsCard}>
-            {/* Theme Row: Now uses the Dropdown Component */}
-            <View
-              style={[
-                styles.row,
-                { paddingVertical: 10, alignItems: "center" },
-              ]}
-            >
-              <Text style={styles.rowLabel}>Display</Text>
-              {/* 
-                The ThemeSwitcher is self-contained with its own button style.
-                We place it here to replace the old manual toggle.
-              */}
-              <ThemeSwitcher />
-            </View>
+            {/* Theme Row */}
+
+            {/* <ThemeSwitcher /> */}
 
             {/* Time Format Row */}
             <TouchableOpacity
@@ -86,10 +70,10 @@ export default function SettingsScreen() {
         <View style={styles.section}>
           <Text style={styles.sectionHeader}>System</Text>
 
-          <TouchableOpacity
+          <RetroButton
             style={styles.logoutButton}
             onPress={handleLogout}
-            activeOpacity={0.8}
+            shadowColor={colors.border}
           >
             <LogOut size={20} color={colors.text} />
             <Text
@@ -101,7 +85,7 @@ export default function SettingsScreen() {
             >
               Logout System
             </Text>
-          </TouchableOpacity>
+          </RetroButton>
         </View>
       </ScrollView>
     </View>
