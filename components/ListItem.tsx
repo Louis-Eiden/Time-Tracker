@@ -125,11 +125,11 @@ export default function ListItem({
         onSwipeableWillClose={() => setIsSwiping(false)}
       >
         <View style={styles.container}>
-          {id && (
+          {/* {id && (
             <View style={styles.idTag}>
               <Text style={styles.idTagText}>#{id.substring(0, 4)}</Text>
             </View>
-          )}
+          )} */}
 
           <TouchableOpacity
             onPress={handlePress}
