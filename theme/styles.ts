@@ -1,87 +1,111 @@
-import { Platform, StyleSheet, TextStyle } from "react-native";
-import { isMobileOrTablet } from "../utils/platform";
-import { getThemeColors, Theme, useTheme } from "@/contexts/ThemeContext";
-import {
-  red100,
-  white,
-} from "react-native-paper/lib/typescript/styles/themes/v2/colors";
+import { StyleSheet, ViewStyle, TextStyle } from "react-native";
+import { getThemeColors } from "@/contexts/ThemeContext";
 
-// Common styles that can be reused across components
+// --- Retro Design Constants ---
+const BORDER_WIDTH = 2;
+const SHADOW_OFFSET = 4;
+
 export const createCommonStyles = (
   colors: ReturnType<typeof getThemeColors>,
-  theme: Theme,
-  platform: string,
-  routeName?: string,
 ) => {
-  const isClear = theme?.startsWith("clear") ?? false;
-  const isJobScreen = routeName?.startsWith("Job") ?? false;
-  const isWeb = platform === "web";
-
   return StyleSheet.create({
     container: {
       flex: 1,
-      padding: 20,
       backgroundColor: colors.background,
-      alignItems: "center",
     },
     main: {
       flex: 1,
       width: "100%",
-      height: "100%",
-      alignItems: "center",
-      justifyContent: isWeb ? undefined : "center",
+      maxWidth: 600,
+      alignSelf: "center",
+      padding: 16,
       backgroundColor: colors.background,
     },
-    button: {
-      borderWidth: colors.borderWidth,
-      borderBottomWidth: colors.borderBottomWidth,
-      borderRadius: colors.borderRadius,
+
+    // --- SHARED RETRO CARD STYLES (Hard Shadow) ---
+    retroCardWrapper: {
+      position: "relative",
+      width: "100%",
+      marginBottom: 16,
+    } as ViewStyle,
+
+    retroCardShadow: {
+      position: "absolute",
+      top: 4,
+      left: 4,
+      width: "100%",
+      height: "100%",
+      backgroundColor: "#000000", // Hard Black Shadow
+    } as ViewStyle,
+
+    retroCardMain: {
+      backgroundColor: "#FFFFFF",
+      borderWidth: BORDER_WIDTH,
       borderColor: colors.border,
-    },
+      elevation: 0, // Disable native Android shadow
+      zIndex: 2, // Ensure it sits above the shadow
+    } as ViewStyle,
+    // ----------------------------------------------
+
+    // Old soft shadow card (kept for settings/other lists if needed)
+    card: {
+      backgroundColor: "#FFFFFF",
+      borderWidth: BORDER_WIDTH,
+      borderColor: colors.border,
+      padding: 20,
+      marginBottom: 16,
+      shadowColor: colors.border,
+      shadowOffset: { width: SHADOW_OFFSET, height: SHADOW_OFFSET },
+      shadowOpacity: 1,
+      shadowRadius: 0,
+      elevation: 4,
+    } as ViewStyle,
+
     title: {
       color: colors.text,
-      fontSize: 28,
-      fontWeight: "600",
-    },
+      fontSize: 24,
+      fontWeight: "900",
+      textTransform: "uppercase",
+      letterSpacing: -0.5,
+      marginBottom: 8,
+    } as TextStyle,
 
     text: {
       color: colors.text,
-      fontSize: 18,
-      fontWeight: "400",
-    },
+      fontSize: 14,
+      fontWeight: "500",
+    } as TextStyle,
+
+    label: {
+      fontSize: 12,
+      fontWeight: "bold",
+      textTransform: "uppercase",
+      letterSpacing: 1,
+      color: "#4B5563",
+      marginBottom: 6,
+    } as TextStyle,
 
     listContainer: {
-      minHeight: 300,
-      maxHeight: isWeb ? 400 : isJobScreen ? 400 : 800,
-      flexGrow: 1,
-      width: 300,
-      borderWidth: isClear ? 0 : colors.borderWidth,
-      borderBottomWidth: isClear ? 0 : colors.borderBottomWidth,
-      borderColor: colors.border,
-      borderRadius: colors.borderRadius,
-      padding: 10,
-      backgroundColor: colors.background,
-      position: "relative",
-      overflow: "hidden",
+      flex: 1,
+      width: "100%",
+      maxWidth: 600,
+      alignSelf: "center",
+      paddingBottom: 80,
     },
 
-    // Add Button
-    addButton: {
-      width: isJobScreen ? "50%" : "100%",
-      height: 46,
-      margin: 0,
-      borderLeftWidth: isJobScreen ? 0 : isClear ? 0 : colors.borderWidth,
-      borderWidth: isClear ? 0 : colors.borderWidth,
-      borderBottomWidth: colors.borderBottomWidth,
-      borderRadius: colors.borderRadius,
+    fab: {
+      position: "absolute",
+      bottom: 24,
+      right: 24,
+      width: 56,
+      height: 56,
+      backgroundColor: "#2EC4B6",
+      borderWidth: BORDER_WIDTH,
       borderColor: colors.border,
-      backgroundColor: colors.buttons,
-    },
-
-    addButtonText: {
-      color: colors.text,
-      fontSize: 32,
-    },
+      alignItems: "center",
+      justifyContent: "center",
+      zIndex: 20,
+    } as ViewStyle,
   });
 };
 
@@ -89,14 +113,31 @@ export const createHeaderStyles = (colors: ReturnType<typeof getThemeColors>) =>
   StyleSheet.create({
     header: {
       width: "100%",
-      height: 50,
+      height: 60,
       flexDirection: "row",
       justifyContent: "space-between",
       alignItems: "center",
-      marginBottom: 30,
-      position: "relative",
-      marginTop: 10,
-      right: 0,
+      paddingHorizontal: 16,
+      backgroundColor: "#FFFFFF",
+      borderBottomWidth: BORDER_WIDTH,
+      borderColor: colors.border,
+      zIndex: 10,
+    },
+    titleGroup: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 12,
+    },
+    headerTitle: {
+      fontSize: 20,
+      fontWeight: "900",
+      textTransform: "uppercase",
+      color: colors.text,
+    },
+    iconButton: {
+      padding: 8,
+      justifyContent: "center",
+      alignItems: "center",
     },
   });
 
@@ -104,522 +145,471 @@ export const createListItemStyles = (
   colors: ReturnType<typeof getThemeColors>,
   platform: string,
 ) => {
-  const isWeb = platform === "web";
-
   return StyleSheet.create({
+    swipeWrapper: {
+      marginBottom: 12,
+    },
     container: {
+      backgroundColor: "#FFFFFF",
+      borderWidth: BORDER_WIDTH,
       borderColor: colors.border,
-      borderWidth: colors.borderWidth,
-      borderBottomWidth: colors.borderBottomWidth,
-      borderRadius: colors.borderRadius,
-      marginBottom: 10,
-      height: 45,
-      padding: isWeb ? 10 : 0,
-      width: "100%",
-      backgroundColor: colors.buttons,
-      elevation: 0,
-      shadowOpacity: 0,
-      flex: 1,
-      justifyContent: "center",
-      alignItems: "center",
     },
-    content: {
+    touchable: {
+      padding: 16,
+      paddingTop: 20,
+    },
+    headerRow: {
       flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+    },
+    idTag: {
+      position: "absolute",
+      top: 0,
+      left: 0,
+      backgroundColor: colors.border,
+      paddingHorizontal: 8,
+      paddingVertical: 2,
+      zIndex: 1,
+    },
+    idTagText: {
+      color: "#FFFFFF",
+      fontSize: 10,
+      fontWeight: "bold",
+    },
+    itemTitle: {
+      fontSize: 18,
+      fontWeight: "bold",
+      color: colors.text,
+    },
+    itemSubtitle: {
+      fontSize: 12,
+      color: "#6B7280",
+      marginTop: 4,
+    },
+    iconBox: {
+      width: 32,
+      height: 32,
+      borderWidth: 2,
+      borderColor: colors.border,
+      borderRadius: 16,
       alignItems: "center",
       justifyContent: "center",
-      width: 225,
     },
-
-    swipeableContainer: {
-      display: isMobileOrTablet() ? "flex" : "none",
+    progressBarContainer: {
+      height: 8,
+      width: "100%",
+      borderTopWidth: 2,
+      borderColor: colors.border,
+      backgroundColor: "transparent",
+      flexDirection: "row",
+      marginTop: 12,
+    },
+    progressBarFill: {
+      backgroundColor: "#FF9F1C",
+      height: "100%",
+    },
+    rightSwipeActions: {
+      backgroundColor: "#FF6B6B",
+      justifyContent: "center",
+      alignItems: "center",
+      width: 80,
+      height: "100%",
+      borderLeftWidth: 2,
+      borderColor: colors.border,
     },
     leftSwipeActions: {
-      backgroundColor: "blue",
+      backgroundColor: "#2EC4B6",
       justifyContent: "center",
       alignItems: "center",
-      borderRadius: colors.borderRadius,
-      width: 70,
-      marginTop: 0,
-      height: 45,
+      width: 80,
+      height: "100%",
+      borderRightWidth: 2,
+      borderColor: colors.border,
     },
-
-    rightSwipeActions: {
-      backgroundColor: "red",
-      justifyContent: "center",
-      alignItems: "center",
-      borderRadius: colors.borderRadius,
-      width: 70,
-      marginTop: 0,
-      height: 45,
-    },
-
-    touchableText: {
-      color: "white",
+    swipeText: {
+      color: colors.text,
+      fontWeight: "bold",
+      fontSize: 12,
     },
   });
 };
 
 export const createModalFormStyles = (
   colors: ReturnType<typeof getThemeColors>,
-  platform: string,
 ) => {
-  const isWeb = platform === "web";
-
   return StyleSheet.create({
-    modalContainer: {
+    modalOverlay: {
       flex: 1,
       justifyContent: "center",
       alignItems: "center",
       backgroundColor: "rgba(0, 0, 0, 0.5)",
+      padding: 20,
     },
     modalContent: {
-      flex: 1,
       width: "100%",
-      justifyContent: "center",
-      alignItems: "center",
-      // padding: 20,
-      backgroundColor: colors.background,
-      borderWidth: colors.borderWidth,
-      borderBottomWidth: colors.borderBottomWidth,
+      maxWidth: 320,
+      backgroundColor: "#FFFFFF",
+      borderWidth: 2,
       borderColor: colors.border,
+      padding: 20,
+      shadowColor: colors.border,
+      shadowOffset: { width: 4, height: 4 },
+      shadowOpacity: 1,
+      shadowRadius: 0,
+      elevation: 5,
     },
     modalTitle: {
-      fontSize: 18,
-      marginBottom: 15,
-      textAlign: "center",
+      fontSize: 20,
+      fontWeight: "900",
+      textTransform: "uppercase",
+      marginBottom: 24,
+      borderBottomWidth: 2,
+      borderColor: colors.border,
+      paddingBottom: 8,
       color: colors.text,
     },
-
-    modalInput: {
-      borderWidth: colors.borderWidth,
-      borderBottomWidth: colors.borderBottomWidth,
+    inputGroup: {
+      marginBottom: 16,
+    },
+    label: {
+      fontSize: 12,
+      fontWeight: "bold",
+      textTransform: "uppercase",
+      letterSpacing: 1,
+      color: "#4B5563",
+      marginBottom: 6,
+    },
+    input: {
+      width: "100%",
+      backgroundColor: "#FFFFFF",
+      borderWidth: 2,
       borderColor: colors.border,
-      borderRadius: colors.borderRadius,
-      padding: 10,
-      marginBottom: 15,
-      height: 40,
-      width: isWeb ? "50%" : "80%",
+      padding: 12,
+      fontSize: 14,
       color: colors.text,
     },
-    modalInputFocused: {
-      borderColor: colors.border,
-      outlineStyle: "none",
-      backgroundColor: "white",
-    } as TextStyle,
-
-    // buttons
-    openPickerButton: {
-      position: "relative",
-      marginTop: 20,
-      // padding: 20,
-      paddingRight: 20,
-      paddingLeft: 20,
-      borderRadius: colors.borderRadius,
-      backgroundColor: colors.buttons,
-      borderWidth: colors.borderWidth,
-      borderBottomWidth: colors.borderBottomWidth,
-      borderColor: colors.border,
-      height: 45,
-      // alignItems: "center",
-      // justifyContent: "center",
-    },
-
-    openPickerButtonText: {
-      color: colors.text,
-      fontSize: 18,
-      fontWeight: "600",
-    },
-    modalButtonContainer: {
+    buttonContainer: {
       flexDirection: "row",
-      justifyContent: "center",
-      width: "80%",
+      gap: 12,
+      marginTop: 16,
     },
-    modalButton: {
-      margin: 20,
+    pickerContainer: {
+      gap: 12,
+      height: 96,
+    },
+    button: {
       flex: 1,
-      marginHorizontal: 5,
-      borderRadius: colors.borderRadius,
+      borderWidth: 2,
       borderColor: colors.border,
-      borderWidth: colors.borderWidth,
-      borderBottomWidth: colors.borderBottomWidth,
-      maxWidth: 276,
-      backgroundColor: colors.buttons,
+      justifyContent: "center",
+      alignItems: "center",
+      flexDirection: "row",
+      paddingHorizontal: 12,
+      paddingVertical: 8,
+      height: 42,
     },
-    modalButtonText: {
-      color: "#000000",
+    cancelButton: {
+      backgroundColor: "#FFFFFF",
+    },
+    confirmButton: {
+      backgroundColor: "#FF9F1C",
+    },
+    buttonText: {
+      fontWeight: "600",
+      fontSize: 14,
+      color: colors.text,
+      textTransform: "uppercase",
+      marginVertical: 3,
+      textAlign: "center",
     },
   });
 };
 
 export const createLoginStyles = (
   colors: ReturnType<typeof getThemeColors>,
-  theme: Theme,
-  platform: string,
-  routeName?: string,
 ) => {
-  const isClear = theme?.startsWith("clear") ?? false;
-  const isJobScreen = routeName?.startsWith("Job") ?? false;
-  const isWeb = platform === "web";
-
   return StyleSheet.create({
-    loginListContainer: {
-      minHeight: 300,
-      maxHeight: 400,
+    container: {
       flex: 1,
       justifyContent: "center",
       alignItems: "center",
-      width: 300,
-      borderWidth: isClear ? 0 : colors.borderWidth,
-      borderBottomWidth: isClear ? 0 : colors.borderBottomWidth,
-      borderColor: colors.border,
-      borderRadius: colors.borderRadius,
-      padding: 30,
       backgroundColor: colors.background,
-      // position: "relative",
-      // overflow: "hidden",
+      padding: 20,
     },
-
-    input: {
-      borderWidth: colors.borderWidth,
-      borderBottomWidth: colors.borderBottomWidth,
-      borderColor: colors.border,
-      borderRadius: colors.borderRadius,
-      backgroundColor: colors.background,
-      padding: 10,
-      marginBottom: 15,
-      height: 40,
+    // Specific wrapper sizing for Login
+    loginCardWrapper: {
+      maxWidth: 320,
+    },
+    // Specific internal padding for Login
+    loginCardContent: {
+      padding: 24,
+      alignItems: "center",
+    },
+    logoWrapper: {
+      width: 64,
+      height: 64,
+      marginBottom: 16,
+      position: "relative",
+    },
+    logoShadow: {
+      position: "absolute",
+      top: 4,
+      left: 4,
       width: "100%",
+      height: "100%",
+      backgroundColor: "#FF9F1C",
+    },
+    logoMain: {
+      width: "100%",
+      height: "100%",
+      backgroundColor: "#000000",
+      justifyContent: "center",
+      alignItems: "center",
+      borderWidth: 2,
+      borderColor: "#000000",
+    },
+    title: {
+      fontSize: 24,
+      fontWeight: "900",
+      textTransform: "uppercase",
+      marginBottom: 8,
       color: colors.text,
     },
-    inputFocused: {
-      borderColor: colors.border,
-      outlineStyle: "none",
-      appearance: "none",
-      backgroundColor: "white",
-    } as TextStyle,
-
-    errorText: {
-      color: "red",
+    subtitle: {
       fontSize: 12,
-      marginBottom: 4,
+      color: "#6B7280",
+      marginBottom: 24,
     },
-
-    // Buttons
-
-    loginButton: {
-      marginTop: 20,
-      // padding: 20,
-      paddingRight: 20,
-      paddingLeft: 20,
-      borderRadius: colors.borderRadius,
-      backgroundColor: colors.buttons,
-      borderWidth: colors.borderWidth,
-      borderBottomWidth: colors.borderBottomWidth,
+    inputGroup: {
+      width: "100%",
+      marginBottom: 16,
+    },
+    input: {
+      width: "100%",
+      backgroundColor: "#FFFFFF",
+      borderWidth: 2,
       borderColor: colors.border,
-      height: 45,
-      alignItems: "center",
+      padding: 12,
+      fontSize: 14,
+      color: colors.text,
+    },
+    loginButton: {
+      width: "100%",
+      height: 48,
+      backgroundColor: "#FF9F1C",
+      borderWidth: 2,
+      borderColor: colors.border,
       justifyContent: "center",
+      alignItems: "center",
+      padding: 8,
+      marginTop: 8,
     },
     loginButtonText: {
+      fontWeight: "bold",
+      fontSize: 14,
+      textTransform: "uppercase",
       color: colors.text,
-      fontSize: 18,
-      fontWeight: "600",
     },
     toggleButton: {
       marginTop: 16,
     },
     toggleText: {
-      color: colors.text,
-      textAlign: "center",
+      fontSize: 12,
+      textDecorationLine: "underline",
+      color: "#6B7280",
+    },
+    errorText: {
+      color: "#FF6B6B",
+      fontSize: 12,
+      marginBottom: 4,
+      alignSelf: "flex-start",
     },
   });
 };
 
-// export const createHomeStyles = (colors: ReturnType<typeof getThemeColors>) =>
-//   StyleSheet.create({
-//     jobButton: {
-//       borderColor: colors.border,
-//       borderWidth: colors.borderWidth,
-//       borderBottomWidth: colors.borderBottomWidth,
-//       borderRadius: colors.borderRadius,
-//       marginVertical: 5,
-//       height: 45,
-//       width: 276,
-//       backgroundColor: colors.background,
-//       elevation: 0,
-//       shadowOpacity: 0,
-//     },
-//     buttonContent: {
-//       borderRadius: colors.borderRadius,
-//       width: 225,
-//       flexDirection: "row",
-//     },
-//     jobButtonText: {
-//       color: colors.text,
-//       fontSize: 18,
-//       fontWeight: "400",
-//       flex: 1,
-//     },
-//     contextMenuButtons: {
-//       // backgroundColor: "transparent",
-//       borderWidth: colors.borderWidth,
-//       borderBottomWidth: colors.borderBottomWidth,
-//       position: "absolute",
-//       right: -1,
-//       top: -2,
-//       zIndex: 1000,
-//       padding: 0,
-//       margin: 0,
-//       color: colors.icon,
-//       display: !isMobileOrTablet() ? "flex" : "none",
-//       width: 24,
-//       height: 24,
-//       alignItems: "center",
-//       justifyContent: "center",
-//     },
-
-//     swipeableContainer: {
-//       display: isMobileOrTablet() ? "flex" : "none",
-//     },
-
-//     modalContainer: {
-//       flex: 1,
-//       justifyContent: "center",
-//       alignItems: "center",
-//       backgroundColor: "rgba(0, 0, 0, 0.5)",
-//     },
-//     modalContent: {
-//       flex: 1,
-//       width: "100%",
-//       justifyContent: "center",
-//       alignItems: "center",
-//       padding: 20,
-//       backgroundColor: colors.background,
-//       borderWidth: colors.borderWidth,
-//       borderBottomWidth: colors.borderBottomWidth,
-//       borderColor: colors.border,
-//     },
-//     modalTitle: {
-//       fontSize: 18,
-//       marginBottom: 15,
-//       textAlign: "center",
-//     },
-//     input: {
-//       borderWidth: colors.borderWidth,
-//       borderBottomWidth: colors.borderBottomWidth,
-//       padding: 10,
-//       marginBottom: 15,
-//       height: 40,
-//     },
-//     modalButtons: {
-//       flexDirection: "row",
-//       justifyContent: "space-between",
-//       width: "100%",
-//     },
-//     modalButton: {
-//       flex: 1,
-//       marginHorizontal: 5,
-//       borderRadius: colors.borderRadius,
-//       borderColor: colors.border,
-//       borderWidth: colors.borderWidth,
-//       borderBottomWidth: colors.borderBottomWidth,
-//     },
-//     modalInput: {
-//       borderWidth: colors.borderWidth,
-//       borderBottomWidth: colors.borderBottomWidth,
-//       borderColor: colors.border,
-//       borderRadius: colors.borderRadius,
-//       padding: 10,
-//       marginBottom: 15,
-//       height: 40,
-//       width: "100%",
-//     },
-//     modalActionButton: {
-//       borderColor: "#000000",
-//       borderRadius: colors.borderRadius,
-//       backgroundColor: "#D3D3D3",
-//     },
-//   });
+export const createJobStyles = (colors: ReturnType<typeof getThemeColors>) =>
+  StyleSheet.create({
+    // Updated: Removed native shadow props, as we use the retroCard wrapper now
+    timerCard: {
+      backgroundColor: "#FDFBF7",
+      // Border is handled by wrapper usually, but we keep it here if we want specific color
+      // or we can let the wrapper handle border.
+      // For safety, let's keep padding/align here, but remove shadow/elevation.
+      padding: 20,
+      alignItems: "center",
+    },
+    timerLabel: {
+      fontSize: 12,
+      textTransform: "uppercase",
+      letterSpacing: 2,
+      marginBottom: 8,
+      color: "#6B7280",
+    },
+    timerDisplay: {
+      fontSize: 48,
+      fontWeight: "900",
+      letterSpacing: 2,
+      marginBottom: 32,
+      color: colors.text,
+      fontVariant: ["tabular-nums"],
+    },
+    controlButton: {
+      width: 120,
+      height: 48,
+      borderWidth: 2,
+      borderColor: colors.border,
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "center",
+      gap: 8,
+    },
+    startBtn: { backgroundColor: "#FF9F1C" },
+    stopBtn: { backgroundColor: "#FF6B6B" },
+    btnText: {
+      fontWeight: "bold",
+      textTransform: "uppercase",
+      color: colors.text,
+    },
+    actionGrid: {
+      flexDirection: "row",
+      width: "100%",
+      gap: 12,
+      marginBottom: 24,
+    },
+    actionButton: {
+      flex: 1,
+      backgroundColor: "#FFFFFF",
+      borderWidth: 2,
+      borderColor: colors.border,
+      padding: 12,
+      alignItems: "center",
+      justifyContent: "center",
+      flexDirection: "row",
+      gap: 8,
+      height: 44,
+    },
+    sectionTitle: {
+      fontSize: 14,
+      fontWeight: "bold",
+      textTransform: "uppercase",
+      borderBottomWidth: 2,
+      borderColor: colors.border,
+      alignSelf: "flex-start",
+      marginBottom: 12,
+      color: colors.text,
+    },
+  });
 
 export const createSettingsStyles = (
   colors: ReturnType<typeof getThemeColors>,
 ) =>
   StyleSheet.create({
-    placeholder: {
-      width: 48,
+    section: {
+      marginBottom: 24,
+    },
+    sectionHeader: {
+      fontSize: 12,
+      fontWeight: "bold",
+      textTransform: "uppercase",
+      letterSpacing: 1,
+      color: "#4B5563",
+      marginBottom: 12,
+      marginLeft: 4,
+    },
+    settingsCard: {
+      backgroundColor: "#FFFFFF",
+      borderWidth: 2,
+      borderColor: colors.border,
+      shadowColor: colors.border,
+      shadowOffset: { width: 4, height: 4 },
+      shadowOpacity: 1,
+      shadowRadius: 0,
+      elevation: 4,
+    },
+    row: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      padding: 16,
+      borderBottomWidth: 2,
+      borderColor: colors.border,
+    },
+    rowLast: {
+      borderBottomWidth: 0,
+    },
+    rowLabel: {
+      fontWeight: "bold",
+      color: colors.text,
+    },
+    valueBadge: {
+      fontSize: 12,
+      backgroundColor: "#FF9F1C",
+      paddingHorizontal: 8,
+      paddingVertical: 4,
+      borderWidth: 1,
+      borderColor: colors.border,
+      fontWeight: "bold",
+      color: colors.text,
     },
     button: {
-      width: 300,
-      borderWidth: colors.borderWidth,
-      borderBottomWidth: colors.borderBottomWidth,
-      borderColor: colors.border,
-      marginBottom: 15,
-      height: 45,
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      paddingHorizontal: 12,
+      paddingVertical: 8,
+      backgroundColor: colors.surface,
       borderRadius: colors.borderRadius,
-    },
-    languageButtonText: {
-      color: colors.text,
     },
     themeButtonText: {
       color: colors.text,
+      marginVertical: 3,
+      fontSize: 14,
+      fontWeight: "600",
+    },
+    logoutButton: {
+      backgroundColor: "#FF6B6B",
+      borderWidth: 2,
+      borderColor: colors.border,
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "center",
+      padding: 16,
+      gap: 8,
+      height: 56,
     },
   });
 
-export const createJobStyles = (colors: ReturnType<typeof getThemeColors>) =>
+export const createThemeDropdownStyles = () =>
   StyleSheet.create({
-    timer: {
-      fontSize: 56,
-      textAlign: "center",
-      marginVertical: 20,
-      fontWeight: "400",
-      color: colors.text,
+    modalOverlay: {
+      flex: 1,
+      backgroundColor: "rgba(0,0,0,0.5)",
+      justifyContent: "center",
+      alignItems: "center",
     },
-
-    timeEntryList: {
-      minHeight: 300,
-      maxHeight: 400,
-      flexGrow: 1,
+    dropdownContainer: {
       width: 300,
-      borderWidth: colors.borderWidth,
-      borderBottomWidth: colors.borderBottomWidth,
-      borderColor: colors.border,
-      borderRadius: colors.borderRadius,
-      padding: 10,
-      backgroundColor: colors.background,
-      position: "relative",
       overflow: "hidden",
     },
-
-    timeEntry: {
-      borderColor: colors.border,
-      borderWidth: colors.borderWidth,
-      borderBottomWidth: colors.borderBottomWidth,
-      borderRadius: colors.borderRadius,
-      marginVertical: 5,
-      padding: 0,
-      height: 45,
-      width: 276,
-      backgroundColor: colors.buttons,
-      elevation: 0,
-      shadowOpacity: 0,
-    },
-    timeEntryText: {
-      color: colors.text,
-      fontSize: 18,
-      fontWeight: "400",
-      textAlign: "left",
-      flex: 1,
-    },
-
-    swipeableContainer: {
-      display: isMobileOrTablet() ? "flex" : "none",
-    },
-
-    backIcon: {
-      color: colors.icon,
-    },
-    content: {
-      flex: 1,
+    header: {
+      padding: 16,
       alignItems: "center",
     },
-    timerContainer: {
-      alignItems: "center",
-      marginBottom: 30,
-    },
-
-    buttonContent: {
-      flexDirection: "row",
-      justifyContent: "space-around",
-      width: "100%",
-      marginBottom: 30,
-    },
-
-    buttonText: {
+    headerText: {
       fontSize: 16,
-      color: colors.text,
-      textAlign: "center",
+      fontWeight: "bold",
+      textTransform: "uppercase",
+      letterSpacing: 1,
     },
-    sessionList: {
-      width: "100%",
-    },
-    sessionItem: {
+    optionRow: {
       flexDirection: "row",
+      alignItems: "center",
       justifyContent: "space-between",
-      padding: 10,
-      borderWidth: colors.borderWidth,
-      borderBottomWidth: colors.borderBottomWidth,
-      borderColor: colors.border,
-      marginBottom: 10,
+      paddingVertical: 16,
+      paddingHorizontal: 20,
     },
-    sessionText: {
-      color: colors.text,
-    },
-
-    // ---------------------------------------------------------------------------
-    // buttons
-    // ---------------------------------------------------------------------------
-
-    // Start Stop Button
-    timerButton: {
-      borderWidth: 2,
-      borderColor: colors.border,
-      width: 100,
-      height: 100,
-      alignSelf: "center",
-      justifyContent: "center",
-      borderRadius: colors.borderRadius,
-      backgroundColor: colors.background,
-    },
-
-    //   Back to days Button
-    backButton: {
-      marginBottom: 10,
-      borderWidth: colors.borderWidth,
-      borderBottomWidth: colors.borderBottomWidth,
-      borderColor: colors.border,
-      borderRadius: colors.borderRadius,
-      padding: 0,
-      // paddingRight: 20,
-      // paddingLeft: 20,
-      height: 45,
-      justifyContent: "center",
-      alignItems: "center",
-      backgroundColor: colors.buttons,
-    },
-    backButtonText: {
-      color: colors.text,
-      fontSize: 20,
-      fontWeight: "700",
-    },
-    // Back to Jobs Button
-    backToJobsButton: {
-      marginBottom: 10,
-      borderWidth: colors.borderWidth,
-      borderBottomWidth: colors.borderBottomWidth,
-      borderColor: colors.border,
-      borderRadius: colors.borderRadius,
-      padding: 0,
-      height: 45,
-      justifyContent: "center",
-      alignItems: "center",
-      backgroundColor: colors.buttons,
-      fontSize: 22,
-      fontWeight: "600",
-    },
-
-    // Print Button
-    printButton: {
-      width: "50%",
-      borderWidth: colors.borderWidth,
-      borderBottomWidth: colors.borderBottomWidth,
-      borderRadius: colors.borderRadius,
-      borderColor: colors.border,
-      backgroundColor: colors.buttons,
-    },
-
-    printButtonText: {
-      color: colors.text,
-      fontSize: 20,
-      fontWeight: "700",
+    optionText: {
+      fontSize: 16,
     },
   });

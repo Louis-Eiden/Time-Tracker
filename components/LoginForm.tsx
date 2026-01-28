@@ -1,17 +1,15 @@
-// LoginForm.tsx
 import React, { useState } from "react";
 import {
   View,
   TextInput,
-  Button,
   Text,
-  StyleSheet,
-  Pressable,
+  TouchableOpacity,
   Platform,
 } from "react-native";
 
-import { createCommonStyles, createLoginStyles } from "@/theme/styles";
+import { createLoginStyles } from "@/theme/styles";
 import { getThemeColors, useTheme } from "@/contexts/ThemeContext";
+import RetroButton from "./RetroButton"; // Import RetroButton
 
 interface LoginFormProps {
   loading?: boolean;
@@ -38,29 +36,12 @@ export default function LoginForm({
 
   const { theme } = useTheme();
   const colors = getThemeColors(theme);
-  const styles = createLoginStyles(colors, theme, Platform.OS, "Login");
-  const commonStyles = createCommonStyles(colors, theme, Platform.OS, "Login");
-
-  // Separate focus states for each input
-  const [emailFocused, setEmailFocused] = useState(false);
-  const [passwordFocused, setPasswordFocused] = useState(false);
+  const styles = createLoginStyles(colors);
 
   const validate = () => {
     const newErrors: { email?: string; password?: string } = {};
-
-    if (!email.trim()) {
-      newErrors.email = "Email is required";
-    } else {
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(email.trim())) {
-        newErrors.email = "Please enter a valid email address";
-      }
-    }
-
-    if (!password.trim()) {
-      newErrors.password = "Password is required";
-    }
-
+    if (!email.trim()) newErrors.email = "Email is required";
+    if (!password.trim()) newErrors.password = "Password is required";
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -70,63 +51,68 @@ export default function LoginForm({
     onSubmit({ email: email.trim(), password, isSignUp });
   };
 
-  const handleToggleMode = () => {
-    onToggleMode(!isSignUp);
-  };
-
   return (
     <>
-      <TextInput
-        placeholder="Email"
-        value={email}
-        onChangeText={setEmail}
-        keyboardType="email-address"
-        autoCapitalize="none"
-        autoCorrect={false}
-        textContentType="emailAddress"
-        style={[styles.input, emailFocused && styles.inputFocused]}
-        onFocus={() => setEmailFocused(true)}
-        onBlur={() => setEmailFocused(false)}
-      />
-      {errors.email ? (
-        <Text style={styles.errorText}>{errors.email}</Text>
-      ) : null}
-
-      <TextInput
-        placeholder="Password"
-        value={password}
-        onChangeText={setPassword}
-        secureTextEntry
-        textContentType="password"
-        style={[styles.input, passwordFocused && styles.inputFocused]}
-        onSubmitEditing={handleSubmit}
-        returnKeyType="done"
-        onFocus={() => setPasswordFocused(true)}
-        onBlur={() => setPasswordFocused(false)}
-      />
-      {errors.password ? (
-        <Text style={styles.errorText}>{errors.password}</Text>
-      ) : null}
-
-      <View>
-        <Pressable
-          style={styles.loginButton}
-          onPress={handleSubmit}
-          disabled={loading}
+      <View style={styles.inputGroup}>
+        <Text
+          style={{ ...styles.subtitle, marginBottom: 6, fontWeight: "bold" }}
         >
-          <Text style={styles.loginButtonText}>
-            {loading ? "Loading..." : isSignUp ? "Sign Up" : "Login"}
-          </Text>
-        </Pressable>
+          IDENTITY
+        </Text>
+        <TextInput
+          placeholder="user@example.com"
+          value={email}
+          onChangeText={setEmail}
+          keyboardType="email-address"
+          autoCapitalize="none"
+          style={styles.input}
+          placeholderTextColor="#9CA3AF"
+        />
+        {errors.email && <Text style={styles.errorText}>{errors.email}</Text>}
       </View>
 
-      <View style={styles.toggleButton}>
-        <Text onPress={handleToggleMode} style={styles.toggleText}>
-          {isSignUp
-            ? "Already have an account? Login"
-            : "Don't have an account? Sign Up"}
+      <View style={styles.inputGroup}>
+        <Text
+          style={{ ...styles.subtitle, marginBottom: 6, fontWeight: "bold" }}
+        >
+          PASSCODE
         </Text>
+        <TextInput
+          placeholder="••••••••"
+          value={password}
+          onChangeText={setPassword}
+          secureTextEntry
+          style={styles.input}
+          placeholderTextColor="#9CA3AF"
+        />
+        {errors.password && (
+          <Text style={styles.errorText}>{errors.password}</Text>
+        )}
       </View>
+
+      <RetroButton
+        style={styles.loginButton}
+        onPress={handleSubmit}
+        disabled={loading}
+        shadowColor={colors.border}
+      >
+        <Text style={styles.loginButtonText}>
+          {loading
+            ? "PROCESSING..."
+            : isSignUp
+              ? "CREATE ACCOUNT"
+              : "ACCESS SYSTEM"}
+        </Text>
+      </RetroButton>
+
+      <TouchableOpacity
+        onPress={() => onToggleMode(!isSignUp)}
+        style={styles.toggleButton}
+      >
+        <Text style={styles.toggleText}>
+          {isSignUp ? "Already have an account? Login" : "Create new account"}
+        </Text>
+      </TouchableOpacity>
     </>
   );
 }
