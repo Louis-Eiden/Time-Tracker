@@ -119,10 +119,10 @@ and this to your android/app/build.gradle android section
 and add the secrets to your gradle.properties file at the bottom
 
 ```
-TIMETRACKER_UPLOAD_STORE_FILE=release-key.keystore
-TIMETRACKER_UPLOAD_KEY_ALIAS=release-key
-TIMETRACKER_UPLOAD_STORE_PASSWORD=***********
-TIMETRACKER_UPLOAD_KEY_PASSWORD=***********
+TIMETRACKER_UPLOAD_STORE_FILE=release.keystore
+TIMETRACKER_UPLOAD_KEY_ALIAS=release
+TIMETRACKER_UPLOAD_STORE_PASSWORD=**********
+TIMETRACKER_UPLOAD_KEY_PASSWORD=**********
 ```
 
 Keystore is in google drive! and needs to go into android/app directory
@@ -137,7 +137,7 @@ cd android
 ```
 
 #change sdk Version to latest inside android/build.gradle
-buildscript > ext section
+buildscript > ext section > targetSdkVersion
 
 then build the .aab file
 
