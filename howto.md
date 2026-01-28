@@ -34,7 +34,7 @@ bunx expo start -c
 
 ---
 
-add this to your build.gradle allprojects -> repositories section
+add this to your android/build.gradle allprojects > repositories section
 
 ```
         // project specific fix of following Error
@@ -50,8 +50,6 @@ add this to your build.gradle allprojects -> repositories section
             url "$rootDir/../node_modules/@notifee/react-native/android/libs"
         }
 ```
-
----
 
 ## 🔥 1. The Nuclear Reset (when nothing works)
 
@@ -81,7 +79,76 @@ bunx expo run:ios   # or run:android
 bunx expo start --clear
 ```
 
+# For Store Releases, these are the steps for adding the keystore to the project:
+
+and this to your android/app/build.gradle android section
+
+```
+    signingConfigs {
+        debug {
+            storeFile file('debug.keystore')
+            storePassword 'android'
+            keyAlias 'androiddebugkey'
+            keyPassword 'android'
+        }
+        release {
+            if (project.hasProperty('TIMETRACKER_UPLOAD_STORE_FILE')) {
+                storeFile file(TIMETRACKER_UPLOAD_STORE_FILE)
+                storePassword TIMETRACKER_UPLOAD_STORE_PASSWORD
+                keyAlias TIMETRACKER_UPLOAD_KEY_ALIAS
+                keyPassword TIMETRACKER_UPLOAD_KEY_PASSWORD
+            }
+        }
+    }
+    buildTypes {
+        debug {
+            signingConfig signingConfigs.debug
+        }
+        release {
+            // Caution! In production, you need to generate your own keystore file.
+            // see https://reactnative.dev/docs/signed-apk-android.
+            signingConfig signingConfigs.release
+            shrinkResources (findProperty('android.enableShrinkResourcesInReleaseBuilds')?.toBoolean() ?: false)
+            minifyEnabled enableProguardInReleaseBuilds
+            proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
+            crunchPngs (findProperty('android.enablePngCrunchInReleaseBuilds')?.toBoolean() ?: true)
+        }
+    }
+```
+
+and add the secrets to your gradle.properties file at the bottom
+
+```
+TIMETRACKER_UPLOAD_STORE_FILE=release-key.keystore
+TIMETRACKER_UPLOAD_KEY_ALIAS=release-key
+TIMETRACKER_UPLOAD_STORE_PASSWORD=***********
+TIMETRACKER_UPLOAD_KEY_PASSWORD=***********
+```
+
+Keystore is in google drive! and needs to go into android/app directory
+
+after adding clean gradle cache
+
+```
+cd android
+./gradlew --stop
+./gradlew clean
+./gradlew signingReport
+```
+
+#change sdk Version to latest inside android/build.gradle
+buildscript > ext section
+
+then build the .aab file
+
+```
+cd android
+./gradlew bundleRelease
+```
+
+---
+
 # Version History
 
 1.0.0 - first version
-1.1.0 - UI-redesign color sheme, button styling and placement.
+1.1.0 - new UI color sheme, button styling and placement.
