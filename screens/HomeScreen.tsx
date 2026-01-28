@@ -2,6 +2,7 @@ import React from "react";
 import { View, FlatList, Platform } from "react-native";
 import { Plus } from "lucide-react-native";
 import { useNavigation } from "@react-navigation/native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 import { Job } from "@/types";
 import { useTheme, getThemeColors } from "@/contexts/ThemeContext";
@@ -28,7 +29,7 @@ export default function HomeScreen() {
   });
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container} edges={["top", "bottom"]}>
       <Header />
       <View style={styles.main}>
         <View style={styles.listContainer}>
@@ -75,6 +76,6 @@ export default function HomeScreen() {
         onInputChange={modal.setValue}
         placeholder="e.g. Website Redesign"
       />
-    </View>
+    </SafeAreaView>
   );
 }

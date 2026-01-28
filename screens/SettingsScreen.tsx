@@ -8,6 +8,7 @@ import {
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { LogOut, ChevronRight } from "lucide-react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 import { useTheme, getThemeColors } from "@/contexts/ThemeContext";
 import { useTimeFormat } from "@/contexts/TimeContext";
@@ -36,7 +37,7 @@ export default function SettingsScreen() {
   };
 
   return (
-    <View style={commonStyles.container}>
+    <SafeAreaView style={commonStyles.container} edges={["top", "bottom"]}>
       <Header />
 
       <ScrollView contentContainerStyle={commonStyles.main}>
@@ -88,6 +89,6 @@ export default function SettingsScreen() {
           </RetroButton>
         </View>
       </ScrollView>
-    </View>
+    </SafeAreaView>
   );
 }

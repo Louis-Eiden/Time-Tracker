@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from "react";
 import { View, FlatList, Platform, Text, TouchableOpacity } from "react-native";
 import { useNavigation, useRoute, RouteProp } from "@react-navigation/native";
 import { Play, Pause, Printer, Clock } from "lucide-react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 import { useTheme, getThemeColors } from "@/contexts/ThemeContext";
 import { useTimeFormat } from "@/contexts/TimeContext";
@@ -89,7 +90,7 @@ export default function JobScreen() {
   };
 
   return (
-    <View style={commonStyles.container}>
+    <SafeAreaView style={commonStyles.container} edges={["top", "bottom"]}>
       <Header jobName={jobName} />
 
       <View style={commonStyles.main}>
@@ -236,6 +237,6 @@ export default function JobScreen() {
           setIsTimeModalVisible(false);
         }}
       />
-    </View>
+    </SafeAreaView>
   );
 }

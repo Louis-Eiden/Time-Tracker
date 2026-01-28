@@ -23,7 +23,7 @@ const config: ExpoConfig = {
   },
 
   android: {
-    versionCode: 2,
+    versionCode: 3,
     package: "com.louiseiden.timetracker",
     googleServicesFile: "./google-services.json",
     permissions: [

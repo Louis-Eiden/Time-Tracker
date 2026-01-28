@@ -1,3 +1,5 @@
+// App.tsx
+
 import React, { useEffect } from "react";
 import { useColorScheme, Platform, View, Text } from "react-native";
 import { NavigationContainer, LinkingOptions } from "@react-navigation/native";
@@ -7,6 +9,7 @@ import { Provider as PaperProvider } from "react-native-paper";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { TimeProvider } from "./contexts/TimeContext";
 import notifee, { EventType } from "@notifee/react-native";
+import { SafeAreaProvider } from "react-native-safe-area-context";
 
 // Screen Components
 import LoginScreen from "./screens/LoginScreen";
@@ -99,25 +102,30 @@ export default function App() {
   }, []);
 
   return (
-    <ErrorBoundary>
-      <GestureHandlerRootView style={{ flex: 1 }}>
-        <AuthProvider>
-          <ThemeProvider>
-            <TimeProvider>
-              <PaperProvider>
-                <NavigationContainer linking={linking}>
-                  <Stack.Navigator screenOptions={{ headerShown: false }}>
-                    <Stack.Screen name="Login" component={LoginScreen} />
-                    <Stack.Screen name="Home" component={HomeScreen} />
-                    <Stack.Screen name="Job" component={JobScreen} />
-                    <Stack.Screen name="Settings" component={SettingsScreen} />
-                  </Stack.Navigator>
-                </NavigationContainer>
-              </PaperProvider>
-            </TimeProvider>
-          </ThemeProvider>
-        </AuthProvider>
-      </GestureHandlerRootView>
-    </ErrorBoundary>
+    <SafeAreaProvider>
+      <ErrorBoundary>
+        <GestureHandlerRootView style={{ flex: 1 }}>
+          <AuthProvider>
+            <ThemeProvider>
+              <TimeProvider>
+                <PaperProvider>
+                  <NavigationContainer linking={linking}>
+                    <Stack.Navigator screenOptions={{ headerShown: false }}>
+                      <Stack.Screen name="Login" component={LoginScreen} />
+                      <Stack.Screen name="Home" component={HomeScreen} />
+                      <Stack.Screen name="Job" component={JobScreen} />
+                      <Stack.Screen
+                        name="Settings"
+                        component={SettingsScreen}
+                      />
+                    </Stack.Navigator>
+                  </NavigationContainer>
+                </PaperProvider>
+              </TimeProvider>
+            </ThemeProvider>
+          </AuthProvider>
+        </GestureHandlerRootView>
+      </ErrorBoundary>
+    </SafeAreaProvider>
   );
 }

@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Platform, View, Text, StyleSheet } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { Clock } from "lucide-react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 import { signUpUser, signInUser } from "@/services/users.service";
 import type { NavigationProp } from "@/types";
@@ -46,7 +47,7 @@ export default function LoginScreen() {
   };
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container} edges={["top", "bottom"]}>
       {/* 
         FIX: Use StyleSheet.flatten() because AnimatedScreenWrapper 
         expects a single ViewStyle object, not an array.
@@ -87,6 +88,6 @@ export default function LoginScreen() {
           ) : null}
         </View>
       </AnimatedScreenWrapper>
-    </View>
+    </SafeAreaView>
   );
 }
