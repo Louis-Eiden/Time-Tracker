@@ -141,10 +141,14 @@ buildscript > ext section > targetSdkVersion
 
 then build the .aab file
 
+also change the app version inside of app.config.ts > android section
+
 ```
 cd android
 ./gradlew bundleRelease
 ```
+
+you can find the file inside android/app/build/outputs/bundle/release
 
 ---
 

@@ -1,4 +1,4 @@
-import { Platform, Alert } from "react-native";
+import { Platform, Alert, Linking } from "react-native";
 import { Time } from "../types"; // Adjust path as needed
 import { formatTimeForDisplay, formatDateForDisplay } from "../utils/time";
 import { TimeFormat } from "../contexts/TimeContext";
@@ -6,7 +6,7 @@ import { TimeFormat } from "../contexts/TimeContext";
 export const handlePrint = async (
   jobName: string,
   times: Time[],
-  timeFormat: TimeFormat
+  timeFormat: TimeFormat,
 ) => {
   try {
     // Filter times for this job and convert Timestamps to Dates
@@ -18,7 +18,7 @@ export const handlePrint = async (
 
     // Sort times by start date (earliest first)
     timesWithDates.sort(
-      (a, b) => a.startDate.getTime() - b.startDate.getTime()
+      (a, b) => a.startDate.getTime() - b.startDate.getTime(),
     );
 
     // Group times by day
@@ -130,7 +130,7 @@ ${(() => {
 
   // Sort weeks chronologically
   const sortedWeeks = Array.from(weekMap.entries()).sort(
-    ([a], [b]) => new Date(a).getTime() - new Date(b).getTime()
+    ([a], [b]) => new Date(a).getTime() - new Date(b).getTime(),
   );
 
   let grandTotalMinutes = 0;
@@ -141,7 +141,7 @@ ${(() => {
 
       // Sort days within week
       const sortedDays = weekDays.sort(
-        ([a], [b]) => new Date(a).getTime() - new Date(b).getTime()
+        ([a], [b]) => new Date(a).getTime() - new Date(b).getTime(),
       );
 
       const daysHtml = sortedDays
@@ -161,7 +161,7 @@ ${(() => {
                 ? formatTimeForDisplay(end, timeFormat)
                 : "In Progress",
               duration: `${Math.floor(durationMinutes / 60)}h ${Math.round(
-                durationMinutes % 60
+                durationMinutes % 60,
               )}m`,
             };
           });
@@ -188,14 +188,14 @@ ${(() => {
                   <td>${entry.duration}</td>
                   <td></td>
                 </tr>
-              `
+              `,
                 )
                 .join("")}
               <tr class="day-total">
                 <td colspan="2">Day Total:</td>
                 <td>${Math.floor(dayTotalMinutes / 60)}h ${Math.round(
-            dayTotalMinutes % 60
-          )}m</td>
+                  dayTotalMinutes % 60,
+                )}m</td>
                 <td></td>
               </tr>
             </table>
@@ -213,12 +213,12 @@ ${(() => {
         <div class="week-section">
           <h2>Week of ${formatDateForDisplay(
             weekStartDate,
-            timeFormat
+            timeFormat,
           )} - ${formatDateForDisplay(weekEndDate, timeFormat)}</h2>
           ${daysHtml}
           <div class="week-total">
             <strong>Week Total: ${Math.floor(
-              weekTotalMinutes / 60
+              weekTotalMinutes / 60,
             )}h ${Math.round(weekTotalMinutes % 60)}m</strong>
           </div>
         </div>
@@ -230,8 +230,8 @@ ${(() => {
     ${weeksHtml}
     <div class="grand-total">
       <strong>Total Hours for ${jobName}: ${Math.floor(
-    grandTotalMinutes / 60
-  )}h ${Math.round(grandTotalMinutes % 60)}m</strong>
+        grandTotalMinutes / 60,
+      )}h ${Math.round(grandTotalMinutes % 60)}m</strong>
     </div>
   `;
 })()}
@@ -251,7 +251,18 @@ ${(() => {
     // Native (for now)
     Alert.alert(
       "Print not supported",
-      "Printing is currently only available in the web"
+      "Printing is currently only available on the web.",
+      [
+        {
+          text: "Open Web Version",
+          onPress: () =>
+            Linking.openURL("https://louis-eiden.github.io/Time-Tracker/"),
+        },
+        {
+          text: "OK",
+          style: "cancel",
+        },
+      ],
     );
   } catch (error: any) {
     console.error("Error generating timesheet:", error);
