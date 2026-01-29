@@ -42,7 +42,8 @@ const Stack = createNativeStackNavigator<RootStackParamList>();
 
 // Linking Options
 const linking: LinkingOptions<RootStackParamList> = {
-  prefixes: Platform.OS === "web" ? ["#/"] : [],
+  prefixes:
+    Platform.OS === "web" ? ["https://louis-eiden.github.io/Time-Tracker"] : [],
   config: {
     screens: {
       Login: "login",
