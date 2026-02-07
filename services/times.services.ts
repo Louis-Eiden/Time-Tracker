@@ -28,6 +28,7 @@ export async function startTimer(jobId: string) {
     userId: user.uid,
     start: serverTimestamp(), // Firestore timestamp
     end: null,
+    pause: 0, // Default 0 for timer entries created using the Timer
     createdAt: serverTimestamp(),
   });
 
@@ -62,9 +63,6 @@ export async function stopTimer(timeId: string) {
   await cancelTimerNotification(timeId);
 }
 
-// ... createTime and deleteTime remain the same ...
-// Note: You might want to add cancelTimerNotification(timeId) to deleteTime as well
-// in case a user deletes a currently running timer.
 export async function deleteTime(timeId: string) {
   const { cancelTimerNotification } = require("./notifications.services");
 
@@ -72,13 +70,13 @@ export async function deleteTime(timeId: string) {
   await cancelTimerNotification(timeId);
 }
 
-// ... createTime remains the same ...
 export async function createTime(params: {
   jobId: string;
   start: Date;
   end: Date;
+  pause?: number; // Optional pause in minutes
 }) {
-  const { jobId, start, end } = params;
+  const { jobId, start, end, pause = 0 } = params;
   const user = auth.currentUser;
   if (!user) {
     throw new Error("Not authenticated");
@@ -95,6 +93,7 @@ export async function createTime(params: {
     userId: user.uid,
     start: Timestamp.fromDate(start),
     end: Timestamp.fromDate(end),
+    pause: Number(pause) || 0,
     createdAt: serverTimestamp(),
   });
 }

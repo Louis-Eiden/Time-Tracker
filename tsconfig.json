@@ -5,7 +5,7 @@
     "jsx": "react-native",
     "moduleResolution": "bundler", // Override to a modern module resolution (old resolution comes from "extends": "expo/tsconfig.base" it still uses "node10")
     "types": ["node"],
-    "paths": { "@/*": ["./*"] }
+    "paths": { "@/*": ["./*"], "lib": ["dom", "esnext"] }
   },
   "include": ["**/*.ts", "**/*.tsx", "env.d.ts"]
 }

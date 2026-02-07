@@ -6,7 +6,7 @@ import { TimeFormat } from "../contexts/TimeContext";
 export const handlePrint = async (
   jobName: string,
   times: Time[],
-  timeFormat: TimeFormat,
+  timeFormat: TimeFormat
 ) => {
   try {
     // Filter times for this job and convert Timestamps to Dates
@@ -14,11 +14,13 @@ export const handlePrint = async (
       ...time,
       startDate: time.start.toDate(),
       endDate: time.end?.toDate() || null,
+      // Ensure we capture the pause, default to 0 if missing
+      pause: (time as any).pause || 0,
     }));
 
     // Sort times by start date (earliest first)
     timesWithDates.sort(
-      (a, b) => a.startDate.getTime() - b.startDate.getTime(),
+      (a, b) => a.startDate.getTime() - b.startDate.getTime()
     );
 
     // Group times by day
@@ -130,7 +132,7 @@ ${(() => {
 
   // Sort weeks chronologically
   const sortedWeeks = Array.from(weekMap.entries()).sort(
-    ([a], [b]) => new Date(a).getTime() - new Date(b).getTime(),
+    ([a], [b]) => new Date(a).getTime() - new Date(b).getTime()
   );
 
   let grandTotalMinutes = 0;
@@ -141,7 +143,7 @@ ${(() => {
 
       // Sort days within week
       const sortedDays = weekDays.sort(
-        ([a], [b]) => new Date(a).getTime() - new Date(b).getTime(),
+        ([a], [b]) => new Date(a).getTime() - new Date(b).getTime()
       );
 
       const daysHtml = sortedDays
@@ -151,8 +153,15 @@ ${(() => {
           const entriesWithDuration = dayTimes.map((time) => {
             const start = time.startDate;
             const end = time.endDate || new Date(); // Use current time if still running
+            const pauseMinutes = time.pause || 0;
 
-            const durationMinutes = (end.getTime() - start.getTime()) / 60000;
+            // Calculate duration in minutes, subtracting pause
+            let durationMinutes = (end.getTime() - start.getTime()) / 60000;
+            durationMinutes = durationMinutes - pauseMinutes;
+
+            // Prevent negative duration
+            if (durationMinutes < 0) durationMinutes = 0;
+
             dayTotalMinutes += durationMinutes;
 
             return {
@@ -160,8 +169,9 @@ ${(() => {
               end: time.endDate
                 ? formatTimeForDisplay(end, timeFormat)
                 : "In Progress",
+              pause: pauseMinutes > 0 ? `${pauseMinutes}m` : "-",
               duration: `${Math.floor(durationMinutes / 60)}h ${Math.round(
-                durationMinutes % 60,
+                durationMinutes % 60
               )}m`,
             };
           });
@@ -176,6 +186,7 @@ ${(() => {
               <tr>
                 <th>Start Time</th>
                 <th>End Time</th>
+                <th>Pause</th>
                 <th>Duration</th>
                 <th>Notes</th>
               </tr>
@@ -185,17 +196,18 @@ ${(() => {
                 <tr>
                   <td>${entry.start}</td>
                   <td>${entry.end}</td>
+                  <td>${entry.pause}</td>
                   <td>${entry.duration}</td>
                   <td></td>
                 </tr>
-              `,
+              `
                 )
                 .join("")}
               <tr class="day-total">
-                <td colspan="2">Day Total:</td>
+                <td colspan="3">Day Total:</td>
                 <td>${Math.floor(dayTotalMinutes / 60)}h ${Math.round(
-                  dayTotalMinutes % 60,
-                )}m</td>
+            dayTotalMinutes % 60
+          )}m</td>
                 <td></td>
               </tr>
             </table>
@@ -213,12 +225,12 @@ ${(() => {
         <div class="week-section">
           <h2>Week of ${formatDateForDisplay(
             weekStartDate,
-            timeFormat,
+            timeFormat
           )} - ${formatDateForDisplay(weekEndDate, timeFormat)}</h2>
           ${daysHtml}
           <div class="week-total">
             <strong>Week Total: ${Math.floor(
-              weekTotalMinutes / 60,
+              weekTotalMinutes / 60
             )}h ${Math.round(weekTotalMinutes % 60)}m</strong>
           </div>
         </div>
@@ -230,8 +242,8 @@ ${(() => {
     ${weeksHtml}
     <div class="grand-total">
       <strong>Total Hours for ${jobName}: ${Math.floor(
-        grandTotalMinutes / 60,
-      )}h ${Math.round(grandTotalMinutes % 60)}m</strong>
+    grandTotalMinutes / 60
+  )}h ${Math.round(grandTotalMinutes % 60)}m</strong>
     </div>
   `;
 })()}
@@ -262,7 +274,7 @@ ${(() => {
           text: "OK",
           style: "cancel",
         },
-      ],
+      ]
     );
   } catch (error: any) {
     console.error("Error generating timesheet:", error);

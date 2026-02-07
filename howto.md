@@ -1,4 +1,7 @@
-# run on android
+<details>
+<summary>
+run on android
+</summary>
 
 ```
 bunx expo start --go
@@ -11,7 +14,14 @@ bunx expo prebuild
 bunx expo run:android
 ```
 
-# run on web
+---
+
+</details>
+
+<details>
+<summary>
+run on web
+</summary>
 
 ```
 bunx expo start
@@ -19,20 +29,25 @@ bunx expo start
 
 ### ✅ After changing:
 
-app.config.ts
-Environment variables
-Firebase setup
-Native plugins
-Dependencies
+app.config.ts  
+Environment variables  
+Firebase setup  
+Native plugins  
+Dependencies  
 Expo SDK version
 
 ```
 bunx expo start -c
 ```
 
-# Build Error? Do this!
-
 ---
+
+</details>
+
+<details>
+<summary>
+Build Error? Do this!
+</summary>
 
 add this to your android/build.gradle allprojects > repositories section
 
@@ -79,9 +94,18 @@ bunx expo run:ios   # or run:android
 bunx expo start --clear
 ```
 
-# For Store Releases, these are the steps for adding the keystore to the project:
+---
 
-and this to your android/app/build.gradle android section
+</details>
+
+<details>
+<summary>
+For Store Release
+</summary>
+
+### 1. adding the keystore to the project:
+
+add this to your android/app/build.gradle android section
 
 ```
     signingConfigs {
@@ -136,7 +160,15 @@ cd android
 ./gradlew signingReport
 ```
 
-#change sdk Version to latest inside android/build.gradle
+---
+
+</details>
+
+<details>
+<summary>
+change sdk Version to latest inside android/build.gradle
+</summary>
+
 buildscript > ext section > targetSdkVersion
 
 then build the .aab file
@@ -148,11 +180,43 @@ cd android
 ./gradlew bundleRelease
 ```
 
-you can find the file inside android/app/build/outputs/bundle/release
+## you can find the file inside android/app/build/outputs/bundle/release
+
+</details>
+
+<details>
+<summary>
+first steps after cloning from github
+</summary>
+
+1. git clone
+
+2. bun install
+
+3. create .env file and add the variables from firebase
+
+- Go to the Firebase Console.
+- Click on your project.
+- Click the Gear icon (Settings) next to "Project Overview" in the top left and select Project settings.
+- Scroll down to the "Your apps" section.
+- Select your Web app (</> icon). If you haven't created one yet, click "Add app" -> Web.
+- Under "SDK setup and configuration", select "Config".
+
+```
+EXPO_PUBLIC_FIREBASE_API_KEY=
+EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN=
+EXPO_PUBLIC_FIREBASE_PROJECT_ID=
+EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET=
+EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=
+EXPO_PUBLIC_FIREBASE_APP_ID=
+EXPO_PUBLIC_FIREBASE_MEASUREMENT_ID=
+```
 
 ---
 
-# Version History
+</details>
 
-1.0.0 - first version
+### Version History
+
+1.0.0 - first version  
 1.1.0 - new UI color sheme, button styling and placement.

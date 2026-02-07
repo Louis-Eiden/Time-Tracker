@@ -62,7 +62,10 @@ export default function JobScreen() {
     const hrs = Math.floor(seconds / 3600);
     const mins = Math.floor((seconds % 3600) / 60);
     const secs = seconds % 60;
-    return `${String(hrs).padStart(2, "0")}:${String(mins).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
+    return `${String(hrs).padStart(2, "0")}:${String(mins).padStart(
+      2,
+      "0"
+    )}:${String(secs).padStart(2, "0")}`;
   };
 
   const handleStartStop = async () => {
@@ -152,7 +155,10 @@ export default function JobScreen() {
         <View style={{ flex: 1 }}>
           <Text style={styles.sectionTitle}>
             {selectedDay
-              ? `LOGS: ${formatDateForDisplay(new Date(selectedDay), timeFormat)}`
+              ? `LOGS: ${formatDateForDisplay(
+                  new Date(selectedDay),
+                  timeFormat
+                )}`
               : "RECENT LOGS"}
           </Text>
 
@@ -179,7 +185,7 @@ export default function JobScreen() {
           <FlatList<Time | Days>
             data={
               selectedDay
-                ? (days.find((d) => d.date === selectedDay)?.times ?? [])
+                ? days.find((d) => d.date === selectedDay)?.times ?? []
                 : days
             }
             keyExtractor={(item) =>
@@ -189,9 +195,20 @@ export default function JobScreen() {
               if (selectedDay) {
                 // Render Time Entry
                 const t = item as Time;
+                // Check if pause exists on the type (casting if needed or if type is updated)
+                const pauseVal = (t as any).pause || 0;
                 return (
                   <ListItem
-                    text={`${formatTimeForDisplay(t.start.toDate(), timeFormat)} - ${t.end ? formatTimeForDisplay(t.end.toDate(), timeFormat) : "Running"}`}
+                    text={`${formatTimeForDisplay(
+                      t.start.toDate(),
+                      timeFormat
+                    )} - ${
+                      t.end
+                        ? formatTimeForDisplay(t.end.toDate(), timeFormat)
+                        : "Running"
+                    }`}
+                    // Show pause in subtext if it exists
+                    subText={pauseVal > 0 ? `Pause: ${pauseVal}m` : undefined}
                     rightSwipeActions={{
                       label: "DELETE",
                       onPress: () => deleteTime(t.id),
@@ -229,9 +246,10 @@ export default function JobScreen() {
         onStartTimeChange={setStartTime}
         onEndTimeChange={setEndTime}
         onClose={() => setIsTimeModalVisible(false)}
-        onConfirm={(_, start, end) => {
+        // Updated to receive pause
+        onConfirm={(_, start, end, pause) => {
           if (!start || !end) return;
-          createTime({ jobId, start, end });
+          createTime({ jobId, start, end, pause });
           setStartTime(undefined);
           setEndTime(undefined);
           setIsTimeModalVisible(false);

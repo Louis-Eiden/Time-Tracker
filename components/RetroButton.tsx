@@ -54,7 +54,6 @@ export default function RetroButton({
 
   const flatStyle = StyleSheet.flatten(style || {});
 
-  // --- FIX STARTS HERE ---
   // We extract flex and width properties so they apply to the Container.
   // This allows the button to grow (flex: 1) within a row.
   const {
@@ -109,7 +108,6 @@ export default function RetroButton({
     width,
     height,
   };
-  // --- FIX ENDS HERE ---
 
   return (
     <TouchableWithoutFeedback

@@ -10,7 +10,12 @@ import RetroButton from "./RetroButton";
 interface ModalFormProps {
   visible: boolean;
   onClose: () => void;
-  onConfirm: (value: string, startTime?: Date, endTime?: Date) => void;
+  onConfirm: (
+    value: string,
+    startTime?: Date,
+    endTime?: Date,
+    pause?: number
+  ) => void;
   title: string;
   inputValue: string;
   onInputChange: (value: string) => void;
@@ -51,13 +56,18 @@ export default function ModalForm({
   const { timeFormat } = useTimeFormat();
 
   const [activePicker, setActivePicker] = useState<"start" | "end" | null>(
-    null,
+    null
   );
   const [datePickerVisible, setDatePickerVisible] = useState(false);
   const [timePickerVisible, setTimePickerVisible] = useState(false);
   const [pickedDate, setPickedDate] = useState<Date | undefined>();
   const [newStartTime, setNewStartTime] = useState<Date | undefined>(startTime);
   const [newEndTime, setNewEndTime] = useState<Date | undefined>(endTime);
+
+  const [pauseMinutes, setPauseMinutes] = useState("");
+
+  // We capture the current time to force the picker to this value
+  const now = new Date();
 
   const openStartPicker = () => {
     setActivePicker("start");
@@ -72,7 +82,16 @@ export default function ModalForm({
   const handleConfirm = () => {
     if (isTimeEntry) {
       if (newStartTime && newEndTime) {
-        onConfirm(inputValue.trim(), newStartTime, newEndTime);
+        const pauseVal = parseInt(pauseMinutes, 10);
+
+        onConfirm(
+          inputValue.trim(),
+          newStartTime,
+          newEndTime,
+          isNaN(pauseVal) ? 0 : pauseVal
+        );
+
+        setPauseMinutes("");
       }
       return;
     }
@@ -93,57 +112,73 @@ export default function ModalForm({
           <Text style={styles.modalTitle}>{title}</Text>
 
           {isTimeEntry ? (
-            <View style={styles.pickerContainer}>
-              <RetroButton style={styles.button} onPress={openStartPicker}>
-                <Text style={styles.buttonText}>
-                  {newStartTime
-                    ? `START: ${newStartTime.toLocaleString()}`
-                    : "PICK START TIME"}
-                </Text>
-              </RetroButton>
-              <RetroButton style={styles.button} onPress={openEndPicker}>
-                <Text style={styles.buttonText}>
-                  {newEndTime
-                    ? `END: ${newEndTime.toLocaleString()}`
-                    : "PICK END TIME"}
-                </Text>
-              </RetroButton>
+            <>
+              <View style={styles.pickerContainer}>
+                <RetroButton style={styles.button} onPress={openStartPicker}>
+                  <Text style={styles.buttonText}>
+                    {newStartTime
+                      ? `START: ${newStartTime.toLocaleString()}`
+                      : "PICK START TIME"}
+                  </Text>
+                </RetroButton>
+                <RetroButton style={styles.button} onPress={openEndPicker}>
+                  <Text style={styles.buttonText}>
+                    {newEndTime
+                      ? `END: ${newEndTime.toLocaleString()}`
+                      : "PICK END TIME"}
+                  </Text>
+                </RetroButton>
 
-              <DatePickerModal
-                locale="en"
-                mode="single"
-                visible={datePickerVisible}
-                onDismiss={() => setDatePickerVisible(false)}
-                date={pickedDate}
-                onConfirm={({ date }) => {
-                  setDatePickerVisible(false);
-                  setPickedDate(date);
-                  setTimePickerVisible(true);
-                }}
-              />
-              <TimePickerModal
-                visible={timePickerVisible}
-                onDismiss={() => setTimePickerVisible(false)}
-                use24HourClock={timeFormat === "24h"}
-                onConfirm={({ hours, minutes }) => {
-                  if (!pickedDate || !activePicker) return;
-                  const combined = combineDateAndTime(
-                    pickedDate,
-                    hours,
-                    minutes,
-                  );
-                  if (activePicker === "start") {
-                    setNewStartTime(combined);
-                    onStartTimeChange?.(combined);
-                  } else {
-                    setNewEndTime(combined);
-                    onEndTimeChange?.(combined);
-                  }
-                  setTimePickerVisible(false);
-                  setActivePicker(null);
-                }}
-              />
-            </View>
+                <DatePickerModal
+                  locale="en"
+                  mode="single"
+                  visible={datePickerVisible}
+                  onDismiss={() => setDatePickerVisible(false)}
+                  date={pickedDate}
+                  onConfirm={({ date }) => {
+                    setDatePickerVisible(false);
+                    setPickedDate(date);
+                    setTimePickerVisible(true);
+                  }}
+                />
+                <TimePickerModal
+                  visible={timePickerVisible}
+                  onDismiss={() => setTimePickerVisible(false)}
+                  use24HourClock={timeFormat === "24h"}
+                  // Explicitly set these to current time.
+                  // This overrides any internal memory of the Start Time.
+                  hours={now.getHours()}
+                  minutes={now.getMinutes()}
+                  onConfirm={({ hours, minutes }) => {
+                    if (!pickedDate || !activePicker) return;
+                    const combined = combineDateAndTime(
+                      pickedDate,
+                      hours,
+                      minutes
+                    );
+                    if (activePicker === "start") {
+                      setNewStartTime(combined);
+                      onStartTimeChange?.(combined);
+                    } else {
+                      setNewEndTime(combined);
+                      onEndTimeChange?.(combined);
+                    }
+                    setTimePickerVisible(false);
+                    setActivePicker(null);
+                  }}
+                />
+              </View>
+              <View style={[styles.inputGroup, { marginTop: 15 }]}>
+                <TextInput
+                  style={styles.input}
+                  value={pauseMinutes}
+                  onChangeText={setPauseMinutes}
+                  placeholder="PAUSE (MINUTES)"
+                  placeholderTextColor="#9CA3AF"
+                  keyboardType="numeric"
+                />
+              </View>
+            </>
           ) : (
             <View style={styles.inputGroup}>
               <Text style={styles.label}>NAME</Text>
