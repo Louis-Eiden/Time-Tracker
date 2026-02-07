@@ -219,4 +219,5 @@ EXPO_PUBLIC_FIREBASE_MEASUREMENT_ID=
 ### Version History
 
 1.0.0 - first version  
-1.1.0 - new UI color sheme, button styling and placement.
+1.1.0 - new UI color sheme, button styling and placement.  
+1.2.0 - new pause feature, for manual entries.
