@@ -3,13 +3,13 @@
 run on android
 </summary>
 
-```
+```bash
 bunx expo start --go
 ```
 
 or
 
-```
+```bash
 bunx expo prebuild
 bunx expo run:android
 ```
@@ -23,7 +23,7 @@ bunx expo run:android
 run on web
 </summary>
 
-```
+```bash
 bunx expo start
 ```
 
@@ -36,7 +36,7 @@ Native plugins
 Dependencies  
 Expo SDK version
 
-```
+```bash
 bunx expo start -c
 ```
 
@@ -51,7 +51,7 @@ Build Error? Do this!
 
 add this to your android/build.gradle allprojects > repositories section
 
-```
+```Java
         // project specific fix of following Error
         // Could not find any matches for app.notifee:core:+ as no versions of app.notifee:core are available.
         // Searched in the following locations:
@@ -70,27 +70,42 @@ add this to your android/build.gradle allprojects > repositories section
 
 This fixes ~80% of “my build never works” cases.
 
-```
+```bash
+# 1. Clear Package Manager Cache & Dependencies
 bun pm cache rm
 rm -rf node_modules
-rm -rf ios android
-rm -rf ~/.gradle
-rm -rf ~/Library/Developer/Xcode/DerivedData
-rm -rf $TMPDIR/metro-*
 rm bun.lockb
 rm bun.lock
+
+# 2. Clear Build Artifacts & Local State
+rm -rf ios android
+rm -rf .expo
+rm -rf ~/.gradle
+rm -rf ~/Library/Developer/Xcode/DerivedData
+
+# 3. Clear Metro Bundler Cache
+rm -rf $TMPDIR/metro-*
+
+# 4. Reset Watchman (If installed - common culprit for file watching errors)
+watchman watch-del-all
 ```
 
-then
+Then reinstall and rebuild:
 
-```
+```bash
 bun install
-bunx expo doctor or npx expo-doctor
+bunx expo doctor
+# or
+npx expo-doctor
 bunx expo install --check
+
+# Re-generate native folders cleanly
 bunx expo prebuild --clean
-# first time run:
-bunx expo run:ios   # or run:android
-# already run on the device:
+
+# First time run (builds the native app):
+bunx expo run:android
+
+# Once installed on device, just start the server:
 bunx expo start --clear
 ```
 
@@ -107,7 +122,7 @@ For Store Release
 
 add this to your android/app/build.gradle android section
 
-```
+```Java
     signingConfigs {
         debug {
             storeFile file('debug.keystore')
@@ -153,7 +168,7 @@ Keystore is in google drive! and needs to go into android/app directory
 
 after adding clean gradle cache
 
-```
+```bash
 cd android
 ./gradlew --stop
 ./gradlew clean
@@ -175,7 +190,7 @@ then build the .aab file
 
 also change the app version inside of app.config.ts > android section
 
-```
+```bash
 cd android
 ./gradlew bundleRelease
 ```
@@ -202,7 +217,7 @@ first steps after cloning from github
 - Select your Web app (</> icon). If you haven't created one yet, click "Add app" -> Web.
 - Under "SDK setup and configuration", select "Config".
 
-```
+```ts
 EXPO_PUBLIC_FIREBASE_API_KEY=
 EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN=
 EXPO_PUBLIC_FIREBASE_PROJECT_ID=

@@ -4,7 +4,7 @@ import type { ExpoConfig } from "expo/config";
 const config: ExpoConfig = {
   name: "Time-Tracker",
   slug: "Time-Tracker",
-  version: "1.1.0",
+  version: "1.2.0",
   orientation: "portrait",
   icon: "./assets/icon.png",
   userInterfaceStyle: "light",
@@ -23,7 +23,7 @@ const config: ExpoConfig = {
   },
 
   android: {
-    versionCode: 3,
+    versionCode: 4,
     package: "com.louiseiden.timetracker",
     googleServicesFile: "./google-services.json",
     permissions: [
